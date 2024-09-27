@@ -8,13 +8,10 @@ import { images } from "../../constants";
 // import { createUser } from "../../lib/appwrite";
 import CustomButton from "../../components/CustomButton";
 import FormField from "../../components/FormField";
-import { register, resetAuthState } from "../../features/authSlice";
-
-// import { useGlobalContext } from "../../context/GlobalProvider";
+import { register, resetAuthState } from "../../store/auth/authSlice";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  //   const { setUser, setIsLogged } = useGlobalContext();
 
   const { isLoading, isSuccess, isError } = useSelector((state) => state.auth);
 
@@ -54,7 +51,7 @@ const SignUp = () => {
         text2: "User created successfully",
       });
       router.push("/sign-in");
-      dispatch(resetAuthState()); // Dispatch resetAuthState after navigation
+      dispatch(resetAuthState());
     }
     if (isError) {
       Toast.show({
@@ -62,7 +59,7 @@ const SignUp = () => {
         text1: "Error",
         text2: "An error occurred during registration.",
       });
-      dispatch(resetAuthState()); // Dispatch resetAuthState on error
+      dispatch(resetAuthState());
     }
   }, [isSuccess, isError, dispatch, router]);
 

@@ -1,12 +1,43 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../constants";
 import CustomButton from "../components/CustomButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loadUser, resetAuthState } from "../store/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { loadThemeFromStorage } from "../store/themeSlice";
+import { useColorScheme } from "nativewind";
 
 const index = () => {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(loadUser());
+    // dispatch(loadThemeFromStorage());
+  }, [dispatch]);
+
+  const handlePress = async () => {
+    const user = await AsyncStorage.getItem("user");
+    // const theme = await AsyncStorage.getItem("theme");
+    console.log("user: ", user);
+    // console.log("theme: ", theme);
+    dispatch(resetAuthState());
+    if (user === null) {
+      router.push("/sign-in");
+    } else {
+      router.push("/home");
+    }
+  };
   return (
     <SafeAreaView className="bg-[#09092B] h-full">
       <ScrollView
@@ -27,7 +58,7 @@ const index = () => {
             resizeMode="contain"
           />
           <View className="relative mt-5">
-            <Text className="text-3xl text-white font-bold text-center">
+            <Text className="text-3xl text-white font-bold text-center dark:text-red-600">
               Discover Endless{"\n"}
               Possibilities with{" "}
               <Text className="text-secondary-200">Prime</Text>
@@ -46,9 +77,17 @@ const index = () => {
           {/* <CustomButton title="Continue with Email"/> */}
           <CustomButton
             title="Get Started"
-            handlePress={() => router.push("/sign-in")}
+            handlePress={handlePress}
             containerStyles="w-full mt-10"
           />
+          <TouchableOpacity
+            className="mt-10 dark:text-white"
+            onPress={toggleColorScheme}
+          >
+            <Text className=" dark:text-slate-200">{`Toggle to ${
+              colorScheme === "dark" ? "light" : "dark"
+            }`}</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <StatusBar backgroundColor="#161622" style="light" />

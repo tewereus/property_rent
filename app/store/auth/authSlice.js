@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "./authService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialState = {
   user: null,
@@ -9,6 +10,11 @@ const initialState = {
   isSuccess: false,
   message: "",
 };
+
+export const loadUser = createAsyncThunk("auth/loadUser", async () => {
+  const userData = await AsyncStorage.getItem("user");
+  return userData ? JSON.parse(userData) : null; // Parse and return user data or null
+});
 
 export const login = createAsyncThunk("auth/login", async (data, thunkAPI) => {
   try {
@@ -36,6 +42,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      AsyncStorage.removeItem("user");
     },
     resetAuthState: (state) => {
       state.isLoading = false;
@@ -46,6 +53,11 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(loadUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isSuccess = true;
+        // console.log("load user: ", state.user);
+      })
       .addCase(login.pending, (state) => {
         state.isLoading = true;
       })

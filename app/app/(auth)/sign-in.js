@@ -6,7 +6,7 @@ import CustomButton from "../../components/CustomButton";
 import { Link, router } from "expo-router";
 import FormField from "../../components/FormField";
 import Toast from "react-native-toast-message";
-import { login, resetAuthState } from "../../features/authSlice";
+import { login, resetAuthState } from "../../store/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const SignIn = () => {
@@ -24,8 +24,8 @@ const SignIn = () => {
       email: form.email,
       password: form.password,
     };
-    // dispatch(login(data));
-    router.push("/home");
+    dispatch(login(data));
+    // router.push("/home");
   };
 
   useEffect(() => {

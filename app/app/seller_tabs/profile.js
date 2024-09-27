@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 const Profile = () => {
   const router = useRouter();
   const handleBecomePress = () => {
-    router.push("/(tabs)");
+    router.push("/home");
   };
   return (
     <View className="bg-[#09092B] w-full min-h-screen">
