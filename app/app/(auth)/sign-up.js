@@ -61,7 +61,7 @@ const SignUp = () => {
       });
       dispatch(resetAuthState());
     }
-  }, [isSuccess, isError, dispatch, router]);
+  }, [isSuccess, isError, router]);
 
   return (
     <SafeAreaView className="bg-[#09092B] h-full">

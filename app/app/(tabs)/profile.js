@@ -1,55 +1,88 @@
 import { View, Text, Button, Switch, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../store/auth/authSlice";
-import Toast from "react-native-toast-message";
+import {
+  logout,
+  resetAuthState,
+  toggleDarkMode,
+} from "../../store/auth/authSlice";
+import { useColorScheme } from "nativewind";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = () => {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
   const router = useRouter();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, isSuccess } = useSelector((state) => state.auth);
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Save color scheme to local storage
+  // const saveColorScheme = async (scheme) => {
+  //   try {
+  //     await AsyncStorage.setItem("colorScheme", scheme);
+  //   } catch (error) {
+  //     console.error("Failed to save color scheme:", error);
+  //   }
+  // };
 
-  const handleBecomePress = () => {
+  useEffect(() => {
+    console.log(isSuccess);
+  }, []);
+
+  const saveColorScheme = async (scheme) => {
+    try {
+      const userData = JSON.parse(await AsyncStorage.getItem("user"));
+      if (userData) {
+        userData.preference.mode = scheme; // Update mode in user data
+        await AsyncStorage.setItem("user", JSON.stringify(userData)); // Save updated user data
+
+        // Dispatch the action and handle then/catch
+        return dispatch(toggleDarkMode({ preference: { mode: scheme } }))
+          .unwrap() // If using Redux Toolkit, unwrap to get the promise
+          .then(() => {
+            if (isSuccess) {
+              console.log("Color scheme updated successfully");
+              dispatch(resetAuthState());
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to update dark mode:", error);
+          });
+      }
+    } catch (error) {
+      console.error("Failed to save color scheme:", error);
+    }
+  };
+
+  const handleToggleColorScheme = () => {
+    toggleColorScheme();
+    saveColorScheme(colorScheme === "dark" ? "light" : "dark"); // Toggle and save the new scheme
+  };
+
+  const handlePress = () => {
     router.push("/seller_tabs");
   };
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push("/sign-in"); // Redirect to login page after logout
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode((prevMode) => !prevMode);
+    router.push("/sign-in");
   };
 
   return (
-    <View
-      className={`flex-1 p-5 ${isDarkMode ? "bg-gray-900" : "bg-gray-800"}`}
-    >
-      <Text
-        className={`text-2xl text-white text-center mb-5 ${
-          isDarkMode ? "text-yellow-300" : ""
-        }`}
-      >
+    <View className={`flex-1 p-5 bg-slate-300 dark:bg-gray-800`}>
+      <Text className="text-2xl text-gray-600 dark:text-slate-300 text-center mb-5">
         Profile
       </Text>
 
       <View className="flex-row items-center justify-between mb-5">
-        <Text
-          className={`text-lg text-white ${
-            isDarkMode ? "text-yellow-300" : ""
-          }`}
-        >
+        <Text className="text-lg text-gray-600 dark:text-slate-300">
           Dark Mode
         </Text>
         <Switch
-          value={isDarkMode}
-          onValueChange={toggleDarkMode}
+          value={colorScheme === "dark"}
+          onValueChange={handleToggleColorScheme}
           trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isDarkMode ? "#f5dd4b" : "#f4f3f4"}
+          thumbColor={colorScheme === "dark" ? "#f5dd4b" : "#f4f3f4"}
         />
       </View>
 
@@ -59,7 +92,7 @@ const Profile = () => {
             ? "Become a Seller"
             : "Seller Dashboard"
         }
-        onPress={handleBecomePress}
+        onPress={handlePress}
         color="#FFA001"
       />
 

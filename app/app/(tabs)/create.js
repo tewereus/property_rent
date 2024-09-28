@@ -1,38 +1,37 @@
-// import { View, Text } from "react-native";
-// import React from "react";
-
-// const Create = () => {
-//   return (
-//     <View className="bg-[#09092B] w-full min-h-screen">
-//       <Text>Create</Text>
-//     </View>
-//   );
-// };
-
-// export default Create;
-
-// src/App.js
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { View, Text, Button } from "react-native";
-import { toggleTheme, loadThemeFromStorage } from "../../store/themeSlice";
+import { View, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useColorScheme } from "nativewind";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Create = () => {
-  const dispatch = useDispatch();
-  const mode = useSelector((state) => state.theme.mode);
+  // const [localColorScheme, setLocalColorScheme] = useState("light");
+  // const { setColorScheme } = useColorScheme();
 
-  useEffect(() => {
-    dispatch(loadThemeFromStorage());
-  }, [dispatch]);
+  // const loadColorScheme = async () => {
+  //   try {
+  //     const user = await AsyncStorage.getItem("user");
+  //     console.log(user.preference);
+  //     const storedScheme = user;
+  //     // if (storedScheme) {
+  //     //   setLocalColorScheme(storedScheme);
+  //     //   setColorScheme(storedScheme);
+  //     // }
+  //   } catch (error) {
+  //     console.error("Failed to load color scheme:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   loadColorScheme();
+  // }, []);
 
   return (
-    <View
-      className={`flex-1 justify-center items-center bg-white dark:bg-black`}
-    >
-      <Text className={`text-lg text-black dark:text-white`}>
-        Current Theme: {mode}
+    <View className={`bg-gray-300 dark:bg-[#09092B] w-full min-h-screen`}>
+      <Text className="dark:text-slate-300">Create</Text>
+      <Text className="dark:text-slate-300">
+        {/* Current Color Scheme: {localColorScheme} */}
       </Text>
-      <Button title="Toggle Theme" onPress={() => dispatch(toggleTheme())} />
     </View>
   );
 };

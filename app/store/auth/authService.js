@@ -17,9 +17,30 @@ const login = async (data) => {
   return response.data;
 };
 
+const toggleDarkMode = async (data) => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.put(`${baseUrl}/auth/dark-mode`, data, {
+    headers,
+    withCredentials: true,
+  });
+  console.log(response.data);
+
+  return response.data;
+};
+
 const authService = {
   register,
   login,
+  toggleDarkMode,
 };
 
 export default authService;

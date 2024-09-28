@@ -13,7 +13,7 @@ const Profile = () => {
       <Button
         title="Become a Buyer"
         onPress={handleBecomePress}
-        color="#FFA001" // Customize button color if needed
+        color="#FFA001"
       />
     </View>
   );

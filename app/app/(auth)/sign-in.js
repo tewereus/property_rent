@@ -33,16 +33,16 @@ const SignIn = () => {
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: "User created successfully",
+        text2: "User logged in successfully",
       });
+      dispatch(resetAuthState());
       router.push("/home");
-      dispatch(resetAuthState()); // Dispatch resetAuthState after navigation
     }
     if (isError) {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "An error occurred during registration.",
+        text2: "An error occurred during login.",
       });
       dispatch(resetAuthState()); // Dispatch resetAuthState on error
     }

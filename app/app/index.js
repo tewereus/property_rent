@@ -2,6 +2,7 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -15,11 +16,11 @@ import CustomButton from "../components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadUser, resetAuthState } from "../store/auth/authSlice";
 import { useDispatch } from "react-redux";
-import { loadThemeFromStorage } from "../store/themeSlice";
-import { useColorScheme } from "nativewind";
+// import { loadThemeFromStorage } from "../store/themeSlice";
+// import { useColorScheme } from "nativewind";
 
 const index = () => {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  // const { colorScheme, toggleColorScheme } = useColorScheme();
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(loadUser());
@@ -39,7 +40,7 @@ const index = () => {
     }
   };
   return (
-    <SafeAreaView className="bg-[#09092B] h-full">
+    <SafeAreaView className="h-full bg-slate-400 dark:bg-[#09092B] ">
       <ScrollView
         contentContainerStyle={{
           height: "100%",
@@ -58,7 +59,7 @@ const index = () => {
             resizeMode="contain"
           />
           <View className="relative mt-5">
-            <Text className="text-3xl text-white font-bold text-center dark:text-red-600">
+            <Text className="text-3xl text-white font-bold text-center">
               Discover Endless{"\n"}
               Possibilities with{" "}
               <Text className="text-secondary-200">Prime</Text>
@@ -80,14 +81,6 @@ const index = () => {
             handlePress={handlePress}
             containerStyles="w-full mt-10"
           />
-          <TouchableOpacity
-            className="mt-10 dark:text-white"
-            onPress={toggleColorScheme}
-          >
-            <Text className=" dark:text-slate-200">{`Toggle to ${
-              colorScheme === "dark" ? "light" : "dark"
-            }`}</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
       <StatusBar backgroundColor="#161622" style="light" />
@@ -97,4 +90,23 @@ const index = () => {
 
 export default index;
 
-const styles = StyleSheet.create({});
+// import { Pressable, Text } from "react-native";
+// import { useColorScheme } from "nativewind";
+
+// function index() {
+//   const { colorScheme, toggleColorScheme } = useColorScheme();
+
+//   return (
+//     <Pressable
+//       className="flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-900"
+//       onPress={toggleColorScheme}
+//     >
+//       <Text className="text-black dark:text-white">
+//         {`Try clicking me! ${colorScheme === "dark" ? "🌙" : "🌞"}`}
+//       </Text>
+//       <Text className="text-6xl mt-40 dark:text-neutral-100">Get Started</Text>
+//     </Pressable>
+//   );
+// }
+
+// export default index;
