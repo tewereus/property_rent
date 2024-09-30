@@ -24,6 +24,19 @@ var userSchema = new mongoose.Schema({
     type: String,
     default: "inactive",
   },
+  preference: {
+    mode: {
+      type: String,
+      enum: ["light", "dark"],
+      default: "light",
+    },
+    language: {
+      type: String,
+      enum: ["Eng", "Amh"],
+      default: "Eng",
+    },
+  },
+  refershToken: { type: String },
 });
 
 module.exports = mongoose.model("User", userSchema);

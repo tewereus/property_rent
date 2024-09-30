@@ -54,15 +54,15 @@ const SellerTabs = () => {
         }}
       />
       <Tabs.Screen
-        name="favourite"
+        name="create"
         options={{
-          title: "Favourite",
+          title: "Create",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.star}
+              icon={icons.plus}
               color={color}
-              name="Favourite"
+              name="create"
               focused={focused}
             />
           ),

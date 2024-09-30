@@ -46,6 +46,17 @@ export const toggleDarkMode = createAsyncThunk(
   }
 );
 
+export const verifySeller = createAsyncThunk(
+  "user/verify-seller",
+  async (thunkAPI) => {
+    try {
+      return await authService.verifySeller();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -117,6 +128,26 @@ const authSlice = createSlice({
         }
       })
       .addCase(toggleDarkMode.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.error.message;
+      })
+      .addCase(verifySeller.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(verifySeller.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // state.isError = false;
+        // state.isSuccess = true;
+        // state.message = "mode changed successfully";
+        console.log("output:", action.payload.seller_tab);
+        if (action.payload.seller_tab) {
+          state.user.seller_tab = action.payload.seller_tab;
+        }
+        console.log(state.user);
+      })
+      .addCase(verifySeller.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;

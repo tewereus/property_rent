@@ -25,10 +25,6 @@ const Profile = () => {
   //   }
   // };
 
-  useEffect(() => {
-    console.log(isSuccess);
-  }, []);
-
   const saveColorScheme = async (scheme) => {
     try {
       const userData = JSON.parse(await AsyncStorage.getItem("user"));
@@ -60,7 +56,14 @@ const Profile = () => {
   };
 
   const handlePress = () => {
-    router.push("/seller_tabs");
+    // console.log(user?.seller_tab);
+    if (user?.seller_tab === "inactive") {
+      router.push("/seller_auth");
+    } else if (user?.seller_tab === "waiting") {
+      router.push("/waiting");
+    } else if (user?.seller_tab === "active") {
+      router.push("/seller_tabs");
+    }
   };
 
   const handleLogout = () => {

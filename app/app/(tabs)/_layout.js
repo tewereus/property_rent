@@ -70,20 +70,21 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="create"
+          name="favourite"
           options={{
-            title: "Create",
+            title: "Favourite",
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-                icon={icons.plus}
+                icon={icons.star}
                 color={color}
-                name="create"
+                name="Favourite"
                 focused={focused}
               />
             ),
           }}
         />
+
         <Tabs.Screen
           name="profile"
           options={{

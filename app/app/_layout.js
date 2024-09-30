@@ -12,6 +12,8 @@ const _layout = () => {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="seller_tabs" options={{ headerShown: false }} />
+        <Stack.Screen name="seller_auth" options={{ headerShown: false }} />
+        <Stack.Screen name="waiting" options={{ headerShown: false }} />
       </Stack>
       <ToastProvider />
     </Provider>
