@@ -4,7 +4,7 @@ const {
   login,
   ToggleDarkMode,
   verifySeller,
-} = require("../controllers/authController");
+} = require("../controllers/authCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
