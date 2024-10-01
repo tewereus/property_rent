@@ -79,7 +79,7 @@ const ToggleDarkMode = asyncHandler(async (req, res) => {
 
 const verifySeller = asyncHandler(async (req, res) => {
   const { id } = req.user;
-  console.log("here");
+  console.log("here at verify");
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,

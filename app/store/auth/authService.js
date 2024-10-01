@@ -37,7 +37,7 @@ const toggleDarkMode = async (data) => {
 };
 
 const verifySeller = async () => {
-  console.log("here");
+  console.log("here at auth");
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
