@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Property = require("../models/propertyModel");
+const PropertyType = require("../models/propertyTypeModel");
 
 const createProperty = asyncHandler(async (req, res) => {
   // const {id} = req.user
@@ -16,9 +17,11 @@ const createProperty = asyncHandler(async (req, res) => {
     status,
   } = req.body;
   try {
+    const propertyType = await PropertyType.findOne({ name: property_type });
+    // console.log("type here ", propertyType._id);
     const property = await Property.create({
       name,
-      property_type,
+      property_type: propertyType._id,
       property_use,
       num_bed,
       location,

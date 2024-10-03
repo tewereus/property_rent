@@ -39,8 +39,20 @@ const editPropertyType = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllPropertyTypes = asyncHandler(async (req, res) => {
+  try {
+    const allProperties = await PropertyType.find();
+    const property = allProperties.map((prop) => prop.name);
+    // console.log(property);
+    res.json(property);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createPropertyType,
   deletePropertyType,
   editPropertyType,
+  getAllPropertyTypes,
 };
