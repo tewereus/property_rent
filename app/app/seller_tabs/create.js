@@ -3,9 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllPropertyTypes } from "../../store/propertyType/propertyTypeSlice";
-import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
-import { createProperty } from "../../store/property/propertySlice";
 
 const Create = () => {
   const router = useRouter();
@@ -14,15 +12,6 @@ const Create = () => {
     dispatch(getAllPropertyTypes());
   }, []);
 
-  const [form, setForm] = useState({
-    name: "",
-    property_type: "",
-    property_use: "",
-    num_bed: 0,
-    location: "",
-    price: 0,
-    description: "",
-  });
   const [propertyTypeVisible, setPropertyTypeVisible] = useState(false);
   const [selectPropertyId, setSelectedPropertyId] = useState("");
   const [selectPropertyUse, setSelectedPropertyUse] = useState("");
@@ -42,24 +31,10 @@ const Create = () => {
     setPropertyUseVisible(false);
   };
 
-  const handleSubmit = () => {
-    const data = {
-      name: form.name,
-      property_type: selectPropertyId,
-      property_use: selectPropertyUse,
-      num_bed: form.num_bed,
-      location: form.location,
-      price: form.price,
-      description: form.description,
-    };
-    // console.log("data: ", data);
-    dispatch(createProperty(data));
-  };
-
   const handleNext = () => {
     router.push({
       pathname: "/create_property",
-      params: { propertyType: "villa", action: "sell" },
+      params: { type: selectPropertyId, action: selectPropertyUse },
     });
   };
 
@@ -121,43 +96,6 @@ const Create = () => {
         </View>
         // <Text>Hello</Text>
       )}
-
-      <FormField
-        title="name"
-        value={form.name}
-        handleChangeText={(e) => setForm({ ...form, name: e })}
-        otherStyles="mt-6"
-      />
-      <FormField
-        title="bedrooms"
-        value={form.num_bed}
-        placeholder="Number of bedrooms"
-        handleChangeText={(e) => setForm({ ...form, num_bed: e })}
-        otherStyles="mt-6"
-      />
-      <FormField
-        title="location"
-        value={form.location}
-        handleChangeText={(e) => setForm({ ...form, location: e })}
-        otherStyles="mt-6"
-      />
-      <FormField
-        title="price"
-        value={form.price}
-        handleChangeText={(e) => setForm({ ...form, price: e })}
-        otherStyles="mt-6"
-      />
-      <FormField
-        title="description"
-        value={form.description}
-        handleChangeText={(e) => setForm({ ...form, description: e })}
-        otherStyles="mt-6"
-      />
-      <CustomButton
-        title="Add Property"
-        handlePress={handleSubmit}
-        containerStyles="mt-7"
-      />
 
       <CustomButton
         title="Continue"

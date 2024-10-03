@@ -45,9 +45,25 @@ const SellerTabs = () => {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.dashboard}
+              icon={icons.menu}
               color={color}
               name="Dashboard"
+              focused={focused}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="listing"
+        options={{
+          title: "Listing",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.upload}
+              color={color}
+              name="listing"
               focused={focused}
             />
           ),
@@ -63,21 +79,6 @@ const SellerTabs = () => {
               icon={icons.plus}
               color={color}
               name="create"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="work"
-        options={{
-          title: "Work",
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.work}
-              color={color}
-              name="Work"
               focused={focused}
             />
           ),

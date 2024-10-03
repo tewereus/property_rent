@@ -19,18 +19,18 @@ export const createProperty = createAsyncThunk(
   }
 );
 
-// export const getAllPropertyTypes = createAsyncThunk(
-//   "property/all-properties",
-//   async (data, thunkAPI) => {
-//     try {
-//       return propertyService.getAllPropertyTypes();
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error);
-//     }
-//   }
-// );
+export const getAllUsersProperties = createAsyncThunk(
+  "property/users-properties",
+  async (thunkAPI) => {
+    try {
+      return propertyService.getAllUsersProperties();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
 
-export const propertyTypeSlice = createSlice({
+export const propertySlice = createSlice({
   name: "property",
   initialState,
   reducers: {
@@ -50,7 +50,7 @@ export const propertyTypeSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
-        state.message = "success";
+        state.message = "property added successfully";
       })
       .addCase(createProperty.rejected, (state, action) => {
         state.isLoading = false;
@@ -58,17 +58,17 @@ export const propertyTypeSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      .addCase(getAllPropertyTypes.pending, (state) => {
+      .addCase(getAllUsersProperties.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getAllPropertyTypes.fulfilled, (state, action) => {
+      .addCase(getAllUsersProperties.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
         state.message = "success";
-        state.propertyTypes = action.payload;
+        state.properties = action.payload;
       })
-      .addCase(getAllPropertyTypes.rejected, (state, action) => {
+      .addCase(getAllUsersProperties.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;
@@ -77,5 +77,5 @@ export const propertyTypeSlice = createSlice({
   },
 });
 
-export const { resetAuthState } = propertyTypeSlice.actions;
-export default propertyTypeSlice.reducer;
+export const { resetAuthState } = propertySlice.actions;
+export default propertySlice.reducer;

@@ -2,24 +2,29 @@ const mongoose = require("mongoose"); // Erase if already required
 const bcrypt = require("bcryptjs");
 
 // Declare the Schema of the Mongo model
-var adminSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true,
+var adminSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    refreshToken: { type: String },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  refreshToken: { type: String },
-});
+  {
+    timestamps: true,
+  }
+);
 
 adminSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
