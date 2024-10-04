@@ -47,6 +47,7 @@ const login = asyncHandler(async (req, res) => {
         name: updateduser?.name,
         email: updateduser?.email,
         preference: updateduser?.preference,
+        wishlist: updateduser?.wishlist,
         seller_tab: updateduser?.seller_tab,
         token: accessToken,
       });
@@ -94,9 +95,67 @@ const verifySeller = asyncHandler(async (req, res) => {
   }
 });
 
+const getWishlist = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    const wishlist = await User.findById(id)
+      .select("wishlist")
+      .populate("wishlist");
+    res.json(wishlist);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const addToWishlist = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { prodId } = req.body;
+  try {
+    const user = await User.findById(id);
+    console.log(user.wishlist);
+    // if (user.wishlist === null) {
+    //   let updateduser = await User.findByIdAndUpdate(
+    //     id,
+    //     {
+    //       $push: { wishlist: prodId },
+    //     },
+    //     { new: true }
+    //   );
+
+    //   res.json(updateduser);
+    // }
+    const alreadyadded = user.wishlist.find((id) => id.toString() === prodId);
+    if (alreadyadded) {
+      let user = await User.findByIdAndUpdate(
+        id,
+        {
+          $pull: { wishlist: prodId },
+        },
+        { new: true }
+      );
+
+      res.json(user);
+    } else {
+      let user = await User.findByIdAndUpdate(
+        id,
+        {
+          $push: { wishlist: prodId },
+        },
+        { new: true }
+      );
+
+      res.json(user);
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   register,
   login,
   ToggleDarkMode,
   verifySeller,
+  getWishlist,
+  addToWishlist,
 };

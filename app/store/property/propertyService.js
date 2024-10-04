@@ -23,6 +23,60 @@ const createProperty = async (data) => {
   return response.data;
 };
 
+const getAllProperties = async () => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.get(`${baseUrl}/property/all-properties`, {
+    headers,
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+const getAllSellProperties = async () => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.get(`${baseUrl}/property/all-sell-properties`, {
+    headers,
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+const getAllRentProperties = async () => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.get(`${baseUrl}/property/all-rent-properties`, {
+    headers,
+    withCredentials: true,
+  });
+  return response.data;
+};
+
 const getAllUsersProperties = async () => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
@@ -43,6 +97,9 @@ const getAllUsersProperties = async () => {
 
 const propertyService = {
   createProperty,
+  getAllProperties,
+  getAllSellProperties,
+  getAllRentProperties,
   getAllUsersProperties,
 };
 

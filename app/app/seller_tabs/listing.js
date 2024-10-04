@@ -9,7 +9,7 @@ const Listing = () => {
     dispatch(getAllUsersProperties());
   }, []);
 
-  const { properties } = useSelector((state) => state.property);
+  const { userProperties } = useSelector((state) => state.property);
 
   const renderProperties = ({ item }) => (
     <View className="bg-white rounded-lg p-4 mb-2 shadow-md flex-row justify-between items-center">
@@ -24,12 +24,12 @@ const Listing = () => {
 
   return (
     <View className="bg-[#09092B] w-full min-h-screen">
-      <Text onPress={() => console.log(properties)}>Listing</Text>
-      {properties?.length > 0 ? (
+      <Text onPress={() => console.log(userProperties)}>Listing</Text>
+      {userProperties?.length > 0 ? (
         <View>
           <Text>Active Listing</Text>
           <FlatList
-            data={properties}
+            data={userProperties}
             keyExtractor={(item) => item._id}
             renderItem={renderProperties}
             contentContainerStyle={{ paddingBottom: 20 }}

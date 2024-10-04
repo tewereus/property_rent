@@ -19,6 +19,39 @@ export const createProperty = createAsyncThunk(
   }
 );
 
+export const getAllProperties = createAsyncThunk(
+  "property/all-properties",
+  async (thunkAPI) => {
+    try {
+      return propertyService.getAllProperties();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getAllSellProperties = createAsyncThunk(
+  "property/all-sell-properties",
+  async (thunkAPI) => {
+    try {
+      return propertyService.getAllSellProperties();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getAllRentProperties = createAsyncThunk(
+  "property/all-rent-properties",
+  async (thunkAPI) => {
+    try {
+      return propertyService.getAllRentProperties();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const getAllUsersProperties = createAsyncThunk(
   "property/users-properties",
   async (thunkAPI) => {
@@ -66,9 +99,57 @@ export const propertySlice = createSlice({
         state.isSuccess = true;
         state.isError = false;
         state.message = "success";
-        state.properties = action.payload;
+        state.userProperties = action.payload;
       })
       .addCase(getAllUsersProperties.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(getAllProperties.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllProperties.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.message = "success";
+        state.properties = action.payload;
+      })
+      .addCase(getAllProperties.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(getAllSellProperties.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllSellProperties.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.message = "success";
+        state.sellProperties = action.payload;
+      })
+      .addCase(getAllSellProperties.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(getAllRentProperties.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllRentProperties.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.message = "success";
+        state.rentProperties = action.payload;
+      })
+      .addCase(getAllRentProperties.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;

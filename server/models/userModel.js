@@ -25,6 +25,12 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: "inactive",
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Property",
+      },
+    ],
     preference: {
       mode: {
         type: String,

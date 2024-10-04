@@ -20,7 +20,7 @@ const Profile = () => {
     <View className="bg-[#09092B] w-full min-h-screen">
       <Text>Profile</Text>
       <Button
-        title="Back to Buyer"
+        title="Back to Buyer Dashboard"
         onPress={handleBecomePress}
         color="#FFA001"
       />

@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { useSelector } from "react-redux";
 
-const Home = () => {
+const Explore = () => {
   const { user } = useSelector((state) => state.auth);
 
   return (
@@ -19,4 +19,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Explore;

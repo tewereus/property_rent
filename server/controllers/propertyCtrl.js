@@ -25,6 +25,7 @@ const createProperty = asyncHandler(async (req, res) => {
     const propertyType = await PropertyType.findOne({ name: property_type });
     // console.log("type here ", propertyType._id);
     const property = await Property.create({
+      // owner: userId,
       owner: id,
       name,
       property_type: propertyType._id,
@@ -48,6 +49,42 @@ const deleteProperty = asyncHandler(async (req, res) => {
   try {
     const property = await Property.findByIdAndDelete(propId);
     res.json(property);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllProperties = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    const properties = await Property.find({ owner: { $ne: id } });
+    res.json(properties);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllSellProperties = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    const properties = await Property.find({
+      owner: { $ne: id },
+      property_use: "sell",
+    });
+    res.json(properties);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllRentProperties = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    const properties = await Property.find({
+      owner: { $ne: id },
+      property_use: "rent",
+    });
+    res.json(properties);
   } catch (error) {
     throw new Error(error);
   }
@@ -99,6 +136,9 @@ module.exports = {
   createProperty,
   deleteProperty,
   editProperty,
+  getAllProperties,
+  getAllSellProperties,
+  getAllRentProperties,
   getAllUsersProperties,
   deleteAllProperties,
   deleteAllUsersProperties,

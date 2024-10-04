@@ -56,11 +56,51 @@ const verifySeller = async () => {
   return response.data;
 };
 
+const addToWishlist = async (data) => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.put(`${baseUrl}/auth/add-wishlist`, data, {
+    headers,
+    withCredentials: true,
+  });
+
+  return response.data;
+};
+
+const getWishlists = async () => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.get(`${baseUrl}/auth/all-wishlists`, {
+    headers,
+    withCredentials: true,
+  });
+
+  return response.data;
+};
+
 const authService = {
   register,
   login,
   toggleDarkMode,
   verifySeller,
+  addToWishlist,
+  getWishlists,
 };
 
 export default authService;

@@ -57,6 +57,28 @@ export const verifySeller = createAsyncThunk(
   }
 );
 
+export const addToWishlist = createAsyncThunk(
+  "user/add-wishlist",
+  async (data, thunkAPI) => {
+    try {
+      return await authService.addToWishlist(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getWishlists = createAsyncThunk(
+  "user/all-wishlists",
+  async (thunkAPI) => {
+    try {
+      return await authService.getWishlists();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -148,6 +170,37 @@ const authSlice = createSlice({
         console.log(state.user);
       })
       .addCase(verifySeller.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.error.message;
+      })
+      .addCase(addToWishlist.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addToWishlist.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.message = "wishlist modified successfully";
+      })
+      .addCase(addToWishlist.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.error.message;
+      })
+      .addCase(getWishlists.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getWishlists.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.message = "success";
+        state.wishlist = action.payload;
+      })
+      .addCase(getWishlists.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;
