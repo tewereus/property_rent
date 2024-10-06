@@ -23,7 +23,7 @@ const createProperty = async (data) => {
   return response.data;
 };
 
-const getAllProperties = async () => {
+const getAllProperties = async ({ limit }) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -34,10 +34,13 @@ const getAllProperties = async () => {
     // Accept: "application/json",
   };
 
-  const response = await axios.get(`${baseUrl}/property/all-properties`, {
-    headers,
-    withCredentials: true,
-  });
+  const response = await axios.get(
+    `${baseUrl}/property/all-properties?limit=${limit}`,
+    {
+      headers,
+      withCredentials: true,
+    }
+  );
   return response.data;
 };
 

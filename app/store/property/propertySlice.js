@@ -21,9 +21,9 @@ export const createProperty = createAsyncThunk(
 
 export const getAllProperties = createAsyncThunk(
   "property/all-properties",
-  async (thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
-      return propertyService.getAllProperties();
+      return propertyService.getAllProperties(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
