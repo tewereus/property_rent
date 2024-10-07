@@ -47,7 +47,7 @@ const create_property = () => {
 
   useEffect(() => {
     console.log("success: ", isSuccess);
-    if (message === "property added successfully") {
+    if (message === "Property Added Successfully") {
       dispatch(resetAuthState());
       router.push("/seller_tabs/listing");
     }

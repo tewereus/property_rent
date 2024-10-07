@@ -83,7 +83,7 @@ export const propertySlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
-        state.message = "property added successfully";
+        state.message = "Property Added Successfully";
       })
       .addCase(createProperty.rejected, (state, action) => {
         state.isLoading = false;

@@ -37,14 +37,13 @@ const Home = () => {
     }
   };
 
-  const property = useEffect(() => {
+  useEffect(() => {
     loadColorScheme();
-    dispatch(getAllProperties());
     dispatch(getAllSellProperties());
     dispatch(getAllRentProperties());
   }, []);
 
-  const { properties, sellProperties, rentProperties } = useSelector(
+  const { sellProperties, rentProperties } = useSelector(
     (state) => state.property
   );
 
@@ -87,7 +86,7 @@ const Home = () => {
       >
         Home
       </Text>
-      {properties?.length > 0 ? (
+      {sellProperties?.length > 0 || rentProperties?.length > 0 ? (
         <View>
           <Text onPress={() => console.log(sellProperties)}>
             Available for Sell
