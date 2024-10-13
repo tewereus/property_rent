@@ -9,10 +9,12 @@ const register = async (data) => {
 };
 
 const login = async (data) => {
+  console.log("login data: ", data);
+
   const response = await axios.post(`${baseUrl}/auth/login`, data);
   await AsyncStorage.setItem("user", JSON.stringify(response.data));
 
-  console.log(response.data);
+  console.log("user data: ", response.data);
 
   return response.data;
 };

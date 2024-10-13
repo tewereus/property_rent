@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-
 import { icons } from "../constants";
 
 const FormField = ({
@@ -15,14 +14,14 @@ const FormField = ({
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
-      <Text className="text-base text-gray-100 font-medium">{title}</Text>
+      <Text className="text-base font-medium dark:text-gray-100">{title}</Text>
 
-      <View className="w-full h-16 px-4 bg-black-100 rounded-2xl border-2 border-black-200 focus:border-secondary flex flex-row items-center">
+      <View className="w-full h-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-300 dark:border-gray-600 flex flex-row items-center">
         <TextInput
-          className="flex-1 text-white font-semibold text-base"
+          className="flex-1 text-gray-800 dark:text-white font-semibold text-base"
           value={value}
           placeholder={placeholder}
-          placeholderTextColor="#7B7B8B"
+          placeholderTextColor="#A0AEC0" // Placeholder color for light mode
           onChangeText={handleChangeText}
           secureTextEntry={title === "Password" && !showPassword}
           {...props}
