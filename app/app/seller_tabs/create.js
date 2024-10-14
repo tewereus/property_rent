@@ -232,8 +232,6 @@ const Create = () => {
             />
           </View>
         )}
-
-        {/* Continue Button */}
         <CustomButton
           title="Continue"
           handlePress={handleNext}
