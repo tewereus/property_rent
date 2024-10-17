@@ -1,23 +1,31 @@
 import { Stack } from "expo-router";
 import { Provider } from "react-redux";
 import { store } from "../store/store";
+import "intl-pluralrules";
+import { I18nextProvider } from "react-i18next";
+import i18n from "../locals/i18n";
 import ToastProvider from "react-native-toast-message";
 import "./index.css";
 const _layout = () => {
   // make it so that the routes are accessable for authenticated users, if user logged out and clicked back it goes back to the page
   return (
     <Provider store={store}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="seller_tabs" options={{ headerShown: false }} />
-        <Stack.Screen name="seller_auth" options={{ headerShown: false }} />
-        <Stack.Screen name="waiting" options={{ headerShown: false }} />
-        <Stack.Screen name="create_property" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="map_component" options={{ headerShown: false }} /> */}
-      </Stack>
-      <ToastProvider />
+      <I18nextProvider i18n={i18n}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="seller_tabs" options={{ headerShown: false }} />
+          <Stack.Screen name="seller_auth" options={{ headerShown: false }} />
+          <Stack.Screen name="waiting" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="create_property"
+            options={{ headerShown: false }}
+          />
+          {/* <Stack.Screen name="map_component" options={{ headerShown: false }} /> */}
+        </Stack>
+        <ToastProvider />
+      </I18nextProvider>
     </Provider>
   );
 };

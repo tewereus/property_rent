@@ -25,6 +25,11 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: "inactive",
     },
+    mode: {
+      type: String,
+      enum: ["customer, seller"],
+      default: "customer",
+    },
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,

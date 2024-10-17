@@ -9,8 +9,6 @@ const register = async (data) => {
 };
 
 const login = async (data) => {
-  console.log("login data: ", data);
-
   const response = await axios.post(`${baseUrl}/auth/login`, data);
   await AsyncStorage.setItem("user", JSON.stringify(response.data));
 
@@ -20,6 +18,7 @@ const login = async (data) => {
 };
 
 const toggleDarkMode = async (data) => {
+  // console.log(data);
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -39,7 +38,6 @@ const toggleDarkMode = async (data) => {
 };
 
 const verifySeller = async () => {
-  console.log("here at auth");
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -96,6 +94,46 @@ const getWishlists = async () => {
   return response.data;
 };
 
+const changeMode = async (data) => {
+  console.log(data);
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.put(`${baseUrl}/auth/change-mode`, data, {
+    headers,
+    withCredentials: true,
+  });
+
+  return response.data;
+};
+
+const changeLanguageMode = async (data) => {
+  // console.log(data);
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const headers = {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+    }`,
+    // Accept: "application/json",
+  };
+
+  const response = await axios.put(`${baseUrl}/auth/change-language`, data, {
+    headers,
+    withCredentials: true,
+  });
+
+  return response.data;
+};
+
 const authService = {
   register,
   login,
@@ -103,6 +141,8 @@ const authService = {
   verifySeller,
   addToWishlist,
   getWishlists,
+  changeMode,
+  changeLanguageMode,
 };
 
 export default authService;

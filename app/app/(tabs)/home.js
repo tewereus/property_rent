@@ -14,7 +14,12 @@ import {
   getAllRentProperties,
   getAllSellProperties,
 } from "../../store/property/propertySlice";
-import { addToWishlist } from "../../store/auth/authSlice";
+import {
+  addToWishlist,
+  changeLanguage,
+  changeLanguageMode,
+} from "../../store/auth/authSlice";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -41,13 +46,15 @@ const Home = () => {
     dispatch(getAllRentProperties());
   }, []);
 
-  const { sellProperties, rentProperties } = useSelector(
+  const { sellProperties, rentProperties, isSuccess } = useSelector(
     (state) => state.property
   );
 
+  const { t, i18n } = useTranslation();
+
   const handlePress = (prop) => {
     setSelectedProperty(prop);
-    setFavouriteOn(prop.isFavorite); // Assuming prop contains isFavorite
+    setFavouriteOn(prop.isFavorite);
     setModalVisible(true);
   };
 
@@ -63,10 +70,10 @@ const Home = () => {
     <TouchableOpacity
       onPress={() => handlePress(item)}
       className="bg-white rounded-lg shadow-md p-4 m-2"
-      style={{ width: 250 }} // Set a fixed width for each item
+      style={{ width: 250 }}
     >
       <Image
-        source={{ uri: item.image }} // Assuming image URL is available
+        source={{ uri: item.image }}
         className="w-full h-40 rounded-lg"
         resizeMode="cover"
       />
@@ -78,14 +85,39 @@ const Home = () => {
     </TouchableOpacity>
   );
 
+  const changeLanguage = (lng) => {
+    const data = {
+      preference: {
+        language: lng,
+      },
+    };
+    i18n.changeLanguage(lng);
+    dispatch(changeLanguageMode(data));
+  };
+
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] w-full min-h-screen p-5">
-      <Text className="text-xl font-bold dark:text-slate-300 mb-4">Home</Text>
+      <View className="flex flex-row justify-between mt-2">
+        <Text className="text-xl font-bold dark:text-slate-300 mb-4">Home</Text>
+        <View style={{ flexDirection: "row", marginBottom: 10 }}>
+          <TouchableOpacity
+            onPress={() => changeLanguage("Eng")}
+            className="dark:text-slate-300"
+          >
+            <Text style={{ marginRight: 10 }} className="dark:text-slate-300">
+              English
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => changeLanguage("Amh")}>
+            <Text className="dark:text-slate-300">ኣማርኛ</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {sellProperties?.length > 0 || rentProperties?.length > 0 ? (
         <>
           <Text className="text-lg dark:text-white mb-2">
-            Available for Sell
+            {t("available_for_sell")}
           </Text>
           <FlatList
             data={sellProperties}
@@ -97,7 +129,7 @@ const Home = () => {
           />
 
           <Text className="text-lg dark:text-white mt-4 mb-2">
-            Available for Rent
+            {t("available_for_rent")}
           </Text>
           <FlatList
             data={rentProperties}
@@ -111,14 +143,14 @@ const Home = () => {
           {/* Modal for Property Details */}
           <Modal
             animationType="slide"
-            transparent={false} // Set to false for full-screen effect
+            transparent={false}
             visible={modalVisible}
             onRequestClose={() => setModalVisible(!modalVisible)}
           >
             <View className="flex-1 bg-white p-5">
               <View style={{ position: "relative" }}>
                 <Image
-                  source={{ uri: selectedProperty?.image }} // Assuming image URL is available
+                  source={{ uri: selectedProperty?.image }}
                   style={{ width: "100%", height: "50%", borderRadius: 10 }}
                   resizeMode="cover"
                 />

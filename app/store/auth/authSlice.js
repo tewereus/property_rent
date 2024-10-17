@@ -79,6 +79,28 @@ export const getWishlists = createAsyncThunk(
   }
 );
 
+export const changeMode = createAsyncThunk(
+  "user/change-mode",
+  async (data, thunkAPI) => {
+    try {
+      return await authService.changeMode(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const changeLanguageMode = createAsyncThunk(
+  "user/change-language",
+  async (data, thunkAPI) => {
+    try {
+      return await authService.changeLanguageMode(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -201,6 +223,41 @@ const authSlice = createSlice({
         state.wishlist = action.payload;
       })
       .addCase(getWishlists.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.error.message;
+      })
+      .addCase(changeMode.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(changeMode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.message = "success";
+        state.mode = action.payload;
+        console.log(state.mode);
+      })
+      .addCase(changeMode.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.error.message;
+      })
+      .addCase(changeLanguageMode.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(changeLanguageMode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // state.isError = false;
+        // state.isSuccess = true;
+        // state.message = "mode changed successfully";
+        if (action.payload.preference) {
+          state.user.preference.language = action.payload.preference.language;
+        }
+      })
+      .addCase(changeLanguageMode.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;

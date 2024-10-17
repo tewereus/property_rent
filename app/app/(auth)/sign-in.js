@@ -8,8 +8,10 @@ import FormField from "../../components/FormField";
 import Toast from "react-native-toast-message";
 import { login, resetAuthState } from "../../store/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const SignIn = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -17,7 +19,7 @@ const SignIn = () => {
     password: "",
   });
 
-  const { isSuccess, isError } = useSelector((state) => state.auth);
+  const { user, isSuccess, isError } = useSelector((state) => state.auth);
 
   const submit = () => {
     const data = {
@@ -33,10 +35,16 @@ const SignIn = () => {
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: "User logged in successfully",
+        text2: "logged in successfully",
       });
+      if (user?.mode === "customer") {
+        console.log("customer");
+        router.push("/home");
+      } else if (user?.mode === "seller") {
+        console.log("seller");
+        router.push("/seller_tabs");
+      }
       dispatch(resetAuthState());
-      router.push("/home");
     }
     if (isError) {
       Toast.show({
@@ -64,6 +72,7 @@ const SignIn = () => {
               className="w-[215px] h-[120px]"
             />
           </View>
+          <Text>{t("welcome")}</Text>
 
           <Text className="text-2xl font-semibold text-white mt-10">
             Log in to Prime

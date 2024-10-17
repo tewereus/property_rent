@@ -42,7 +42,7 @@ const Bookmark = () => {
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] w-full min-h-screen p-5">
       <Text className="text-xl font-bold dark:text-slate-300 mb-4">
-        Bookmarks
+        Favourites
       </Text>
       <FlatList
         data={wishlist?.wishlist}

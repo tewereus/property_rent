@@ -40,7 +40,7 @@ const index = () => {
     }
   };
   return (
-    <SafeAreaView className="h-full bg-slate-400 dark:bg-[#09092B] ">
+    <SafeAreaView className="h-full bg-[#09092B]">
       <ScrollView
         contentContainerStyle={{
           height: "100%",

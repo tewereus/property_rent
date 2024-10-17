@@ -49,6 +49,7 @@ const login = asyncHandler(async (req, res) => {
         preference: updateduser?.preference,
         wishlist: updateduser?.wishlist,
         seller_tab: updateduser?.seller_tab,
+        mode: updateduser?.mode,
         token: accessToken,
       });
     } else {
@@ -151,6 +152,43 @@ const addToWishlist = asyncHandler(async (req, res) => {
   }
 });
 
+const changeMode = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { mode } = req.body;
+
+  try {
+    const changedMode = await User.findByIdAndUpdate(
+      id,
+      {
+        mode: mode,
+      },
+      { new: true }
+    );
+    res.json(changedMode);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const changeLanguage = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { language } = req.body.preference;
+  try {
+    const lang = await User.findByIdAndUpdate(
+      id,
+      {
+        "preference.language": language,
+      },
+      {
+        new: true,
+      }
+    ).select("preference.language -_id");
+    res.json(lang);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   register,
   login,
@@ -158,4 +196,6 @@ module.exports = {
   verifySeller,
   getWishlist,
   addToWishlist,
+  changeMode,
+  changeLanguage,
 };

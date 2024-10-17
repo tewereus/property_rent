@@ -3,6 +3,7 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  changeMode,
   logout,
   resetAuthState,
   toggleDarkMode,
@@ -18,6 +19,10 @@ const Profile = () => {
   const { isSuccess } = useSelector((state) => state.auth);
 
   const handleBecomePress = () => {
+    const data = {
+      mode: "customer",
+    };
+    dispatch(changeMode(data));
     router.push("/home");
   };
 

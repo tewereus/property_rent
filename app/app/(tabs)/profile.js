@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  changeMode,
   logout,
   resetAuthState,
   toggleDarkMode,
@@ -56,12 +57,16 @@ const Profile = () => {
   };
 
   const handlePress = () => {
-    // console.log(user?.seller_tab);
+    const data = {
+      mode: "seller",
+    };
+
     if (user?.seller_tab === "inactive") {
       router.push("/seller_auth");
     } else if (user?.seller_tab === "waiting") {
       router.push("/waiting");
     } else if (user?.seller_tab === "active") {
+      dispatch(changeMode(data));
       router.push("/seller_tabs");
     }
   };
