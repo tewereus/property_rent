@@ -1,2 +1,3 @@
 => filteration
 => isFeatured property
+=> run mern canva
