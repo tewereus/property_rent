@@ -23,7 +23,7 @@ const createProperty = async (data) => {
   return response.data;
 };
 
-const getAllProperties = async ({ limit }) => {
+const getAllProperties = async ({ limit, minPrice, maxPrice }) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -31,16 +31,24 @@ const getAllProperties = async ({ limit }) => {
     Authorization: `Bearer ${
       getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
     }`,
-    // Accept: "application/json",
   };
 
+  let query = `?limit=${limit}`;
+  if (minPrice) {
+    query += `&price[gte]=${minPrice}`;
+  }
+  if (maxPrice) {
+    query += `&price[lte]=${maxPrice}`;
+  }
+
   const response = await axios.get(
-    `${baseUrl}/property/all-properties?limit=${limit}`,
+    `${baseUrl}/property/all-properties${query}`,
     {
       headers,
       withCredentials: true,
     }
   );
+
   return response.data;
 };
 
