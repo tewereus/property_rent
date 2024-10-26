@@ -55,7 +55,7 @@ const deleteProperty = asyncHandler(async (req, res) => {
 });
 
 const getAllProperties = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  // const { id } = req.user;
   try {
     const queryObj = { ...req.query };
     const excludeFields = [
@@ -93,14 +93,11 @@ const getAllProperties = asyncHandler(async (req, res) => {
     query = query.skip(skip).limit(limit);
     if (req.query.page) {
       const usersCount = await Property.countDocuments();
-      if (skip >= usersCount) throw new Error("This Page does not exists");
+      if (skip >= usersCount) throw new Error("This Page does not exist");
     }
     const totalUsers = await Property.countDocuments();
     const properties = await query;
     res.json({ properties, totalUsers });
-
-    // const properties = await Property.find({ owner: { $ne: id } });
-    // res.json(properties);
   } catch (error) {
     throw new Error(error);
   }

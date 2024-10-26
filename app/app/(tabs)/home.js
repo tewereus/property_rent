@@ -69,15 +69,17 @@ const Home = () => {
   const renderPropertyItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => handlePress(item)}
-      className="bg-white rounded-lg shadow-md p-4 m-2"
-      style={{ width: 250 }}
+      className="bg-white rounded-lg shadow-lg p-4 m-2"
+      style={{ width: 250, elevation: 5 }}
     >
       <Image
         source={{ uri: item.image }}
         className="w-full h-40 rounded-lg"
         resizeMode="cover"
       />
-      <Text className="text-lg font-semibold mt-2">{item.name}</Text>
+      <Text className="text-lg font-semibold mt-2 text-gray-800">
+        {item.name}
+      </Text>
       <Text className="text-gray-500">
         {new Date(item.createdAt).toLocaleDateString()}
       </Text>
@@ -98,7 +100,9 @@ const Home = () => {
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] w-full min-h-screen p-5">
       <View className="flex flex-row justify-between mt-2">
-        <Text className="text-xl font-bold dark:text-slate-300 mb-4">Home</Text>
+        <Text className="text-2xl font-bold dark:text-slate-300 mb-4">
+          Home
+        </Text>
         <View style={{ flexDirection: "row", marginBottom: 10 }}>
           <TouchableOpacity
             onPress={() => changeLanguage("Eng")}

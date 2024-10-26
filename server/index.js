@@ -12,6 +12,7 @@ const adminRouter = require("./routes/adminRoutes");
 const managerRouter = require("./routes/managerRoutes");
 const propertyTypeRouter = require("./routes/propertyTypeRoutes");
 const propertyRouter = require("./routes/propertyRoutes");
+const carPropertyRouter = require("./routes/carPropertyRoutes");
 const PORT = process.env.PORT || 9001;
 // const User = require("./models/userModel");
 
@@ -46,6 +47,7 @@ app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/manager", managerRouter);
 app.use("/api/v1/property", propertyRouter);
 app.use("/api/v1/property-type", propertyTypeRouter);
+app.use("/api/v1/car-property", carPropertyRouter);
 
 // const updateUsers = async () => {
 //   try {

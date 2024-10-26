@@ -168,6 +168,7 @@ import MapComponent from "../components/MapComponent"; // Import the MapComponen
 import { SafeAreaView } from "react-native-safe-area-context";
 import SellVilla from "./propertyComponent/Villa/SellVilla";
 import SellApartment from "./propertyComponent/Apartment/SellApartment";
+import RentApartment from "./propertyComponent/Apartment/RentApartment";
 import RentVilla from "./propertyComponent/Villa/RentVilla";
 
 const CreateProperty = () => {
@@ -242,12 +243,18 @@ const CreateProperty = () => {
             ) : (
               <RentVilla formData={villaForm} setFormData={setVillaForm} />
             ))}
-          {type === "apartment" && (
-            <SellApartment
-              formData={apartmentForm}
-              setFormData={setApartmentForm}
-            />
-          )}
+          {type === "apartment" &&
+            (action === "sell" ? (
+              <SellApartment
+                formData={apartmentForm}
+                setFormData={setApartmentForm}
+              />
+            ) : (
+              <RentApartment
+                formData={apartmentForm}
+                setFormData={setApartmentForm}
+              />
+            ))}
 
           <CustomButton
             title="Select Location on Map"
