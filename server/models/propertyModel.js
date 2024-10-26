@@ -18,13 +18,17 @@ var propertySchema = new mongoose.Schema(
       ref: "PropertyType",
       required: true,
     },
+    property_category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PropertyCategory",
+    },
+    car_category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CarCategory",
+    },
     property_use: {
       type: String,
       enum: ["sell", "rent"],
-      required: true,
-    },
-    num_bed: {
-      type: Number,
       required: true,
     },
     location: {

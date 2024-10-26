@@ -1,12 +1,7 @@
 const mongoose = require("mongoose");
 
-// Declare the Schema of the Mongo model
-var carPropertySchema = new mongoose.Schema(
+var carCategorySchema = new mongoose.Schema(
   {
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
     make: {
       type: String,
       required: true,
@@ -16,10 +11,6 @@ var carPropertySchema = new mongoose.Schema(
       required: true,
     },
     year: {
-      type: Number,
-      required: true,
-    },
-    price: {
       type: Number,
       required: true,
     },
@@ -40,22 +31,10 @@ var carPropertySchema = new mongoose.Schema(
     color: {
       type: String,
     },
-    description: {
-      type: String,
-    },
-    images: {
-      type: [String], // Array of image URLs
-    },
-    status: {
-      type: String,
-      enum: ["available", "unavailable", "sold"],
-      default: "available",
-    },
   },
   {
     timestamps: true,
   }
 );
 
-// Export the model
-module.exports = mongoose.model("CarProperty", carPropertySchema);
+module.exports = mongoose.model("CarCategory", carCategorySchema);
