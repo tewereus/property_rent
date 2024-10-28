@@ -8,13 +8,25 @@ const initialState = {
   message: "",
 };
 
+// export const createProperty = createAsyncThunk(
+//   "property/create-property",
+//   async (data, thunkAPI) => {
+//     try {
+//       return propertyService.createProperty(data);
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(error);
+//     }
+//   }
+// );
+
 export const createProperty = createAsyncThunk(
-  "property/create-property",
-  async (data, thunkAPI) => {
+  "properties/create",
+  async (propertyData, thunkAPI) => {
     try {
-      return propertyService.createProperty(data);
+      // const token = thunkAPI.getState().auth.user.token;
+      return await propertyService.createProperty(propertyData);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
@@ -90,6 +102,7 @@ export const propertySlice = createSlice({
         state.isSuccess = false;
         state.isError = true;
         state.message = action.payload;
+        console.log("error: ", action.payload);
       })
       .addCase(getAllUsersProperties.pending, (state) => {
         state.isLoading = true;

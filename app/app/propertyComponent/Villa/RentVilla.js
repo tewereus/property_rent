@@ -1,63 +1,55 @@
-import { View, Text, TextInput, ScrollView } from "react-native";
+import { View } from "react-native";
 import React from "react";
-import CustomButton from "../../../components/CustomButton";
+import FormField from "../../../components/FormField";
 
 const RentVilla = ({ formData, setFormData }) => {
   return (
-    <ScrollView className="p-5 bg-gray-100">
-      <Text className="text-2xl font-bold mb-5 text-gray-800">
-        Rent a Villa
-      </Text>
-
-      <TextInput
-        className="border border-gray-300 rounded-lg p-3 mb-4 bg-white"
-        placeholder="Villa Name"
-        value={formData.name}
-        onChangeText={(text) => setFormData({ ...formData, name: text })}
+    <View>
+      <FormField
+        title="Title"
+        value={formData.title}
+        handleChangeText={(e) => setFormData({ ...formData, title: e })}
+        otherStyles="mt-6"
       />
-
-      <TextInput
-        className="border border-gray-300 rounded-lg p-3 mb-4 bg-white"
-        placeholder="Number of Bedrooms"
-        keyboardType="numeric"
+      <FormField
+        title="Bedrooms"
         value={formData.num_bed.toString()}
-        onChangeText={(text) =>
-          setFormData({ ...formData, num_bed: parseInt(text) })
+        placeholder="Number of bedrooms"
+        handleChangeText={(e) =>
+          setFormData({ ...formData, num_bed: parseInt(e) })
         }
-      />
-
-      <TextInput
-        className="border border-gray-300 rounded-lg p-3 mb-4 bg-white"
-        placeholder="Location"
-        value={formData.location}
-        onChangeText={(text) => setFormData({ ...formData, location: text })}
-      />
-
-      <TextInput
-        className="border border-gray-300 rounded-lg p-3 mb-4 bg-white"
-        placeholder="Price"
+        otherStyles="mt-6"
         keyboardType="numeric"
+      />
+      <FormField
+        title="Location"
+        value={formData.location}
+        handleChangeText={(e) => setFormData({ ...formData, location: e })}
+        otherStyles="mt-6"
+      />
+      <FormField
+        title="Price"
         value={formData.price.toString()}
-        onChangeText={(text) =>
-          setFormData({ ...formData, price: parseFloat(text) })
+        handleChangeText={(e) =>
+          setFormData({ ...formData, price: parseFloat(e) })
         }
+        otherStyles="mt-6"
+        keyboardType="numeric"
       />
-
-      <TextInput
-        className="border border-gray-300 rounded-lg p-3 mb-4 bg-white"
-        placeholder="Description"
-        multiline
-        numberOfLines={4}
+      <FormField
+        title="Description"
         value={formData.description}
-        onChangeText={(text) => setFormData({ ...formData, description: text })}
+        handleChangeText={(e) => setFormData({ ...formData, description: e })}
+        otherStyles="mt-6"
       />
-
-      <CustomButton
-        title="Submit"
-        handlePress={() => console.log("Villa data submitted")}
-        containerStyles="mt-5 bg-blue-500"
+      <FormField
+        title="Garden Size"
+        value={formData.gardenSize}
+        handleChangeText={(e) => setFormData({ ...formData, gardenSize: e })}
+        otherStyles="mt-6"
+        keyboardType="numeric"
       />
-    </ScrollView>
+    </View>
   );
 };
 

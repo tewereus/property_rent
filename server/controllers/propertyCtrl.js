@@ -1,46 +1,82 @@
 const asyncHandler = require("express-async-handler");
-const Property = require("../models/propertyModel");
+// const Property = require("../models/propertyModel");
 const PropertyType = require("../models/propertyTypeModel");
 const User = require("../models/userModel");
+const {
+  Property,
+  Villa,
+  Warehouse,
+  Car,
+  Apartment,
+  Hall,
+} = require("../models/propertyModel");
 
 const createProperty = asyncHandler(async (req, res) => {
-  const { id } = req.user;
-
   // use validatemongodbid to check if logged in is admin then create product type
-  const {
-    name,
-    property_type,
-    property_use,
-    num_bed,
-    location,
-    price,
-    description,
-    images,
-    status,
-    // userId,
-  } = req.body;
-  try {
-    const user = await User.findById(id);
-    if (!user) throw new Error("User not found");
-    const propertyType = await PropertyType.findOne({ name: property_type });
-    // console.log("type here ", propertyType._id);
-    const property = await Property.create({
-      // owner: userId,
-      owner: id,
-      name,
-      property_type: propertyType._id,
-      property_use,
-      num_bed,
-      location,
-      price,
-      description,
-      images,
-      status,
-    });
-    res.json(property);
-  } catch (error) {
-    throw new Error(error);
+  // const {
+  //   name,
+  //   property_type,
+  //   property_use,
+  //   num_bed,
+  //   location,
+  //   price,
+  //   description,
+  //   images,
+  //   status,
+  //   // userId,
+  // } = req.body;
+  // try {
+  //   const user = await User.findById(id);
+  //   if (!user) throw new Error("User not found");
+  //   const propertyType = await PropertyType.findOne({ name: property_type });
+  //   // console.log("type here ", propertyType._id);
+  //   const property = await Property.create({
+  //     // owner: userId,
+  //     owner: id,
+  //     name,
+  //     property_type: propertyType._id,
+  //     property_use,
+  //     num_bed,
+  //     location,
+  //     price,
+  //     description,
+  //     images,
+  //     status,
+  //   });
+  //   res.json(property);
+  // } catch (error) {
+  //   throw new Error(error);
+  const { id } = req.user;
+  console.log(id);
+  const propertyData = { ...req.body, owner: req.user.id };
+  let property;
+
+  console.log(propertyData);
+
+  switch (propertyData.propertyType) {
+    case "villa":
+      console.log("villa");
+      property = new Villa(propertyData);
+      break;
+    case "warehouse":
+      console.log("warehouse");
+      property = new Warehouse(propertyData);
+      break;
+    case "car":
+      property = new Car(propertyData);
+      break;
+    case "apartment":
+      property = new Apartment(propertyData);
+      break;
+    case "hall":
+      property = new Hall(propertyData);
+      break;
+    default:
+      return res.status(400).json({ message: "Invalid property type" });
   }
+
+  await property.save();
+  res.status(201).json(property);
 });
 
 const deleteProperty = asyncHandler(async (req, res) => {

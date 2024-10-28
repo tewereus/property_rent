@@ -38,6 +38,8 @@ const Create = () => {
   };
 
   const handleNext = () => {
+    console.log("selectedPropertyId", selectedPropertyId);
+    console.log("selectedPropertyUse", selectedPropertyUse);
     router.push({
       pathname: "/create_property",
       params: { type: selectedPropertyId, action: selectedPropertyUse },

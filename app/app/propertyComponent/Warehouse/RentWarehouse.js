@@ -1,8 +1,9 @@
+// app/app/propertyComponent/Warehouse/RentWarehouse.js
 import { View } from "react-native";
 import React from "react";
 import FormField from "../../../components/FormField";
 
-const RentApartment = ({ formData, setFormData }) => {
+const RentWarehouse = ({ formData, setFormData }) => {
   return (
     <View>
       <FormField
@@ -12,11 +13,11 @@ const RentApartment = ({ formData, setFormData }) => {
         otherStyles="mt-6"
       />
       <FormField
-        title="Number of Rooms"
-        value={formData.numberOfRooms}
-        placeholder="number of rooms"
+        title="Storage Capacity"
+        value={formData.storageCapacity.toString()}
+        placeholder="Storage capacity"
         handleChangeText={(e) =>
-          setFormData({ ...formData, numberOfRooms: parseInt(e) })
+          setFormData({ ...formData, storageCapacity: parseInt(e) })
         }
         otherStyles="mt-6"
         keyboardType="numeric"
@@ -29,7 +30,7 @@ const RentApartment = ({ formData, setFormData }) => {
       />
       <FormField
         title="Price"
-        value={formData.price}
+        value={formData.price.toString()}
         handleChangeText={(e) =>
           setFormData({ ...formData, price: parseFloat(e) })
         }
@@ -46,4 +47,4 @@ const RentApartment = ({ formData, setFormData }) => {
   );
 };
 
-export default RentApartment;
+export default RentWarehouse;

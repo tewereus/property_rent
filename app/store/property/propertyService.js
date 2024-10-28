@@ -2,8 +2,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseUrl } from "../../constants/axiosConfig";
 import axios from "axios";
 
-const createProperty = async (data) => {
+// const createProperty = async (data) => {
+//   const userData = await AsyncStorage.getItem("user");
+//   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+//   const headers = {
+//     Authorization: `Bearer ${
+//       getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+//     }`,
+//     // Accept: "application/json",
+//   };
+//   const response = await axios.post(
+//     `${baseUrl}/property/create-property`,
+//     data,
+//     {
+//       headers,
+//       withCredentials: true,
+//     }
+//   );
+//   console.log(response.data);
+//   return response.data;
+// };
+
+const createProperty = async (propertyData) => {
+  console.log("propertyData", propertyData);
   const userData = await AsyncStorage.getItem("user");
+  // console.log("userData", userData);
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
   const headers = {
     Authorization: `Bearer ${
@@ -13,13 +36,12 @@ const createProperty = async (data) => {
   };
   const response = await axios.post(
     `${baseUrl}/property/create-property`,
-    data,
+    propertyData,
     {
       headers,
       withCredentials: true,
     }
   );
-  console.log(response.data);
   return response.data;
 };
 

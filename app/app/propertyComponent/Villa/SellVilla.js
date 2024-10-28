@@ -6,9 +6,9 @@ const SellVilla = ({ formData, setFormData }) => {
   return (
     <View>
       <FormField
-        title="Name"
-        value={formData.name}
-        handleChangeText={(e) => setFormData({ ...formData, name: e })}
+        title="Title"
+        value={formData.title}
+        handleChangeText={(e) => setFormData({ ...formData, title: e })}
         otherStyles="mt-6"
       />
       <FormField
@@ -41,6 +41,13 @@ const SellVilla = ({ formData, setFormData }) => {
         value={formData.description}
         handleChangeText={(e) => setFormData({ ...formData, description: e })}
         otherStyles="mt-6"
+      />
+      <FormField
+        title="Garden Size"
+        value={formData.gardenSize}
+        handleChangeText={(e) => setFormData({ ...formData, gardenSize: e })}
+        otherStyles="mt-6"
+        keyboardType="numeric"
       />
     </View>
   );
