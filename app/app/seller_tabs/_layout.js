@@ -1,8 +1,8 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
 import { Tabs, Redirect } from "expo-router";
-
 import { icons } from "../../constants";
+import { useColorScheme } from "nativewind";
 
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
@@ -24,18 +24,33 @@ const TabIcon = ({ icon, color, name, focused }) => {
 };
 
 const SellerTabs = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
   return (
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "#FFA001",
-        tabBarInactiveTintColor: "#CDCDE0",
+        tabBarActiveTintColor: isDark ? "#FFA001" : "#2563EB",
+        tabBarInactiveTintColor: isDark ? "#CDCDE0" : "#94A3B8",
         tabBarStyle: {
-          backgroundColor: "#161622",
-          borderTopWidth: 2,
-          borderTopColor: "#232533",
+          backgroundColor: isDark ? "#09092B" : "#FFFFFF",
+          borderTopWidth: 1,
+          borderTopColor: isDark ? "#232533" : "#E2E8F0",
           height: 84,
+          elevation: isDark ? 0 : 8,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: -2,
+          },
+          shadowOpacity: isDark ? 0 : 0.1,
+          shadowRadius: 3,
         },
+        headerStyle: {
+          backgroundColor: isDark ? "#09092B" : "#FFFFFF",
+        },
+        headerTintColor: isDark ? "#FFFFFF" : "#000000",
       }}
     >
       <Tabs.Screen
@@ -63,27 +78,35 @@ const SellerTabs = () => {
             <TabIcon
               icon={icons.upload}
               color={color}
-              name="listing"
+              name="Listing"
               focused={focused}
             />
           ),
         }}
       />
+
       <Tabs.Screen
         name="create"
         options={{
           title: "Create",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.plus}
-              color={color}
-              name="create"
-              focused={focused}
-            />
+            <View
+              className={`${
+                isDark ? "bg-[#232533]" : "bg-blue-50"
+              } rounded-full p-3 -mt-6`}
+            >
+              <TabIcon
+                icon={icons.plus}
+                color={isDark ? "#FFA001" : "#2563EB"}
+                name="Create"
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{
@@ -93,7 +116,7 @@ const SellerTabs = () => {
             <TabIcon
               icon={icons.profile}
               color={color}
-              name="profile"
+              name="Profile"
               focused={focused}
             />
           ),

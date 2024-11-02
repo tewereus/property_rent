@@ -1,10 +1,12 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
 import { Tabs, Redirect } from "expo-router";
-
 import { icons } from "../../constants";
+import { useColorScheme } from "nativewind";
 
 const TabIcon = ({ icon, color, name, focused }) => {
+  const { colorScheme } = useColorScheme();
+
   return (
     <View className="items-center justify-center gap-2">
       <Image
@@ -24,19 +26,39 @@ const TabIcon = ({ icon, color, name, focused }) => {
 };
 
 const TabsLayout = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
   return (
     <>
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
-          tabBarActiveTintColor: "#FFA001",
-          tabBarInactiveTintColor: "#CDCDE0",
+          // Dynamic colors based on theme
+          tabBarActiveTintColor: isDark ? "#FFA001" : "#FFA001",
+          tabBarInactiveTintColor: isDark ? "#CDCDE0" : "#94A3B8",
           tabBarStyle: {
-            backgroundColor: "#161622",
-            borderTopWidth: 2,
-            borderTopColor: "#232533",
+            backgroundColor: isDark ? "#09092B" : "#FFFFFF",
+            borderTopWidth: 1,
+            borderTopColor: isDark ? "#232533" : "#E2E8F0",
             height: 84,
+            elevation: isDark ? 0 : 8,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: -2,
+            },
+            shadowOpacity: isDark ? 0 : 0.1,
+            shadowRadius: 3,
           },
+          tabBarItemStyle: {
+            padding: 5,
+          },
+          // Header styles based on theme
+          headerStyle: {
+            backgroundColor: isDark ? "#09092B" : "#FFFFFF",
+          },
+          headerTintColor: isDark ? "#FFFFFF" : "#000000",
         }}
       >
         <Tabs.Screen
@@ -48,7 +70,7 @@ const TabsLayout = () => {
               <TabIcon
                 icon={icons.home}
                 color={color}
-                name="home"
+                name="Home"
                 focused={focused}
               />
             ),
@@ -78,13 +100,12 @@ const TabsLayout = () => {
               <TabIcon
                 icon={icons.bookmark}
                 color={color}
-                name="bookmark"
+                name="Bookmark"
                 focused={focused}
               />
             ),
           }}
         />
-
         <Tabs.Screen
           name="profile"
           options={{
@@ -94,7 +115,7 @@ const TabsLayout = () => {
               <TabIcon
                 icon={icons.profile}
                 color={color}
-                name="profile"
+                name="Profile"
                 focused={focused}
               />
             ),

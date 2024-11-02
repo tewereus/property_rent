@@ -79,7 +79,7 @@ const index = () => {
           <CustomButton
             title="Get Started"
             handlePress={handlePress}
-            containerStyles="w-full mt-10"
+            containerStyles="w-full mt-20"
           />
         </View>
       </ScrollView>
@@ -89,7 +89,6 @@ const index = () => {
 };
 
 export default index;
-
 // import { Pressable, Text } from "react-native";
 // import { useColorScheme } from "nativewind";
 

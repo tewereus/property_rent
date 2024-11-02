@@ -27,7 +27,7 @@ var userSchema = new mongoose.Schema(
     },
     mode: {
       type: String,
-      enum: ["customer, seller"],
+      enum: ["customer", "seller"],
       default: "customer",
     },
     wishlist: [
