@@ -1,4 +1,4 @@
-import { View, Text, Button, Switch, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Switch, Image } from "react-native";
 import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
@@ -10,6 +10,24 @@ import {
 } from "../../store/auth/authSlice";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
+const ProfileOption = ({ icon, label, value, onPress, rightElement }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className="flex-row items-center justify-between bg-white dark:bg-gray-700 p-4 rounded-2xl mb-4 shadow-sm"
+  >
+    <View className="flex-row items-center">
+      <View className="bg-orange-100 dark:bg-orange-800 p-2 rounded-full mr-4">
+        <Ionicons name={icon} size={24} color="#F97316" />
+      </View>
+      <Text className="text-gray-700 dark:text-gray-200 text-lg">{label}</Text>
+    </View>
+    {rightElement || (
+      <Ionicons name="chevron-forward" size={24} color="#6B7280" />
+    )}
+  </TouchableOpacity>
+);
 
 const Profile = () => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -77,39 +95,93 @@ const Profile = () => {
   };
 
   return (
-    <View className={`flex-1 p-5 bg-slate-300 dark:bg-gray-800`}>
-      <Text className="text-2xl text-gray-600 dark:text-slate-300 text-center mb-5">
-        Profile
-      </Text>
-
-      <View className="flex-row items-center justify-between mb-5">
-        <Text className="text-lg text-gray-600 dark:text-slate-300">
-          Dark Mode
-        </Text>
-        <Switch
-          value={colorScheme === "dark"}
-          onValueChange={handleToggleColorScheme}
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={colorScheme === "dark" ? "#f5dd4b" : "#f4f3f4"}
-        />
+    <View className="flex-1 bg-gray-100 dark:bg-gray-900">
+      {/* Profile Header */}
+      <View className="bg-white dark:bg-gray-800 p-6 rounded-b-3xl shadow-sm mb-6">
+        <View className="items-center">
+          <View className="bg-orange-100 dark:bg-orange-700 w-24 h-24 rounded-full items-center justify-center mb-4">
+            <Text className="text-orange-600 dark:text-orange-400 text-4xl font-bold">
+              {user?.name?.[0]?.toUpperCase() || "U"}
+            </Text>
+          </View>
+          <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-1">
+            {user?.name || "User"}
+          </Text>
+          <Text className="text-gray-500 dark:text-gray-400">
+            {user?.email || "email@example.com"}
+          </Text>
+        </View>
       </View>
 
-      <Button
-        title={
-          user?.seller_tab === "inactive"
-            ? "Become a Seller"
-            : "Seller Dashboard"
-        }
-        onPress={handlePress}
-        color="#FFA001"
-      />
+      {/* Profile Options */}
+      <View className="px-4">
+        {/* Dark Mode Toggle */}
+        <ProfileOption
+          icon="moon-outline"
+          label="Dark Mode"
+          rightElement={
+            <Switch
+              value={colorScheme === "dark"}
+              onValueChange={handleToggleColorScheme}
+              trackColor={{ false: "#CBD5E1", true: "#3B82F6" }}
+              thumbColor={colorScheme === "dark" ? "#F3F4F6" : "#FFFFFF"}
+              ios_backgroundColor="#CBD5E1"
+            />
+          }
+        />
 
-      <TouchableOpacity
-        className="mt-5 bg-red-600 rounded p-3 items-center"
-        onPress={handleLogout}
-      >
-        <Text className="text-white text-lg">Logout</Text>
-      </TouchableOpacity>
+        {/* Seller Dashboard */}
+        <ProfileOption
+          icon="briefcase-outline"
+          label={
+            user?.seller_tab === "inactive"
+              ? "Become a Seller"
+              : "Seller Dashboard"
+          }
+          onPress={handlePress}
+        />
+
+        {/* Account Settings */}
+        <ProfileOption
+          icon="settings-outline"
+          label="Account Settings"
+          onPress={() => {
+            /* Add navigation to settings */
+          }}
+        />
+
+        {/* Help & Support */}
+        <ProfileOption
+          icon="help-circle-outline"
+          label="Help & Support"
+          onPress={() => {
+            /* Add navigation to help */
+          }}
+        />
+
+        {/* Privacy Policy */}
+        <ProfileOption
+          icon="shield-outline"
+          label="Privacy Policy"
+          onPress={() => {
+            /* Add navigation to privacy policy */
+          }}
+        />
+
+        {/* Logout Button */}
+        <TouchableOpacity
+          onPress={handleLogout}
+          className="bg-red-500 p-4 rounded-2xl mt-4 flex-row items-center justify-center"
+        >
+          <Ionicons
+            name="log-out-outline"
+            size={24}
+            color="white"
+            className="mr-2"
+          />
+          <Text className="text-white text-lg font-medium ml-2">Logout</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

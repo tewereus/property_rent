@@ -31,7 +31,7 @@ const SellerTabs = () => {
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
-        tabBarActiveTintColor: isDark ? "#FFA001" : "#2563EB",
+        tabBarActiveTintColor: isDark ? "#FFA001" : "#FFA001",
         tabBarInactiveTintColor: isDark ? "#CDCDE0" : "#94A3B8",
         tabBarStyle: {
           backgroundColor: isDark ? "#09092B" : "#FFFFFF",
@@ -91,18 +91,12 @@ const SellerTabs = () => {
           title: "Create",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <View
-              className={`${
-                isDark ? "bg-[#232533]" : "bg-blue-50"
-              } rounded-full p-3 -mt-6`}
-            >
-              <TabIcon
-                icon={icons.plus}
-                color={isDark ? "#FFA001" : "#2563EB"}
-                name="Create"
-                focused={focused}
-              />
-            </View>
+            <TabIcon
+              icon={icons.plus}
+              color={color}
+              name="Create"
+              focused={focused}
+            />
           ),
         }}
       />
