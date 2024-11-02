@@ -1,5 +1,5 @@
 // app/app/create_property.js
-import { View, Text, ScrollView, Modal } from "react-native";
+import { View, Text, ScrollView, Modal, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -21,13 +21,13 @@ import SellCar from "./propertyComponent/Car/SellCar";
 import RentCar from "./propertyComponent/Car/RentCar";
 // import SellHall from "./propertyComponent/Hall/SellHall";
 import RentHall from "./propertyComponent/Hall/RentHall";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const CreateProperty = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { type, action } = useLocalSearchParams();
 
-  // Initialize formData with only relevant fields for the selected property type
   const initialFormData = {
     title: "",
     location: "",
@@ -64,54 +64,76 @@ const CreateProperty = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View className="bg-gray-300 dark:bg-[#09092B] w-full p-5">
-        <Text className="text-xl font-bold dark:text-slate-300 mb-4">
-          Create Property
-        </Text>
+      <View className="flex-1 bg-gray-50 dark:bg-gray-900">
+        <View className="bg-white dark:bg-gray-800 p-6 rounded-b-3xl shadow-sm">
+          <Text className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+            Create Property
+          </Text>
+          <Text className="text-gray-500 dark:text-gray-400">
+            Fill in the details for your {type} listing
+          </Text>
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          className="flex-1 px-6 pt-6"
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
-          {type === "villa" &&
-            (action === "sell" ? (
-              <SellVilla formData={formData} setFormData={setFormData} />
-            ) : (
-              <RentVilla formData={formData} setFormData={setFormData} />
-            ))}
-          {type === "apartment" &&
-            (action === "sell" ? (
-              <SellApartment formData={formData} setFormData={setFormData} />
-            ) : (
-              <RentApartment formData={formData} setFormData={setFormData} />
-            ))}
-          {type === "warehouse" &&
-            (action === "sell" ? (
-              <SellWarehouse formData={formData} setFormData={setFormData} />
-            ) : (
-              <RentWarehouse formData={formData} setFormData={setFormData} />
-            ))}
-          {type === "car" &&
-            (action === "sell" ? (
-              <SellCar formData={formData} setFormData={setFormData} />
-            ) : (
-              <RentCar formData={formData} setFormData={setFormData} />
-            ))}
-          {type === "hall" && action === "rent" && (
-            <RentHall formData={formData} setFormData={setFormData} />
-          )}
+          <View className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6">
+            {type === "villa" &&
+              (action === "sell" ? (
+                <SellVilla formData={formData} setFormData={setFormData} />
+              ) : (
+                <RentVilla formData={formData} setFormData={setFormData} />
+              ))}
+            {type === "apartment" &&
+              (action === "sell" ? (
+                <SellApartment formData={formData} setFormData={setFormData} />
+              ) : (
+                <RentApartment formData={formData} setFormData={setFormData} />
+              ))}
+            {type === "warehouse" &&
+              (action === "sell" ? (
+                <SellWarehouse formData={formData} setFormData={setFormData} />
+              ) : (
+                <RentWarehouse formData={formData} setFormData={setFormData} />
+              ))}
+            {type === "car" &&
+              (action === "sell" ? (
+                <SellCar formData={formData} setFormData={setFormData} />
+              ) : (
+                <RentCar formData={formData} setFormData={setFormData} />
+              ))}
+            {type === "hall" && action === "rent" && (
+              <RentHall formData={formData} setFormData={setFormData} />
+            )}
+          </View>
 
-          <CustomButton
-            title="Select Location on Map"
-            handlePress={() => setShowMapModal(true)}
-            containerStyles="mt-7 mb-5"
-          />
+          <TouchableOpacity
+            onPress={() => setShowMapModal(true)}
+            className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl mb-6 flex-row items-center"
+          >
+            <View className="bg-blue-100 dark:bg-blue-800 p-2 rounded-xl mr-4">
+              <Ionicons name="location-outline" size={24} color="#3B82F6" />
+            </View>
+            <View>
+              <Text className="text-blue-600 dark:text-blue-400 text-lg font-semibold">
+                Select Location
+              </Text>
+              <Text className="text-blue-500 dark:text-blue-300 opacity-60">
+                {formData.location || "Choose on map"}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-          <CustomButton
-            title="Add Property"
-            handlePress={handleSubmit}
-            containerStyles="mt-7 mb-5"
-          />
+          <TouchableOpacity
+            onPress={handleSubmit}
+            className="bg-[#FF8E01] p-4 rounded-2xl mb-6"
+          >
+            <Text className="text-white text-center text-lg font-semibold">
+              Add Property
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
 
         <Modal
@@ -119,13 +141,18 @@ const CreateProperty = () => {
           animationType="slide"
           onRequestClose={() => setShowMapModal(false)}
         >
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <MapComponent onLocationSelect={handleLocationSelect} />
-            <CustomButton
-              title="Close Map"
-              handlePress={() => setShowMapModal(false)}
-              containerStyles={{ marginBottom: 20 }}
-            />
+            <View className="p-6">
+              <TouchableOpacity
+                onPress={() => setShowMapModal(false)}
+                className="bg-gray-200 dark:bg-gray-800 p-4 rounded-2xl"
+              >
+                <Text className="text-gray-800 dark:text-white text-center text-lg font-semibold">
+                  Close Map
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
       </View>

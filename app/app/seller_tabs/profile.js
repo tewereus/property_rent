@@ -70,7 +70,7 @@ const Profile = () => {
 
   const handleToggleColorScheme = () => {
     toggleColorScheme();
-    saveColorScheme(colorScheme === "dark" ? "light" : "dark"); // Toggle and save the new scheme
+    saveColorScheme(colorScheme === "dark" ? "light" : "dark");
   };
 
   const handleLogout = () => {
@@ -96,9 +96,7 @@ const Profile = () => {
         </View>
       </View>
 
-      {/* Profile Options */}
       <View>
-        {/* Dark Mode Toggle */}
         <ProfileOption
           icon="moon-outline"
           label="Dark Mode"
@@ -113,53 +111,32 @@ const Profile = () => {
           }
         />
 
-        {/* Buyer Dashboard */}
         <ProfileOption
           icon="home-outline"
           label="Switch to Buyer Dashboard"
           onPress={handleBecomePress}
         />
 
-        {/* Account Settings */}
         <ProfileOption
           icon="settings-outline"
           label="Account Settings"
-          onPress={() => {
-            /* Add navigation to settings */
-          }}
+          onPress={() => {}}
         />
 
-        {/* Analytics */}
         <ProfileOption
           icon="bar-chart-outline"
           label="Analytics"
-          onPress={() => {
-            /* Add navigation to analytics */
-          }}
+          onPress={() => {}}
         />
-
-        {/* Property Listings */}
-        <ProfileOption
-          icon="list-outline"
-          label="My Listings"
-          onPress={() => {
-            /* Add navigation to listings */
-          }}
-        />
-
-        {/* Help & Support */}
         <ProfileOption
           icon="help-circle-outline"
           label="Help & Support"
-          onPress={() => {
-            /* Add navigation to help */
-          }}
+          onPress={() => {}}
         />
 
-        {/* Logout Button */}
         <TouchableOpacity
           onPress={handleLogout}
-          className="bg-red-500 p-4 rounded-2xl mt-4 flex-row items-center justify-center mx-4"
+          className="bg-red-500 p-4 rounded-2xl mt-2 flex-row items-center justify-center mx-4"
         >
           <Ionicons
             name="log-out-outline"

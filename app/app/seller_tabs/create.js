@@ -2,18 +2,20 @@ import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
-  Pressable,
+  Animated,
+  ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllPropertyTypes } from "../../store/propertyType/propertyTypeSlice";
 import CustomButton from "../../components/CustomButton";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Create = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const dropdownAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     dispatch(getAllPropertyTypes());
@@ -27,110 +29,183 @@ const Create = () => {
   const usePropertyData = ["rent", "sell"];
   const { propertyTypes } = useSelector((state) => state.propertyType);
 
+  const animateDropdown = (show) => {
+    Animated.spring(dropdownAnimation, {
+      toValue: show ? 1 : 0,
+      useNativeDriver: true,
+      tension: 20,
+      friction: 7,
+    }).start();
+  };
+
   const handlePropertyTypeSelect = (type) => {
     setSelectedPropertyId(type);
     setPropertyTypeVisible(false);
+    animateDropdown(false);
   };
 
   const handlePropertyUseSelect = (use) => {
     setSelectedPropertyUse(use);
     setPropertyUseVisible(false);
+    animateDropdown(false);
   };
 
   const handleNext = () => {
-    console.log("selectedPropertyId", selectedPropertyId);
-    console.log("selectedPropertyUse", selectedPropertyUse);
     router.push({
       pathname: "/create_property",
       params: { type: selectedPropertyId, action: selectedPropertyUse },
     });
   };
 
-  // Close dropdowns when clicking outside
   const handleOutsidePress = () => {
-    if (propertyTypeVisible) setPropertyTypeVisible(false);
-    if (propertyUseVisible) setPropertyUseVisible(false);
+    if (propertyTypeVisible) {
+      setPropertyTypeVisible(false);
+      animateDropdown(false);
+    }
+    if (propertyUseVisible) {
+      setPropertyUseVisible(false);
+      animateDropdown(false);
+    }
   };
 
+  const SelectBox = ({ label, value, onPress, icon, isOpen }) => (
+    <View>
+      <TouchableOpacity
+        onPress={() => {
+          onPress();
+          animateDropdown(true);
+        }}
+        className="bg-white dark:bg-gray-800 p-6 rounded-2xl mb-2 shadow-sm w-full"
+      >
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center">
+            <View className="bg-orange-100 dark:bg-orange-700 p-2 rounded-full mr-4">
+              <Ionicons name={icon} size={24} color="#F97316" />
+            </View>
+            <View>
+              <Text className="text-gray-500 dark:text-gray-400 text-sm mb-1">
+                {label}
+              </Text>
+              <Text className="text-gray-800 dark:text-white text-lg font-semibold">
+                {value || "Select option"}
+              </Text>
+            </View>
+          </View>
+          <Ionicons
+            name="chevron-down"
+            size={24}
+            color="#6B7280"
+            style={{ transform: [{ rotate: isOpen ? "180deg" : "0deg" }] }}
+          />
+        </View>
+      </TouchableOpacity>
+
+      {isOpen && (
+        <Animated.View
+          style={{
+            transform: [
+              {
+                translateY: dropdownAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-10, 0],
+                }),
+              },
+            ],
+            opacity: dropdownAnimation,
+          }}
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-4"
+        >
+          {(label === "Property Type" ? propertyTypes : usePropertyData).map(
+            (item) => (
+              <TouchableOpacity
+                key={item}
+                onPress={() =>
+                  label === "Property Type"
+                    ? handlePropertyTypeSelect(item)
+                    : handlePropertyUseSelect(item)
+                }
+                className="p-4 flex-row items-center border-b border-gray-100 dark:border-gray-700"
+              >
+                <Ionicons
+                  name={
+                    label === "Property Type"
+                      ? "home"
+                      : item === "rent"
+                      ? "key-outline"
+                      : "cart-outline"
+                  }
+                  size={20}
+                  color="#F97316"
+                  className="mr-3"
+                />
+                <Text className="text-gray-700 dark:text-white text-lg capitalize">
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            )
+          )}
+        </Animated.View>
+      )}
+    </View>
+  );
+
   return (
-    <Pressable onPress={handleOutsidePress} className="flex-1">
-      <View className="bg-gray-300 dark:bg-[#09092B] w-full min-h-screen flex justify-center items-center p-5">
-        <Text className="text-xl font-bold dark:text-slate-300 mb-4">
-          Create
-        </Text>
+    <View
+      className="flex-1 bg-gray-100 dark:bg-gray-900"
+      onPress={handleOutsidePress}
+    >
+      <ScrollView className="p-6">
+        {/* Header */}
+        <View className="mb-8">
+          <Text className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+            Create Listing
+          </Text>
+          <Text className="text-gray-500 dark:text-gray-400">
+            Let's get started with your property listing
+          </Text>
+        </View>
 
-        {/* Property Type Selector */}
+        {/* Selection Area */}
+        <View className="space-y-2">
+          <SelectBox
+            label="Property Type"
+            value={selectedPropertyId}
+            onPress={() => {
+              setPropertyTypeVisible(!propertyTypeVisible);
+              setPropertyUseVisible(false);
+            }}
+            icon="home-outline"
+            isOpen={propertyTypeVisible}
+          />
+
+          <SelectBox
+            label="Property Use"
+            value={selectedPropertyUse}
+            onPress={() => {
+              setPropertyUseVisible(!propertyUseVisible);
+              setPropertyTypeVisible(false);
+            }}
+            icon="business-outline"
+            isOpen={propertyUseVisible}
+          />
+        </View>
+      </ScrollView>
+      <View className="p-6 bg-gray-100 dark:bg-gray-900">
         <TouchableOpacity
-          onPress={() => setPropertyTypeVisible(true)}
-          className="bg-gray-200 dark:bg-gray-700 p-6 rounded-lg mb-3 w-full max-w-md shadow"
+          onPress={handleNext}
+          disabled={!selectedPropertyId || !selectedPropertyUse}
+          className={`p-4 rounded-2xl ${
+            selectedPropertyId && selectedPropertyUse
+              ? "bg-[#FF8E01]"
+              : "bg-gray-400"
+          }`}
         >
-          <Text className="text-gray-700 dark:text-white text-lg">
-            {selectedPropertyId || "Select Property Type"}
+          <Text className="text-white text-center text-lg font-semibold">
+            Continue
           </Text>
         </TouchableOpacity>
-
-        {/* Property Type Dropdown */}
-        {propertyTypeVisible && (
-          <View className="absolute bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 w-full max-w-md">
-            <FlatList
-              data={propertyTypes}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => handlePropertyTypeSelect(item)}
-                  className="p-5 border-b border-gray-200 dark:border-gray-600"
-                >
-                  <Text className="text-gray-600 dark:text-white font-semibold text-lg">
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              ItemSeparatorComponent={() => (
-                <View className="h-px bg-gray-200 dark:bg-gray-600" />
-              )}
-            />
-          </View>
-        )}
-
-        {/* Property Use Selector */}
-        <TouchableOpacity
-          onPress={() => setPropertyUseVisible(true)}
-          className="bg-gray-200 dark:bg-gray-700 p-6 rounded-lg mb-3 w-full max-w-md shadow"
-        >
-          <Text className="text-gray-700 dark:text-white text-lg">
-            {selectedPropertyUse || "Select Property Use"}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Property Use Dropdown */}
-        {propertyUseVisible && (
-          <View className="absolute bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 w-full max-w-md">
-            <FlatList
-              data={usePropertyData}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => handlePropertyUseSelect(item)}
-                  className="p-5 border-b border-gray-200 dark:border-gray-600"
-                >
-                  <Text className="text-gray-600 dark:text-white font-semibold text-lg">
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              ItemSeparatorComponent={() => (
-                <View className="h-px bg-gray-200 dark:bg-gray-600" />
-              )}
-            />
-          </View>
-        )}
-        <CustomButton
-          title="Continue"
-          handlePress={handleNext}
-          containerStyles="mt-7"
-        />
       </View>
-    </Pressable>
+    </View>
   );
 };
 
