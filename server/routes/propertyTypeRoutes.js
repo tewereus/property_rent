@@ -1,15 +1,18 @@
 const express = require("express");
+const router = express.Router();
 const {
   createPropertyType,
-  deletePropertyType,
-  editPropertyType,
   getAllPropertyTypes,
+  getPropertyType,
+  updatePropertyType,
+  deletePropertyType,
 } = require("../controllers/propertyTypeCtrl");
-const router = express.Router();
+const { authMiddleware } = require("../middlewares/authMiddleware");
 
-router.post("/create-type", createPropertyType);
-router.delete("/delete-type", deletePropertyType);
-router.put("/edit-type", editPropertyType);
-router.get("/all-types", getAllPropertyTypes);
+router.post("/", authMiddleware, createPropertyType);
+router.get("/", getAllPropertyTypes);
+router.get("/:id", getPropertyType);
+router.put("/:id", authMiddleware, updatePropertyType);
+router.delete("/:id", authMiddleware, deletePropertyType);
 
 module.exports = router;

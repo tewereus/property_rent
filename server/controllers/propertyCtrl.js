@@ -1,206 +1,152 @@
 const asyncHandler = require("express-async-handler");
-// const Property = require("../models/propertyModel");
-const PropertyType = require("../models/propertyTypeModel");
-const User = require("../models/userModel");
 const {
   Property,
-  Villa,
-  Warehouse,
-  Car,
-  Apartment,
-  Hall,
+  createPropertyDiscriminator,
 } = require("../models/propertyModel");
+const { PropertyType } = require("../models/propertyTypeModel");
 
 const createProperty = asyncHandler(async (req, res) => {
-  // use validatemongodbid to check if logged in is admin then create product type
-  // const {
-  //   name,
-  //   property_type,
-  //   property_use,
-  //   num_bed,
-  //   location,
-  //   price,
-  //   description,
-  //   images,
-  //   status,
-  //   // userId,
-  // } = req.body;
-  // try {
-  //   const user = await User.findById(id);
-  //   if (!user) throw new Error("User not found");
-  //   const propertyType = await PropertyType.findOne({ name: property_type });
-  //   // console.log("type here ", propertyType._id);
-  //   const property = await Property.create({
-  //     // owner: userId,
-  //     owner: id,
-  //     name,
-  //     property_type: propertyType._id,
-  //     property_use,
-  //     num_bed,
-  //     location,
-  //     price,
-  //     description,
-  //     images,
-  //     status,
-  //   });
-  //   res.json(property);
-  // } catch (error) {
-  //   throw new Error(error);
   const { id } = req.user;
-  console.log(id);
-  const propertyData = { ...req.body, owner: req.user.id };
-  let property;
+  const { typeSpecificFields, ...propertyData } = req.body;
 
-  console.log(propertyData);
-
-  switch (propertyData.propertyType) {
-    case "villa":
-      console.log("villa");
-      property = new Villa(propertyData);
-      break;
-    case "warehouse":
-      console.log("warehouse");
-      property = new Warehouse(propertyData);
-      break;
-    case "car":
-      property = new Car(propertyData);
-      break;
-    case "apartment":
-      property = new Apartment(propertyData);
-      break;
-    case "hall":
-      property = new Hall(propertyData);
-      break;
-    default:
-      return res.status(400).json({ message: "Invalid property type" });
-  }
-
-  await property.save();
-  res.status(201).json(property);
-});
-
-const deleteProperty = asyncHandler(async (req, res) => {
-  // const {id} = req.user
-  const { propId } = req.body;
   try {
-    const property = await Property.findByIdAndDelete(propId);
-    res.json(property);
+    // Get property type and create discriminator
+    const propertyType = await PropertyType.findById(propertyData.propertyType);
+    if (!propertyType) {
+      return res.status(404).json({
+        message: "Property type not found",
+      });
+    }
+
+    // Create property instance with base fields
+    const property = new Property({
+      ...propertyData,
+      owner: id,
+    });
+
+    // Set type-specific fields using the Map
+    if (typeSpecificFields) {
+      Object.entries(typeSpecificFields).forEach(([key, value]) => {
+        property.typeSpecificFields.set(key, value);
+      });
+    }
+
+    await property.save();
+
+    // Populate references before sending response
+    const populatedProperty = await Property.findById(property._id)
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
+
+    res.status(201).json(populatedProperty);
   } catch (error) {
     throw new Error(error);
   }
 });
 
 const getAllProperties = asyncHandler(async (req, res) => {
-  // const { id } = req.user;
   try {
-    const queryObj = { ...req.query };
-    const excludeFields = [
-      "page",
-      "sort",
-      "limit",
-      "fields",
-      "role",
-      "search",
-      "searchField",
-    ];
-    excludeFields.forEach((el) => delete queryObj[el]);
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    let query = Property.find(JSON.parse(queryStr));
-
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort("-createdAt");
-    }
-
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v");
-    }
-
-    // pagination
-    const page = req.query.page;
-    const limit = req.query.limit;
-    const skip = (page - 1) * limit;
-    query = query.skip(skip).limit(limit);
-    if (req.query.page) {
-      const usersCount = await Property.countDocuments();
-      if (skip >= usersCount) throw new Error("This Page does not exist");
-    }
-    const totalUsers = await Property.countDocuments();
-    const properties = await query;
-    res.json({ properties, totalUsers });
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
-const getAllSellProperties = asyncHandler(async (req, res) => {
-  const { id } = req.user;
-  try {
-    const properties = await Property.find({
-      owner: { $ne: id },
-      property_use: "sell",
-    });
+    const properties = await Property.find()
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
     res.json(properties);
   } catch (error) {
     throw new Error(error);
   }
 });
 
-const getAllRentProperties = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+const getProperty = asyncHandler(async (req, res) => {
+  const { id } = req.params;
   try {
-    const properties = await Property.find({
-      owner: { $ne: id },
-      property_use: "rent",
-    });
-    res.json(properties);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
+    const property = await Property.findById(id)
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
 
-const getAllUsersProperties = asyncHandler(async (req, res) => {
-  const { id } = req.user;
-  try {
-    const properties = await Property.find({ owner: id });
-    res.json(properties);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
-const editProperty = asyncHandler(async (req, res) => {
-  // const {id} = req.user
-  const { propId } = req.body;
-  try {
-    const property = await Property.findByIdAndUpdate(propId, req.body, {
-      new: true,
-    });
+    if (!property) {
+      return res.status(404).json({
+        message: "Property not found",
+      });
+    }
     res.json(property);
   } catch (error) {
     throw new Error(error);
   }
 });
 
-const deleteAllProperties = asyncHandler(async (req, res) => {
+const updateProperty = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { typeSpecificFields, ...updateData } = req.body;
+
   try {
-    const properties = await Property.deleteMany();
+    const property = await Property.findById(id);
+    if (!property) {
+      return res.status(404).json({
+        message: "Property not found",
+      });
+    }
+
+    // Update basic fields
+    Object.assign(property, updateData);
+
+    // Update type-specific fields
+    if (typeSpecificFields) {
+      property.setTypeFields(typeSpecificFields);
+    }
+
+    await property.save();
+    res.json(property);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const deleteProperty = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const property = await Property.findByIdAndDelete(id);
+    if (!property) {
+      return res.status(404).json({
+        message: "Property not found",
+      });
+    }
+    res.json({
+      message: "Property deleted successfully",
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getUserProperties = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    const properties = await Property.find({ owner: id })
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
     res.json(properties);
   } catch (error) {
     throw new Error(error);
   }
 });
 
-const deleteAllUsersProperties = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+const getPropertiesByType = asyncHandler(async (req, res) => {
+  const { typeId } = req.params;
   try {
-    const properties = await Property.deleteMany({ owner: id });
+    const properties = await Property.find({ propertyType: typeId })
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
+    res.json(properties);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getPropertiesByUse = asyncHandler(async (req, res) => {
+  const { use } = req.params; // 'sell' or 'rent'
+  try {
+    const properties = await Property.find({ property_use: use })
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
     res.json(properties);
   } catch (error) {
     throw new Error(error);
@@ -209,12 +155,11 @@ const deleteAllUsersProperties = asyncHandler(async (req, res) => {
 
 module.exports = {
   createProperty,
-  deleteProperty,
-  editProperty,
   getAllProperties,
-  getAllSellProperties,
-  getAllRentProperties,
-  getAllUsersProperties,
-  deleteAllProperties,
-  deleteAllUsersProperties,
+  getProperty,
+  updateProperty,
+  deleteProperty,
+  getUserProperties,
+  getPropertiesByType,
+  getPropertiesByUse,
 };

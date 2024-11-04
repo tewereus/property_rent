@@ -1,30 +1,29 @@
 const express = require("express");
+const router = express.Router();
 const {
   createProperty,
-  deleteProperty,
-  editProperty,
-  deleteAllProperties,
-  getAllUsersProperties,
-  deleteAllUsersProperties,
   getAllProperties,
-  getAllSellProperties,
-  getAllRentProperties,
+  getProperty,
+  updateProperty,
+  deleteProperty,
+  getUserProperties,
+  getPropertiesByType,
+  getPropertiesByUse,
 } = require("../controllers/propertyCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
-const router = express.Router();
+// const { uploadImages } = require("../middlewares/uploadImages");
 
-router.post("/create-property", authMiddleware, createProperty);
-router.delete("/delete-property", deleteProperty);
-router.put("/edit-property", editProperty);
-router.delete("/delete-all", deleteAllProperties);
-router.get("/all-properties", getAllProperties);
-router.get("/all-sell-properties", authMiddleware, getAllSellProperties);
-router.get("/all-rent-properties", authMiddleware, getAllRentProperties);
-router.get("/users-properties", authMiddleware, getAllUsersProperties);
-router.delete(
-  "/delete-users-properties",
-  authMiddleware,
-  deleteAllUsersProperties
-);
+// Public routes
+router.get("/", getAllProperties);
+router.get("/type/:typeId", getPropertiesByType);
+router.get("/use/:use", getPropertiesByUse);
+router.get("/:id", getProperty);
+
+// Protected routes
+router.use(authMiddleware);
+router.post("/", createProperty);
+router.put("/:id", updateProperty);
+router.delete("/:id", deleteProperty);
+router.get("/user/properties", getUserProperties);
 
 module.exports = router;

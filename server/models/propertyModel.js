@@ -19,10 +19,9 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
     propertyType: {
-      type: String,
-      enum: ["villa", "warehouse", "car", "apartment", "hall"],
-      // required: true,
-      default: "villa",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PropertyType",
+      required: true,
     },
     property_use: {
       type: String,
@@ -44,47 +43,93 @@ const propertySchema = new mongoose.Schema(
       enum: ["available", "sold", "rented"],
       default: "available",
     },
+    // Dynamic fields based on property type
+    typeSpecificFields: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
   },
   {
     timestamps: true,
+    discriminatorKey: "__type",
   }
 );
 
+// Middleware to validate type-specific fields before saving
+propertySchema.pre("save", async function (next) {
+  try {
+    const propertyType = await mongoose
+      .model("PropertyType")
+      .findById(this.propertyType);
+    if (!propertyType) {
+      throw new Error("Property type not found");
+    }
+
+    // Validate required fields
+    if (propertyType.kind) {
+      const typeModel = await mongoose.model(propertyType.kind);
+      const typeSchema = typeModel.schema;
+
+      for (const [fieldName, fieldSchema] of Object.entries(typeSchema.paths)) {
+        if (
+          fieldSchema.options.required &&
+          !this.typeSpecificFields.get(fieldName)
+        ) {
+          throw new Error(`${fieldName} is required for ${propertyType.name}`);
+        }
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to set type-specific fields
+propertySchema.methods.setTypeFields = function (fields) {
+  Object.entries(fields).forEach(([key, value]) => {
+    this.typeSpecificFields.set(key, value);
+  });
+};
+
 const Property = mongoose.model("Property", propertySchema);
 
-const Villa = Property.discriminator(
-  "Villa",
-  new mongoose.Schema({
-    gardenSize: { type: Number },
-  })
-);
+// Create property discriminator dynamically
+const createPropertyDiscriminator = (propertyType) => {
+  const schemaFields = {};
 
-const Warehouse = Property.discriminator(
-  "Warehouse",
-  new mongoose.Schema({
-    storageCapacity: { type: Number },
-  })
-);
+  propertyType.fields?.forEach((field) => {
+    // Map string types to actual Mongoose types
+    let fieldType;
+    switch (field.type) {
+      case "String":
+        fieldType = String;
+        break;
+      case "Number":
+        fieldType = Number;
+        break;
+      case "Boolean":
+        fieldType = Boolean;
+        break;
+      case "Date":
+        fieldType = Date;
+        break;
+      default:
+        throw new Error(`Invalid field type: ${field.type}`);
+    }
 
-const Car = Property.discriminator(
-  "Car",
-  new mongoose.Schema({
-    makeModel: { type: String },
-  })
-);
+    schemaFields[field.name] = {
+      type: fieldType,
+      required: field.required,
+    };
+  });
 
-const Apartment = Property.discriminator(
-  "Apartment",
-  new mongoose.Schema({
-    numberOfRooms: { type: Number },
-  })
-);
+  const newSchema = new mongoose.Schema(schemaFields);
+  return Property.discriminator(propertyType.name, newSchema);
+};
 
-const Hall = Property.discriminator(
-  "Hall",
-  new mongoose.Schema({
-    capacity: { type: Number },
-  })
-);
-
-module.exports = { Property, Villa, Warehouse, Car, Apartment, Hall };
+module.exports = {
+  Property,
+  createPropertyDiscriminator,
+};
