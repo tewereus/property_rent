@@ -14,16 +14,16 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 // const { uploadImages } = require("../middlewares/uploadImages");
 
 // Public routes
-router.get("/", getAllProperties);
+router.get("/all-properties", getAllProperties);
 router.get("/type/:typeId", getPropertiesByType);
 router.get("/use/:use", getPropertiesByUse);
+router.get("/users-properties", authMiddleware, getUserProperties);
 router.get("/:id", getProperty);
 
 // Protected routes
 router.use(authMiddleware);
-router.post("/", createProperty);
-router.put("/:id", updateProperty);
-router.delete("/:id", deleteProperty);
-router.get("/user/properties", getUserProperties);
+router.post("/create-property", createProperty);
+router.put("/update-property", updateProperty);
+router.delete("/delete-property", deleteProperty);
 
 module.exports = router;

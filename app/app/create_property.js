@@ -7,44 +7,30 @@ import {
   resetAuthState,
 } from "../store/property/propertySlice";
 import { useDispatch, useSelector } from "react-redux";
-import FormField from "../components/FormField";
-import CustomButton from "../components/CustomButton";
+import PropertyForm from "../components/PropertyForm";
 import MapComponent from "../components/MapComponent";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SellVilla from "./propertyComponent/Villa/SellVilla";
-import RentVilla from "./propertyComponent/Villa/RentVilla";
-import SellApartment from "./propertyComponent/Apartment/SellApartment";
-import RentApartment from "./propertyComponent/Apartment/RentApartment";
-import SellWarehouse from "./propertyComponent/Warehouse/SellWarehouse";
-import RentWarehouse from "./propertyComponent/Warehouse/RentWarehouse";
-import SellCar from "./propertyComponent/Car/SellCar";
-import RentCar from "./propertyComponent/Car/RentCar";
-// import SellHall from "./propertyComponent/Hall/SellHall";
-import RentHall from "./propertyComponent/Hall/RentHall";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const CreateProperty = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { type, action } = useLocalSearchParams();
+  const { propertyTypes } = useSelector((state) => state.propertyType);
 
-  const initialFormData = {
+  const selectedPropertyType = propertyTypes?.find((pt) => pt._id === type);
+
+  const [formData, setFormData] = useState({
     title: "",
     location: "",
     price: 0,
     description: "",
-    ...(type === "villa" && { num_bed: 0, gardenSize: "" }),
-    ...(type === "apartment" && { numberOfRooms: 0 }),
-    ...(type === "warehouse" && { storageCapacity: 0 }),
-    ...(type === "car" && { makeModel: "" }),
-    ...(type === "hall" && { capacity: 0 }),
-  };
+    propertyType: type,
+    property_use: action,
+    typeSpecificFields: {},
+  });
 
-  const [formData, setFormData] = useState(initialFormData);
   const [showMapModal, setShowMapModal] = useState(false);
-  const { isSuccess, isError, message } = useSelector(
-    (state) => state.property
-  );
 
   const handleLocationSelect = (coords) => {
     const locationString = `${coords.latitude}, ${coords.longitude}`;
@@ -80,33 +66,11 @@ const CreateProperty = () => {
           contentContainerStyle={{ paddingBottom: 100 }}
         >
           <View className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6">
-            {type === "villa" &&
-              (action === "sell" ? (
-                <SellVilla formData={formData} setFormData={setFormData} />
-              ) : (
-                <RentVilla formData={formData} setFormData={setFormData} />
-              ))}
-            {type === "apartment" &&
-              (action === "sell" ? (
-                <SellApartment formData={formData} setFormData={setFormData} />
-              ) : (
-                <RentApartment formData={formData} setFormData={setFormData} />
-              ))}
-            {type === "warehouse" &&
-              (action === "sell" ? (
-                <SellWarehouse formData={formData} setFormData={setFormData} />
-              ) : (
-                <RentWarehouse formData={formData} setFormData={setFormData} />
-              ))}
-            {type === "car" &&
-              (action === "sell" ? (
-                <SellCar formData={formData} setFormData={setFormData} />
-              ) : (
-                <RentCar formData={formData} setFormData={setFormData} />
-              ))}
-            {type === "hall" && action === "rent" && (
-              <RentHall formData={formData} setFormData={setFormData} />
-            )}
+            <PropertyForm
+              formData={formData}
+              setFormData={setFormData}
+              propertyType={selectedPropertyType}
+            />
           </View>
 
           <TouchableOpacity

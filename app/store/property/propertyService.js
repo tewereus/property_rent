@@ -2,41 +2,25 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseUrl } from "../../constants/axiosConfig";
 import axios from "axios";
 
-// const createProperty = async (data) => {
-//   const userData = await AsyncStorage.getItem("user");
-//   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
-//   const headers = {
-//     Authorization: `Bearer ${
-//       getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
-//     }`,
-//     // Accept: "application/json",
-//   };
-//   const response = await axios.post(
-//     `${baseUrl}/property/create-property`,
-//     data,
-//     {
-//       headers,
-//       withCredentials: true,
-//     }
-//   );
-//   console.log(response.data);
-//   return response.data;
-// };
-
 const createProperty = async (propertyData) => {
-  console.log("propertyData", propertyData);
   const userData = await AsyncStorage.getItem("user");
-  // console.log("userData", userData);
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
   const headers = {
     Authorization: `Bearer ${
       getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
     }`,
-    // Accept: "application/json",
   };
+
+  const transformedData = {
+    ...propertyData,
+    propertyType: propertyData.propertyType,
+    property_use: propertyData.property_use,
+    typeSpecificFields: propertyData.typeSpecificFields,
+  };
+
   const response = await axios.post(
     `${baseUrl}/property/create-property`,
-    propertyData,
+    transformedData,
     {
       headers,
       withCredentials: true,
@@ -90,7 +74,7 @@ const getAllProperties = async ({
   return response.data;
 };
 
-const getAllSellProperties = async () => {
+const getPropertiesByUse = async (use) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -98,35 +82,16 @@ const getAllSellProperties = async () => {
     Authorization: `Bearer ${
       getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
     }`,
-    // Accept: "application/json",
   };
 
-  const response = await axios.get(`${baseUrl}/property/all-sell-properties`, {
+  const response = await axios.get(`${baseUrl}/property/use/${use}`, {
     headers,
     withCredentials: true,
   });
   return response.data;
 };
 
-const getAllRentProperties = async () => {
-  const userData = await AsyncStorage.getItem("user");
-  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
-
-  const headers = {
-    Authorization: `Bearer ${
-      getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
-    }`,
-    // Accept: "application/json",
-  };
-
-  const response = await axios.get(`${baseUrl}/property/all-rent-properties`, {
-    headers,
-    withCredentials: true,
-  });
-  return response.data;
-};
-
-const getAllUsersProperties = async () => {
+const getUserProperties = async () => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -147,9 +112,8 @@ const getAllUsersProperties = async () => {
 const propertyService = {
   createProperty,
   getAllProperties,
-  getAllSellProperties,
-  getAllRentProperties,
-  getAllUsersProperties,
+  getPropertiesByUse,
+  getUserProperties,
 };
 
 export default propertyService;

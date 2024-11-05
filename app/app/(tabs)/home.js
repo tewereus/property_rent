@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllRentProperties,
   getAllSellProperties,
+  getPropertiesByUse,
 } from "../../store/property/propertySlice";
 import {
   addToWishlist,
@@ -47,13 +48,11 @@ const Home = () => {
 
   useEffect(() => {
     loadColorScheme();
-    dispatch(getAllSellProperties());
-    dispatch(getAllRentProperties());
+    dispatch(getPropertiesByUse("sell"));
+    dispatch(getPropertiesByUse("rent"));
   }, []);
 
-  const { sellProperties, rentProperties, isSuccess } = useSelector(
-    (state) => state.property
-  );
+  const { propertiesByUse, isSuccess } = useSelector((state) => state.property);
 
   const { t, i18n } = useTranslation();
 
@@ -233,12 +232,13 @@ const Home = () => {
         </View>
       </View>
 
-      {sellProperties?.length > 0 || rentProperties?.length > 0 ? (
+      {propertiesByUse?.sell?.length > 0 ||
+      propertiesByUse?.rent?.length > 0 ? (
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingBottom: 100, // Add padding to bottom of scroll view
+            paddingBottom: 100,
           }}
         >
           {/* Sell Properties Section */}
@@ -246,7 +246,7 @@ const Home = () => {
             {t("available_for_sell")}
           </Text>
           <FlatList
-            data={sellProperties}
+            data={propertiesByUse.sell}
             keyExtractor={(item) => item._id}
             renderItem={renderPropertyItem}
             horizontal
@@ -266,7 +266,7 @@ const Home = () => {
             {t("available_for_rent")}
           </Text>
           <FlatList
-            data={rentProperties}
+            data={propertiesByUse.rent}
             keyExtractor={(item) => item._id}
             renderItem={renderPropertyItem}
             horizontal

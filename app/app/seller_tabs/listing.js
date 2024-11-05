@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getAllUsersProperties } from "../../store/property/propertySlice";
+import { getUserProperties } from "../../store/property/propertySlice";
 import { useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -28,7 +28,7 @@ const Listing = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
-    dispatch(getAllUsersProperties());
+    dispatch(getUserProperties());
   }, [dispatch]);
 
   const { userProperties } = useSelector((state) => state.property);

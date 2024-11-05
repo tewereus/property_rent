@@ -9,10 +9,10 @@ const {
 } = require("../controllers/propertyTypeCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 
-router.post("/", authMiddleware, createPropertyType);
-router.get("/", getAllPropertyTypes);
+router.post("/create-type", authMiddleware, createPropertyType);
+router.get("/all-types", getAllPropertyTypes);
+router.put("/edit-type", authMiddleware, updatePropertyType);
+router.delete("/delete-type", authMiddleware, deletePropertyType);
 router.get("/:id", getPropertyType);
-router.put("/:id", authMiddleware, updatePropertyType);
-router.delete("/:id", authMiddleware, deletePropertyType);
 
 module.exports = router;

@@ -84,8 +84,14 @@ const Profile = () => {
     } else if (user?.seller_tab === "waiting") {
       router.push("/waiting");
     } else if (user?.seller_tab === "active") {
-      dispatch(changeMode(data));
-      router.push("/seller_tabs");
+      dispatch(changeMode(data))
+        .unwrap()
+        .then((response) => {
+          router.push("/seller_tabs");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 

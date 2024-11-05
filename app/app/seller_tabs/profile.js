@@ -40,8 +40,15 @@ const Profile = () => {
     const data = {
       mode: "customer",
     };
-    dispatch(changeMode(data));
-    router.push("/home");
+    dispatch(changeMode(data))
+      .unwrap()
+      .then((response) => {
+        console.log("response", response);
+        router.push("/home");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const saveColorScheme = async (scheme) => {

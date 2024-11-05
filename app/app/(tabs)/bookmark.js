@@ -38,13 +38,15 @@ const Bookmark = () => {
     const data = {
       prodId: selectedWishlist?._id,
     };
-    dispatch(addToWishlist(data)).then((response) => {
-      if (response.payload) {
-        console.log("here");
-        setFavouriteOn(!favouriteOn);
-        dispatch(getWishlists());
-      }
-    });
+    dispatch(addToWishlist(data))
+      .unwrap()
+      .then((response) => {
+        if (response.payload) {
+          console.log("here");
+          setFavouriteOn(!favouriteOn);
+          dispatch(getWishlists());
+        }
+      });
   };
 
   const renderWishlist = ({ item }) => (
