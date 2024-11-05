@@ -68,86 +68,96 @@ const Create = () => {
     }
   };
 
-  const SelectBox = ({ label, value, onPress, icon, isOpen }) => (
-    <View>
-      <TouchableOpacity
-        onPress={() => {
-          onPress();
-          animateDropdown(true);
-        }}
-        className="bg-white dark:bg-gray-800 p-6 rounded-2xl mb-2 shadow-sm w-full"
-      >
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center">
-            <View className="bg-orange-100 dark:bg-orange-700 p-2 rounded-full mr-4">
-              <Ionicons name={icon} size={24} color="#F97316" />
-            </View>
-            <View>
-              <Text className="text-gray-500 dark:text-gray-400 text-sm mb-1">
-                {label}
-              </Text>
-              <Text className="text-gray-800 dark:text-white text-lg font-semibold">
-                {value || "Select option"}
-              </Text>
-            </View>
-          </View>
-          <Ionicons
-            name="chevron-down"
-            size={24}
-            color="#6B7280"
-            style={{ transform: [{ rotate: isOpen ? "180deg" : "0deg" }] }}
-          />
-        </View>
-      </TouchableOpacity>
+  const SelectBox = ({ label, value, onPress, icon, isOpen }) => {
+    const getDisplayValue = () => {
+      if (label === "Property Type" && value) {
+        const selectedType = propertyTypes.find((type) => type._id === value);
+        return selectedType ? selectedType.name : "Select option";
+      }
+      return value || "Select option";
+    };
 
-      {isOpen && (
-        <Animated.View
-          style={{
-            transform: [
-              {
-                translateY: dropdownAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-10, 0],
-                }),
-              },
-            ],
-            opacity: dropdownAnimation,
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            onPress();
+            animateDropdown(true);
           }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-4"
+          className="bg-white dark:bg-gray-800 p-6 rounded-2xl mb-2 shadow-sm w-full"
         >
-          {(label === "Property Type" ? propertyTypes : usePropertyData).map(
-            (item) => (
-              <TouchableOpacity
-                key={item}
-                onPress={() =>
-                  label === "Property Type"
-                    ? handlePropertyTypeSelect(item)
-                    : handlePropertyUseSelect(item)
-                }
-                className="p-4 flex-row items-center border-b border-gray-100 dark:border-gray-700"
-              >
-                <Ionicons
-                  name={
-                    label === "Property Type"
-                      ? "home"
-                      : item === "rent"
-                      ? "key-outline"
-                      : "cart-outline"
-                  }
-                  size={20}
-                  color="#F97316"
-                  className="mr-3"
-                />
-                <Text className="text-gray-700 dark:text-white text-lg capitalize">
-                  {item}
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <View className="bg-orange-100 dark:bg-orange-700 p-2 rounded-full mr-4">
+                <Ionicons name={icon} size={24} color="#F97316" />
+              </View>
+              <View>
+                <Text className="text-gray-500 dark:text-gray-400 text-sm mb-1">
+                  {label}
                 </Text>
-              </TouchableOpacity>
-            )
-          )}
-        </Animated.View>
-      )}
-    </View>
-  );
+                <Text className="text-gray-800 dark:text-white text-lg font-semibold">
+                  {getDisplayValue()}
+                </Text>
+              </View>
+            </View>
+            <Ionicons
+              name="chevron-down"
+              size={24}
+              color="#6B7280"
+              style={{ transform: [{ rotate: isOpen ? "180deg" : "0deg" }] }}
+            />
+          </View>
+        </TouchableOpacity>
+
+        {isOpen && (
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  translateY: dropdownAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-10, 0],
+                  }),
+                },
+              ],
+              opacity: dropdownAnimation,
+            }}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-4"
+          >
+            {(label === "Property Type" ? propertyTypes : usePropertyData).map(
+              (item) => (
+                <TouchableOpacity
+                  key={typeof item === "object" ? item._id : item}
+                  onPress={() =>
+                    label === "Property Type"
+                      ? handlePropertyTypeSelect(item._id)
+                      : handlePropertyUseSelect(item)
+                  }
+                  className="p-4 flex-row items-center border-b border-gray-100 dark:border-gray-700"
+                >
+                  <Ionicons
+                    name={
+                      label === "Property Type"
+                        ? "home"
+                        : item === "rent"
+                        ? "key-outline"
+                        : "cart-outline"
+                    }
+                    size={20}
+                    color="#F97316"
+                    className="mr-3"
+                  />
+                  <Text className="text-gray-700 dark:text-white text-lg capitalize">
+                    {typeof item === "object" ? item.name : item}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </Animated.View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <View

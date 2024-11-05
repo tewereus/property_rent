@@ -68,10 +68,7 @@ const createPropertyType = asyncHandler(async (req, res) => {
 
 const getAllPropertyTypes = asyncHandler(async (req, res) => {
   try {
-    const propertyTypes = await PropertyType.find().populate(
-      "createdBy",
-      "firstname lastname"
-    );
+    const propertyTypes = await PropertyType.find();
     res.json(propertyTypes);
   } catch (error) {
     throw new Error(error);
