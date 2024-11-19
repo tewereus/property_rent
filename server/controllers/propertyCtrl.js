@@ -4,6 +4,7 @@ const {
   createPropertyDiscriminator,
 } = require("../models/propertyModel");
 const { PropertyType } = require("../models/propertyTypeModel");
+const Transaction = require("../models/transactionModel");
 
 const createProperty = asyncHandler(async (req, res) => {
   const { id } = req.user;
@@ -188,6 +189,55 @@ const getPropertiesByUse = asyncHandler(async (req, res) => {
   }
 });
 
+const buyProperty = asyncHandler(async (req, res) => {
+  const { propertyId, paymentMethod } = req.body;
+  const { id } = req.user;
+
+  try {
+    const property = await Property.findById(propertyId);
+
+    if (!property) {
+      return res.status(404).json({
+        message: "Property not found",
+      });
+    }
+
+    if (property.status !== "available") {
+      return res.status(400).json({
+        message: "Property is not available for purchase",
+      });
+    }
+
+    if (property.owner.toString() === id) {
+      return res.status(400).json({
+        message: "You cannot buy your own property",
+      });
+    }
+
+    // const transaction = await Transaction.create({
+    //   property: propertyId,
+    //   buyer: id,
+    //   seller: property.owner,
+    //   amount: property.price,
+    //   paymentMethod,
+    //   transactionDetails: {
+    //     paymentDate: new Date(),
+    //     receiptNumber: `TXN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    //   },
+    // });
+
+    property.status = "sold";
+    await property.save();
+
+    res.json({
+      message: "Property purchase initiated successfully",
+      property,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProperty,
   getAllProperties,
@@ -197,4 +247,5 @@ module.exports = {
   getUserProperties,
   getPropertiesByType,
   getPropertiesByUse,
+  buyProperty,
 };

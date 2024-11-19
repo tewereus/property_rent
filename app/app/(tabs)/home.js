@@ -17,6 +17,7 @@ import {
   getAllRentProperties,
   getAllSellProperties,
   getPropertiesByUse,
+  buyProperty,
 } from "../../store/property/propertySlice";
 import {
   addToWishlist,
@@ -33,6 +34,8 @@ const Home = () => {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [favouriteOn, setFavouriteOn] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
 
   const loadColorScheme = async () => {
     try {
@@ -195,20 +198,50 @@ const Home = () => {
 
     setIsPurchasing(true);
     try {
-      // Your purchase logic here
-      // For example:
-      // await dispatch(buyProperty({ propertyId: selectedProperty._id }));
+      const result = await dispatch(
+        buyProperty({
+          propertyId: selectedProperty._id,
+          paymentMethod: paymentMethod,
+        })
+      ).unwrap();
 
-      Alert.alert("Success", "Property purchase initiated successfully!");
-      setModalVisible(false);
+      Alert.alert(
+        "Success",
+        "Property purchase initiated successfully! Check your transactions for details.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setModalVisible(false);
+              // Optionally navigate to transactions screen
+              // navigation.navigate('Transactions');
+            },
+          },
+        ]
+      );
     } catch (error) {
       Alert.alert(
         "Error",
-        error.message || "Failed to initiate property purchase"
+        error?.message ||
+          "Failed to initiate property purchase. Please try again later."
       );
     } finally {
       setIsPurchasing(false);
     }
+  };
+
+  const handleScheduleVisit = () => {
+    setIsSchedulingVisit(true);
+    Alert.alert(
+      "Schedule Visit",
+      "Our agent will contact you shortly to arrange a visit.",
+      [
+        {
+          text: "OK",
+          onPress: () => setIsSchedulingVisit(false),
+        },
+      ]
+    );
   };
 
   return (
@@ -242,8 +275,8 @@ const Home = () => {
           }}
         >
           {/* Sell Properties Section */}
-          <Text className="text-lg dark:text-white mb-2">
-            {t("available_for_sell")}
+          <Text className="text-lg dark:text-white mt-4 mb-2">
+            {t("available_for_sale")}
           </Text>
           <FlatList
             data={propertiesByUse.sell}
@@ -279,10 +312,8 @@ const Home = () => {
             ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
             snapToAlignment="start"
             decelerationRate="fast"
-            snapToInterval={295} // width of card (280) + separator (15)
+            snapToInterval={295}
           />
-
-          {/* Add bottom padding to ensure last item is fully visible */}
           <View style={{ height: 100 }} />
         </ScrollView>
       ) : (
@@ -314,34 +345,48 @@ const Home = () => {
 
           {selectedProperty && (
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              {/* Image Carousel */}
-              <ScrollView
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                onMomentumScrollEnd={(event) => {
-                  const slideSize = event.nativeEvent.layoutMeasurement.width;
-                  const index = event.nativeEvent.contentOffset.x / slideSize;
-                  setActiveImageIndex(Math.round(index));
-                }}
-              >
-                {(selectedProperty?.images?.length > 0
-                  ? selectedProperty.images
-                  : placeholderImages
-                ).map((image, index) => (
-                  <Image
-                    key={index}
-                    source={{
-                      uri:
-                        typeof image === "string"
-                          ? image
-                          : image.url || placeholderImages[0],
-                    }}
-                    className="w-screen h-72"
-                    resizeMode="cover"
+              {/* Image Carousel with Favorite Button */}
+              <View className="relative">
+                <ScrollView
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  onMomentumScrollEnd={(event) => {
+                    const slideSize = event.nativeEvent.layoutMeasurement.width;
+                    const index = event.nativeEvent.contentOffset.x / slideSize;
+                    setActiveImageIndex(Math.round(index));
+                  }}
+                >
+                  {(selectedProperty?.images?.length > 0
+                    ? selectedProperty.images
+                    : placeholderImages
+                  ).map((image, index) => (
+                    <Image
+                      key={index}
+                      source={{
+                        uri:
+                          typeof image === "string"
+                            ? image
+                            : image.url || placeholderImages[0],
+                      }}
+                      className="w-screen h-72"
+                      resizeMode="cover"
+                    />
+                  ))}
+                </ScrollView>
+
+                {/* Favorite Button - Now positioned over the image */}
+                <TouchableOpacity
+                  onPress={handleFavourite}
+                  className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
+                >
+                  <Ionicons
+                    name={favouriteOn ? "heart" : "heart-outline"}
+                    size={24}
+                    color={favouriteOn ? "#EF4444" : "#6B7280"}
                   />
-                ))}
-              </ScrollView>
+                </TouchableOpacity>
+              </View>
 
               {/* Carousel Indicators */}
               <View className="flex-row justify-center mt-2">
@@ -362,20 +407,31 @@ const Home = () => {
 
               {/* Content */}
               <View className="p-5">
-                {/* Price and Favorite */}
+                {/* Price and Schedule Visit */}
                 <View className="flex-row justify-between items-center mb-4">
                   <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     ${selectedProperty.price}
                   </Text>
                   <TouchableOpacity
-                    onPress={handleFavourite}
-                    className="bg-gray-100 dark:bg-gray-800 p-2 rounded-full"
+                    onPress={handleScheduleVisit}
+                    disabled={isSchedulingVisit}
+                    className="flex-row items-center bg-green-500 px-4 py-2 rounded-full"
                   >
-                    <Ionicons
-                      name={favouriteOn ? "heart" : "heart-outline"}
-                      size={24}
-                      color={favouriteOn ? "#EF4444" : "#6B7280"}
-                    />
+                    {isSchedulingVisit ? (
+                      <ActivityIndicator color="white" size="small" />
+                    ) : (
+                      <>
+                        <Ionicons
+                          name="calendar-outline"
+                          size={20}
+                          color="white"
+                          className="mr-2"
+                        />
+                        <Text className="text-white font-semibold ml-1">
+                          Schedule Visit
+                        </Text>
+                      </>
+                    )}
                   </TouchableOpacity>
                 </View>
 
@@ -438,7 +494,9 @@ const Home = () => {
                 <ActivityIndicator color="white" />
               ) : (
                 <Text className="text-white text-center font-semibold text-base">
-                  Buy Property
+                  {selectedProperty?.property_use === "rent"
+                    ? "Rent Property"
+                    : "Buy Property"}
                 </Text>
               )}
             </TouchableOpacity>

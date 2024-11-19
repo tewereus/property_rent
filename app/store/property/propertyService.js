@@ -109,11 +109,38 @@ const getUserProperties = async () => {
   return response.data;
 };
 
+const buyProperty = async (data) => {
+  console.log("data: ", data);
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+      }`,
+    },
+    withCredentials: true,
+  };
+
+  const response = await axios.post(
+    `${baseUrl}/property/buy-property`,
+    {
+      propertyId: data.propertyId,
+      paymentMethod: data.paymentMethod,
+    },
+    config
+  );
+
+  return response.data;
+};
+
 const propertyService = {
   createProperty,
   getAllProperties,
   getPropertiesByUse,
   getUserProperties,
+  buyProperty,
 };
 
 export default propertyService;

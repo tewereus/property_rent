@@ -9,6 +9,7 @@ const {
   getUserProperties,
   getPropertiesByType,
   getPropertiesByUse,
+  buyProperty,
 } = require("../controllers/propertyCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 // const { uploadImages } = require("../middlewares/uploadImages");
@@ -25,5 +26,6 @@ router.use(authMiddleware);
 router.post("/create-property", createProperty);
 router.put("/update-property", updateProperty);
 router.delete("/delete-property", deleteProperty);
+router.post("/buy-property", authMiddleware, buyProperty);
 
 module.exports = router;
