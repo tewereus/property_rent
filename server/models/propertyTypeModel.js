@@ -1,18 +1,5 @@
 const mongoose = require("mongoose");
 
-// Define field definition as a plain object type, not a schema
-const fieldDefinition = {
-  name: String,
-  type: {
-    type: String,
-    enum: ["String", "Number", "Boolean", "Date"],
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
-};
-
 const basePropertyTypeSchema = new mongoose.Schema(
   {
     name: {
@@ -20,12 +7,6 @@ const basePropertyTypeSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    // Use type: Array and specify the field structure
     fields: {
       type: [
         {
@@ -41,7 +22,7 @@ const basePropertyTypeSchema = new mongoose.Schema(
         },
       ],
       required: true,
-      _id: false, // This prevents MongoDB from creating _id for array elements
+      _id: false, // preventing creating _id for array elements
     },
   },
   {
@@ -52,7 +33,6 @@ const basePropertyTypeSchema = new mongoose.Schema(
 
 const PropertyType = mongoose.model("PropertyType", basePropertyTypeSchema);
 
-// Function to create a new discriminator dynamically
 const createPropertyTypeDiscriminator = (typeName, fields) => {
   const schemaFields = {};
 
@@ -88,5 +68,4 @@ const createPropertyTypeDiscriminator = (typeName, fields) => {
 module.exports = {
   PropertyType,
   createPropertyTypeDiscriminator,
-  fieldDefinition,
 };

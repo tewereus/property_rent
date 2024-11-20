@@ -6,7 +6,7 @@ const {
 
 const createPropertyType = asyncHandler(async (req, res) => {
   const { name, fields } = req.body;
-  const { id } = req.user;
+  // const { id } = req.user;
 
   try {
     // Check if property type already exists
@@ -20,7 +20,6 @@ const createPropertyType = asyncHandler(async (req, res) => {
     // First create the base property type
     const propertyType = await PropertyType.create({
       name,
-      createdBy: id,
       fields,
     });
 
@@ -79,7 +78,6 @@ const getPropertyType = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const propertyType = await PropertyType.findById(id).populate(
-      "createdBy",
       "firstname lastname"
     );
     if (!propertyType) {

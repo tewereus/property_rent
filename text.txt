@@ -1,3 +1,505 @@
-=> filteration
-=> isFeatured property
-=> run mern canva
+json for property types
+{
+  "name": "House",
+  "fields": [
+    { "name": "bedrooms", "type": "Number", "required": true },
+    { "name": "bathrooms", "type": "Number", "required": true },
+    { "name": "totalFloors", "type": "Number", "required": true },
+    { "name": "squareFootage", "type": "Number", "required": true },
+    { "name": "yearBuilt", "type": "Number", "required": true },
+    { "name": "hasGarage", "type": "Boolean", "required": false },
+    { "name": "garageCapacity", "type": "Number", "required": false },
+    { "name": "hasBasement", "type": "Boolean", "required": false },
+    { "name": "hasGarden", "type": "Boolean", "required": false },
+    { "name": "gardenSize", "type": "Number", "required": false }
+  ]
+}
+
+{
+  "name": "Apartment",
+  "fields": [
+    { "name": "bedrooms", "type": "Number", "required": true },
+    { "name": "bathrooms", "type": "Number", "required": true },
+    { "name": "floorNumber", "type": "Number", "required": true },
+    { "name": "totalFloors", "type": "Number", "required": true },
+    { "name": "squareFootage", "type": "Number", "required": true },
+    { "name": "hasElevator", "type": "Boolean", "required": true },
+    { "name": "hasBalcony", "type": "Boolean", "required": false },
+    { "name": "balconySize", "type": "Number", "required": false },
+    { "name": "parkingSpots", "type": "Number", "required": false },
+    { "name": "monthlyMaintenance", "type": "Number", "required": true }
+  ]
+}
+
+{
+  "name": "Office",
+  "fields": [
+    { "name": "squareFootage", "type": "Number", "required": true },
+    { "name": "floorNumber", "type": "Number", "required": true },
+    { "name": "numberOfOffices", "type": "Number", "required": true },
+    { "name": "numberOfMeetingRooms", "type": "Number", "required": true },
+    { "name": "hasReception", "type": "Boolean", "required": true },
+    { "name": "parkingSpaces", "type": "Number", "required": true },
+    { "name": "hasLoadingDock", "type": "Boolean", "required": false },
+    { "name": "internetSpeed", "type": "Number", "required": false },
+    { "name": "hasBackupPower", "type": "Boolean", "required": true },
+    { "name": "securityLevel", "type": "String", "required": true }
+  ]
+}
+
+{
+  "name": "Retail",
+  "fields": [
+    { "name": "squareFootage", "type": "Number", "required": true },
+    { "name": "frontage", "type": "Number", "required": true },
+    { "name": "hasStorefront", "type": "Boolean", "required": true },
+    { "name": "storageSpace", "type": "Number", "required": true },
+    { "name": "hasLoadingBay", "type": "Boolean", "required": true },
+    { "name": "parkingSpaces", "type": "Number", "required": true },
+    { "name": "footTraffic", "type": "Number", "required": false },
+    { "name": "zoning", "type": "String", "required": true },
+    { "name": "previousBusiness", "type": "String", "required": false },
+    { "name": "signageAllowed", "type": "Boolean", "required": true }
+  ]
+}
+
+{
+  "name": "Warehouse",
+  "fields": [
+    { "name": "totalArea", "type": "Number", "required": true },
+    { "name": "clearHeight", "type": "Number", "required": true },
+    { "name": "numberOfDocks", "type": "Number", "required": true },
+    { "name": "hasOfficeSpace", "type": "Boolean", "required": true },
+    { "name": "officeArea", "type": "Number", "required": false },
+    { "name": "hasYard", "type": "Boolean", "required": true },
+    { "name": "yardSize", "type": "Number", "required": false },
+    { "name": "powerCapacity", "type": "String", "required": true },
+    { "name": "sprinklerSystem", "type": "Boolean", "required": true },
+    { "name": "securityFeatures", "type": "String", "required": true }
+  ]
+}
+
+{
+  "name": "Land",
+  "fields": [
+    { "name": "totalArea", "type": "Number", "required": true },
+    { "name": "zoning", "type": "String", "required": true },
+    { "name": "topography", "type": "String", "required": true },
+    { "name": "hasUtilities", "type": "Boolean", "required": true },
+    { "name": "roadAccess", "type": "Boolean", "required": true },
+    { "name": "soilType", "type": "String", "required": false },
+    { "name": "floodZone", "type": "Boolean", "required": true },
+    { "name": "hasWaterRights", "type": "Boolean", "required": false },
+    { "name": "mineralRights", "type": "Boolean", "required": false },
+    { "name": "environmentalReport", "type": "String", "required": false }
+  ]
+}
+
+{
+  "name": "Villa",
+  "fields": [
+    { "name": "bedrooms", "type": "Number", "required": true },
+    { "name": "bathrooms", "type": "Number", "required": true },
+    { "name": "squareFootage", "type": "Number", "required": true },
+    { "name": "landArea", "type": "Number", "required": true },
+    { "name": "hasPool", "type": "Boolean", "required": true },
+    { "name": "hasGuesthouse", "type": "Boolean", "required": false },
+    { "name": "staffQuarters", "type": "Boolean", "required": false },
+    { "name": "garageCapacity", "type": "Number", "required": true },
+    { "name": "securitySystem", "type": "Boolean", "required": true },
+    { "name": "landscapeType", "type": "String", "required": false }
+  ]
+}
+
+{
+  "name": "Hotel",
+  "fields": [
+    { "name": "numberOfRooms", "type": "Number", "required": true },
+    { "name": "numberOfSuites", "type": "Number", "required": true },
+    { "name": "starRating", "type": "Number", "required": true },
+    { "name": "hasRestaurant", "type": "Boolean", "required": true },
+    { "name": "hasPool", "type": "Boolean", "required": true },
+    { "name": "hasSpa", "type": "Boolean", "required": true },
+    { "name": "conferenceCapacity", "type": "Number", "required": false },
+    { "name": "parkingSpaces", "type": "Number", "required": true },
+    { "name": "yearRenovated", "type": "Number", "required": false },
+    { "name": "occupancyRate", "type": "Number", "required": true }
+  ]
+}
+
+
+
+
+
+users JSON
+{
+  "name": "John Smith",
+  "email": "john.smith@email.com",
+  "password": "hashedPassword123",
+  "role": "customer",
+  "seller_tab": "inactive",
+  "mode": "customer",
+  "wishlist": [],
+  "preference": {
+    "mode": "light",
+    "language": "Eng"
+  }
+}
+
+{
+  "name": "Sarah Johnson",
+  "email": "sarah.realestate@email.com",
+  "password": "hashedPassword456",
+  "role": "seller",
+  "seller_tab": "active",
+  "mode": "seller",
+  "wishlist": ["propertyId1", "propertyId2"],
+  "preference": {
+    "mode": "dark",
+    "language": "Eng"
+  }
+}
+
+{
+  "name": "Abebe Kebede",
+  "email": "abebe.k@email.com",
+  "password": "hashedPassword789",
+  "role": "customer",
+  "seller_tab": "inactive",
+  "mode": "customer",
+  "wishlist": ["propertyId3"],
+  "preference": {
+    "mode": "light",
+    "language": "Amh"
+  }
+}
+
+{
+  "name": "Real Estate Pro",
+  "email": "realtor@email.com",
+  "password": "hashedPasswordABC",
+  "role": "seller",
+  "seller_tab": "active",
+  "mode": "seller",
+  "wishlist": [],
+  "preference": {
+    "mode": "dark",
+    "language": "Eng"
+  }
+}
+
+{
+  "name": "Property Admin",
+  "email": "admin@property.com",
+  "password": "hashedPasswordXYZ",
+  "role": "admin",
+  "seller_tab": "active",
+  "mode": "seller",
+  "wishlist": [],
+  "preference": {
+    "mode": "light",
+    "language": "Eng"
+  }
+}
+
+{
+  "name": "Marta Haile",
+  "email": "marta.h@email.com",
+  "password": "hashedPassword321",
+  "role": "customer",
+  "seller_tab": "inactive",
+  "mode": "customer",
+  "wishlist": ["propertyId4", "propertyId5", "propertyId6"],
+  "preference": {
+    "mode": "light",
+    "language": "Amh"
+  }
+}
+
+{
+  "name": "Premium Agent",
+  "email": "premium.agent@email.com",
+  "password": "hashedPasswordDEF",
+  "role": "seller",
+  "seller_tab": "active",
+  "mode": "seller",
+  "wishlist": ["propertyId7"],
+  "preference": {
+    "mode": "dark",
+    "language": "Eng"
+  }
+}
+
+{
+  "name": "Dual User",
+  "email": "dual.user@email.com",
+  "password": "hashedPasswordGHI",
+  "role": "customer",
+  "seller_tab": "active",
+  "mode": "seller",
+  "wishlist": ["propertyId8", "propertyId9"],
+  "preference": {
+    "mode": "light",
+    "language": "Eng"
+  }
+}
+
+{
+  "name": "Kebede Alemu",
+  "email": "kebede.a@email.com",
+  "password": "hashedPassword654",
+  "role": "seller",
+  "seller_tab": "active",
+  "mode": "seller",
+  "wishlist": [],
+  "preference": {
+    "mode": "dark",
+    "language": "Amh"
+  }
+}
+
+{
+  "name": "New User",
+  "email": "new.user@email.com",
+  "password": "hashedPasswordJKL",
+  "role": "customer",
+  "seller_tab": "inactive",
+  "mode": "customer",
+  "wishlist": [],
+  "preference": {
+    "mode": "light",
+    "language": "Eng"
+  }
+}
+
+
+
+
+
+property json
+
+
+{
+  "title": "Luxury Villa in CMC",
+  "description": "Spacious villa with swimming pool",
+  "price": 15000000,
+  "location": "CMC, Addis Ababa",
+  "propertyType": "673e0d2137cfbc016cdf9882",
+  "property_use": "sell",
+  "images": [
+    "villa1.jpg",
+    "villa2.jpg",
+    "villa3.jpg"
+  ],
+  "owner": "673e0e4e37cfbc016cdf989c",
+  "status": "available",
+  "typeSpecificFields": {
+    "bedrooms": 5,
+    "bathrooms": 4,
+    "squareFootage": 500,
+    "landArea": 1000,
+    "hasPool": true,
+    "hasGuesthouse": true,
+    "staffQuarters": true,
+    "garageCapacity": 3,
+    "securitySystem": true,
+    "landscapeType": "Modern Garden"
+  }
+}
+
+{
+  "title": "Modern Family Home in Bole",
+  "description": "Beautiful 4-bedroom house with modern amenities",
+  "price": 8500000,
+  "location": "Bole, Addis Ababa",
+  "propertyType": "673e0c7637cfbc016cdf986a",
+  "property_use": "sell",
+  "images": [
+    "house1.jpg",
+    "house2.jpg",
+    "house3.jpg"
+  ],
+  "owner": "673e0e0a37cfbc016cdf988d",
+  "status": "available",
+  "typeSpecificFields": {
+    "bedrooms": 4,
+    "bathrooms": 3,
+    "totalFloors": 2,
+    "squareFootage": 350,
+    "yearBuilt": 2020,
+    "hasGarage": true,
+    "garageCapacity": 2,
+    "hasBasement": true,
+    "hasGarden": true,
+    "gardenSize": 100
+  }
+}
+
+{
+  "title": "Modern Apartment in Sarbet",
+  "description": "Well-maintained 2-bedroom apartment",
+  "price": 25000,
+  "location": "Sarbet, Addis Ababa",
+  "propertyType": "673e0cdb37cfbc016cdf986e",
+  "property_use": "rent",
+  "images": [
+    "apt1.jpg",
+    "apt2.jpg"
+  ],
+  "owner": "673e0e1737cfbc016cdf9890",
+  "status": "available",
+  "typeSpecificFields": {
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "floorNumber": 3,
+    "totalFloors": 8,
+    "squareFootage": 120,
+    "hasElevator": true,
+    "hasBalcony": true,
+    "balconySize": 15,
+    "parkingSpots": 1,
+    "monthlyMaintenance": 2000
+  }
+}
+
+{
+  "title": "Prime Office Space in Kazanchis",
+  "description": "Modern office space with great views",
+  "price": 45000,
+  "location": "Kazanchis, Addis Ababa",
+  "propertyType": "673e0ceb37cfbc016cdf9872",
+  "property_use": "rent",
+  "images": [
+    "office1.jpg",
+    "office2.jpg",
+    "office3.jpg"
+  ],
+  "owner": "673e0e2137cfbc016cdf9893",
+  "status": "available",
+  "typeSpecificFields": {
+    "squareFootage": 200,
+    "floorNumber": 5,
+    "numberOfOffices": 4,
+    "numberOfMeetingRooms": 2,
+    "hasReception": true,
+    "parkingSpaces": 3,
+    "hasLoadingDock": false,
+    "internetSpeed": 100,
+    "hasBackupPower": true,
+    "securityLevel": "High"
+  }
+}
+
+{
+  "title": "Retail Space in Piassa",
+  "description": "High-traffic retail location",
+  "price": 35000,
+  "location": "Piassa, Addis Ababa",
+  "propertyType": "673e0cf837cfbc016cdf9876",
+  "property_use": "rent",
+  "images": [
+    "retail1.jpg",
+    "retail2.jpg"
+  ],
+  "owner": "673e0e5937cfbc016cdf989f",
+  "status": "available",
+  "typeSpecificFields": {
+    "squareFootage": 150,
+    "frontage": 10,
+    "hasStorefront": true,
+    "storageSpace": 30,
+    "hasLoadingBay": true,
+    "parkingSpaces": 2,
+    "footTraffic": 1000,
+    "zoning": "Commercial",
+    "previousBusiness": "Clothing Store",
+    "signageAllowed": true
+  }
+}
+
+
+{
+  "title": "Large Warehouse in Industrial Zone",
+  "description": "Modern warehouse with office space",
+  "price": 85000,
+  "location": "Kaliti, Addis Ababa",
+  "propertyType": "673e0d0737cfbc016cdf987a",
+  "property_use": "rent",
+  "images": [
+    "warehouse1.jpg",
+    "warehouse2.jpg"
+  ],
+  "owner": "673e0e4e37cfbc016cdf989c",
+  "status": "available",
+  "typeSpecificFields": {
+    "totalArea": 1000,
+    "clearHeight": 6,
+    "numberOfDocks": 4,
+    "hasOfficeSpace": true,
+    "officeArea": 100,
+    "hasYard": true,
+    "yardSize": 500,
+    "powerCapacity": "200KW",
+    "sprinklerSystem": true,
+    "securityFeatures": "24/7 Guards, CCTV"
+  }
+}
+
+{
+  "title": "Commercial Land in Bole",
+  "description": "Prime location for development",
+  "price": 25000000,
+  "location": "Bole, Addis Ababa",
+  "propertyType": "673e0d1537cfbc016cdf987e",
+  "property_use": "sell",
+  "images": [
+    "land1.jpg",
+    "land2.jpg"
+  ],
+  "owner": "673e0e2137cfbc016cdf9893",
+  "status": "available",
+  "typeSpecificFields": {
+    "totalArea": 2000,
+    "zoning": "Mixed Use",
+    "topography": "Flat",
+    "hasUtilities": true,
+    "roadAccess": true,
+    "soilType": "Clay",
+    "floodZone": false,
+    "hasWaterRights": true,
+    "mineralRights": false,
+    "environmentalReport": "Available"
+  }
+}
+
+{
+  "title": "Boutique Hotel in Bole",
+  "description": "Fully furnished hotel with restaurant",
+  "price": 45000000,
+  "location": "Bole, Addis Ababa",
+  "propertyType": "673e0d2b37cfbc016cdf9886",
+  "property_use": "sell",
+  "images": [
+    "hotel1.jpg",
+    "hotel2.jpg",
+    "hotel3.jpg",
+    "hotel4.jpg"
+  ],
+  "owner": "673e0de237cfbc016cdf988a",
+  "status": "available",
+  "typeSpecificFields": {
+    "numberOfRooms": 30,
+    "numberOfSuites": 5,
+    "starRating": 4,
+    "hasRestaurant": true,
+    "hasPool": true,
+    "hasSpa": true,
+    "conferenceCapacity": 100,
+    "parkingSpaces": 25,
+    "yearRenovated": 2022,
+    "occupancyRate": 75
+  }
+}
+
+
+
