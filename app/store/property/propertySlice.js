@@ -6,6 +6,7 @@ const initialState = {
   isSuccess: false,
   isError: false,
   message: "",
+  transactions: [],
 };
 
 // export const createProperty = createAsyncThunk(
@@ -66,9 +67,26 @@ export const getUserProperties = createAsyncThunk(
 
 export const buyProperty = createAsyncThunk(
   "property/buy",
-  async (propertyId, thunkAPI) => {
+  async (propertyData, thunkAPI) => {
     try {
-      return await propertyService.buyProperty(propertyId);
+      return await propertyService.buyProperty(propertyData);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        "Failed to purchase property";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const getUserTransactions = createAsyncThunk(
+  "property/transactions",
+  async (_, thunkAPI) => {
+    try {
+      return await propertyService.getUserTransactions();
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -183,6 +201,19 @@ export const propertySlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
+        state.message = action.payload;
+      })
+      .addCase(getUserTransactions.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUserTransactions.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.transactions = action.payload;
+      })
+      .addCase(getUserTransactions.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
         state.message = action.payload;
       });
   },

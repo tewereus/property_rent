@@ -22,6 +22,12 @@ const _layout = () => {
             name="create_property"
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="transaction_history"
+            options={{
+              headerShown: false,
+            }}
+          />
           {/* <Stack.Screen name="map_component" options={{ headerShown: false }} /> */}
         </Stack>
         <ToastProvider />

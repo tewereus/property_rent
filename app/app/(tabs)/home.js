@@ -36,6 +36,7 @@ const Home = () => {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
   const loadColorScheme = async () => {
     try {
@@ -213,8 +214,10 @@ const Home = () => {
             text: "OK",
             onPress: () => {
               setModalVisible(false);
-              // Optionally navigate to transactions screen
-              // navigation.navigate('Transactions');
+              setShowPaymentOptions(false);
+              setPaymentMethod("cash");
+              // Refresh properties list
+              dispatch(getPropertiesByUse(selectedProperty.property_use));
             },
           },
         ]
@@ -222,8 +225,7 @@ const Home = () => {
     } catch (error) {
       Alert.alert(
         "Error",
-        error?.message ||
-          "Failed to initiate property purchase. Please try again later."
+        error || "Failed to initiate property purchase. Please try again later."
       );
     } finally {
       setIsPurchasing(false);
@@ -243,6 +245,46 @@ const Home = () => {
       ]
     );
   };
+
+  const PaymentMethodSelector = () => (
+    <View className="mb-4">
+      <Text className="text-gray-800 dark:text-white font-semibold mb-2">
+        Select Payment Method
+      </Text>
+      {["cash", "bank_transfer", "mortgage"].map((method) => (
+        <TouchableOpacity
+          key={method}
+          onPress={() => setPaymentMethod(method)}
+          className={`flex-row items-center p-4 rounded-xl mb-2 ${
+            paymentMethod === method
+              ? "bg-blue-100 dark:bg-blue-900"
+              : "bg-gray-100 dark:bg-gray-800"
+          }`}
+        >
+          <Ionicons
+            name={
+              method === "cash"
+                ? "cash-outline"
+                : method === "bank_transfer"
+                ? "card-outline"
+                : "business-outline"
+            }
+            size={24}
+            color={paymentMethod === method ? "#3B82F6" : "#6B7280"}
+          />
+          <Text
+            className={`ml-3 capitalize ${
+              paymentMethod === method
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-600 dark:text-gray-400"
+            }`}
+          >
+            {method.replace("_", " ")}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
 
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] flex-1">
@@ -483,23 +525,40 @@ const Home = () => {
 
           {/* Bottom Action Button */}
           <View className="p-5 border-t border-gray-200 dark:border-gray-800">
-            <TouchableOpacity
-              onPress={handleBuyProperty}
-              disabled={isPurchasing}
-              className={`${
-                isPurchasing ? "bg-gray-400" : "bg-blue-600"
-              } rounded-xl py-4 px-6`}
-            >
-              {isPurchasing ? (
-                <ActivityIndicator color="white" />
-              ) : (
+            {showPaymentOptions ? (
+              <View>
+                <PaymentMethodSelector />
+                <TouchableOpacity
+                  onPress={handleBuyProperty}
+                  disabled={isPurchasing}
+                  className={`${
+                    isPurchasing ? "bg-gray-400" : "bg-blue-600"
+                  } rounded-xl py-4 px-6`}
+                >
+                  {isPurchasing ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-base">
+                      Confirm{" "}
+                      {selectedProperty?.property_use === "rent"
+                        ? "Rental"
+                        : "Purchase"}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowPaymentOptions(true)}
+                className="bg-blue-600 rounded-xl py-4 px-6"
+              >
                 <Text className="text-white text-center font-semibold text-base">
                   {selectedProperty?.property_use === "rent"
                     ? "Rent Property"
                     : "Buy Property"}
                 </Text>
-              )}
-            </TouchableOpacity>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </Modal>

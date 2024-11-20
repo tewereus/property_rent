@@ -110,7 +110,36 @@ const getUserProperties = async () => {
 };
 
 const buyProperty = async (data) => {
-  console.log("data: ", data);
+  try {
+    const userData = await AsyncStorage.getItem("user");
+    const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+        }`,
+      },
+      withCredentials: true,
+    };
+
+    const response = await axios.post(
+      `${baseUrl}/property/buy-property`,
+      {
+        propertyId: data.propertyId,
+        paymentMethod: data.paymentMethod,
+      },
+      config
+    );
+
+    return response.data;
+  } catch (error) {
+    // Throw error with proper message
+    throw error.response?.data?.message || error.message || "An error occurred";
+  }
+};
+
+const getUserTransactions = async () => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
@@ -123,15 +152,10 @@ const buyProperty = async (data) => {
     withCredentials: true,
   };
 
-  const response = await axios.post(
-    `${baseUrl}/property/buy-property`,
-    {
-      propertyId: data.propertyId,
-      paymentMethod: data.paymentMethod,
-    },
+  const response = await axios.get(
+    `${baseUrl}/transaction/user-transactions`,
     config
   );
-
   return response.data;
 };
 
@@ -141,6 +165,7 @@ const propertyService = {
   getPropertiesByUse,
   getUserProperties,
   buyProperty,
+  getUserTransactions,
 };
 
 export default propertyService;

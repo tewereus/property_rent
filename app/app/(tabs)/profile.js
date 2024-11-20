@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, Switch, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Switch,
+  Image,
+  ScrollView,
+} from "react-native";
 import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
@@ -120,7 +127,7 @@ const Profile = () => {
       </View>
 
       {/* Profile Options */}
-      <View className="px-4">
+      <ScrollView className="px-4" showsVerticalScrollIndicator={false}>
         {/* Dark Mode Toggle */}
         <ProfileOption
           icon="moon-outline"
@@ -174,10 +181,17 @@ const Profile = () => {
           }}
         />
 
+        {/* Transaction History Option */}
+        <ProfileOption
+          icon="receipt-outline"
+          label="Transaction History"
+          onPress={() => router.push("/transaction_history")}
+        />
+
         {/* Logout Button */}
         <TouchableOpacity
           onPress={handleLogout}
-          className="bg-red-500 p-4 rounded-2xl mt-4 flex-row items-center justify-center"
+          className="bg-red-500 p-4 rounded-2xl mt-4 mb-6 flex-row items-center justify-center"
         >
           <Ionicons
             name="log-out-outline"
@@ -187,7 +201,7 @@ const Profile = () => {
           />
           <Text className="text-white text-lg font-medium ml-2">Logout</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 };

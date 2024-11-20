@@ -40,9 +40,15 @@ const propertySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "sold", "rented"],
+      enum: ["available", "sold", "rented", "pending"],
       default: "available",
     },
+    transactionHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transaction",
+      },
+    ],
     // Dynamic fields based on property type
     typeSpecificFields: {
       type: Map,

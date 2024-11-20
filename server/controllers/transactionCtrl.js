@@ -52,17 +52,36 @@ const createTransaction = asyncHandler(async (req, res) => {
 // Get all transactions for a user (either as buyer or seller)
 const getUserTransactions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
+  console.log("first");
 
   try {
     const transactions = await Transaction.find({
       $or: [{ buyer: userId }, { seller: userId }],
     })
-      .populate("property")
-      .populate("buyer", "name email")
-      .populate("seller", "name email")
+      .populate({
+        path: "property",
+        select: "title description price location images property_use status",
+      })
+      .populate({
+        path: "buyer",
+        select: "name email",
+      })
+      .populate({
+        path: "seller",
+        select: "name email",
+      })
       .sort("-createdAt");
+    console.log("second");
+    // Add a field to indicate if the current user is the buyer or seller
+    const transformedTransactions = transactions.map((transaction) => {
+      const plainTransaction = transaction.toObject();
+      plainTransaction.userRole =
+        transaction.buyer._id.toString() === userId ? "buyer" : "seller";
+      return plainTransaction;
+    });
+    console.log("third");
 
-    res.json(transactions);
+    res.json(transformedTransactions);
   } catch (error) {
     throw new Error(error);
   }

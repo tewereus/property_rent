@@ -213,25 +213,41 @@ const buyProperty = asyncHandler(async (req, res) => {
         message: "You cannot buy your own property",
       });
     }
+    console.log("first");
+    // Create transaction
+    const transaction = await Transaction.create({
+      property: propertyId,
+      buyer: id,
+      seller: property.owner,
+      amount: property.price,
+      paymentMethod,
+      transactionType: property.property_use === "rent" ? "rent" : "purchase",
+      transactionDetails: {
+        paymentDate: new Date(),
+        receiptNumber: `TXN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      },
+    });
+    console.log("second");
 
-    // const transaction = await Transaction.create({
-    //   property: propertyId,
-    //   buyer: id,
-    //   seller: property.owner,
-    //   amount: property.price,
-    //   paymentMethod,
-    //   transactionDetails: {
-    //     paymentDate: new Date(),
-    //     receiptNumber: `TXN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    //   },
-    // });
-
-    property.status = "sold";
+    // Update property status
+    property.status = property.property_use === "rent" ? "rented" : "sold";
     await property.save();
+    console.log("third");
+
+    // Populate the transaction with property and user details
+    const populatedTransaction = await Transaction.findById(transaction._id)
+      .populate("property")
+      .populate("buyer", "name email")
+      .populate("seller", "name email");
+
+    console.log("fourth");
 
     res.json({
-      message: "Property purchase initiated successfully",
+      message: `Property ${
+        property.property_use === "rent" ? "rental" : "purchase"
+      } initiated successfully`,
       property,
+      transaction: populatedTransaction,
     });
   } catch (error) {
     throw new Error(error);

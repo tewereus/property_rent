@@ -26,6 +26,11 @@ const transactionSchema = new mongoose.Schema(
       enum: ["pending", "completed", "failed", "cancelled"],
       default: "pending",
     },
+    transactionType: {
+      type: String,
+      enum: ["purchase", "rent"],
+      required: true,
+    },
     paymentMethod: {
       type: String,
       enum: ["cash", "bank_transfer", "mortgage"],
@@ -36,12 +41,20 @@ const transactionSchema = new mongoose.Schema(
       paymentDate: Date,
       receiptNumber: String,
     },
+    notes: {
+      type: String,
+    },
     documents: [
       {
         type: String,
         required: false,
       },
     ],
+    duration: {
+      // For rental properties
+      startDate: Date,
+      endDate: Date,
+    },
   },
   {
     timestamps: true,
