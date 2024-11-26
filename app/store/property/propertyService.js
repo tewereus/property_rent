@@ -11,22 +11,47 @@ const createProperty = async (propertyData) => {
     }`,
   };
 
-  const transformedData = {
-    ...propertyData,
-    propertyType: propertyData.propertyType,
-    property_use: propertyData.property_use,
-    typeSpecificFields: propertyData.typeSpecificFields,
-  };
+  // Create FormData object
+  const formData = new FormData();
 
-  const response = await axios.post(
-    `${baseUrl}/property/create-property`,
-    transformedData,
-    {
-      headers,
-      withCredentials: true,
+  // Append images if they exist
+  if (propertyData.images && propertyData.images.length > 0) {
+    propertyData.images.forEach((image, index) => {
+      formData.append("images", {
+        uri: image.uri,
+        type: "image/jpeg",
+        name: image.fileName || `image${index}.jpg`,
+      });
+    });
+  }
+
+  // Append other fields
+  Object.keys(propertyData).forEach((key) => {
+    if (key !== "images") {
+      if (key === "typeSpecificFields") {
+        formData.append(key, JSON.stringify(propertyData[key]));
+      } else {
+        formData.append(key, propertyData[key]);
+      }
     }
-  );
-  return response.data;
+  });
+
+  try {
+    const response = await axios.post(
+      `${baseUrl}/property/create-property`,
+      formData,
+      {
+        headers: {
+          ...headers,
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
 };
 
 const getAllProperties = async ({

@@ -28,9 +28,26 @@ const CreateProperty = () => {
     propertyType: type,
     property_use: action,
     typeSpecificFields: {},
+    images: [],
   });
 
   const [showMapModal, setShowMapModal] = useState(false);
+
+  const { isLoading, isSuccess, isError, message } = useSelector(
+    (state) => state.property
+  );
+
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     alert("Property created successfully!");
+  //     router.back();
+  //     dispatch(resetAuthState());
+  //   }
+  //   if (isError) {
+  //     alert(message);
+  //     dispatch(resetAuthState());
+  //   }
+  // }, [isSuccess, isError]);
 
   const handleLocationSelect = (coords) => {
     const locationString = `${coords.latitude}, ${coords.longitude}`;
@@ -39,6 +56,22 @@ const CreateProperty = () => {
   };
 
   const handleSubmit = () => {
+    // Validation
+    if (
+      !formData.title ||
+      !formData.location ||
+      !formData.price ||
+      !formData.description
+    ) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    if (!formData.images || formData.images.length === 0) {
+      alert("Please add at least one image");
+      return;
+    }
+
     const data = {
       ...formData,
       propertyType: type,
@@ -92,10 +125,13 @@ const CreateProperty = () => {
 
           <TouchableOpacity
             onPress={handleSubmit}
-            className="bg-[#FF8E01] p-4 rounded-2xl mb-6"
+            disabled={isLoading}
+            className={`bg-[#FF8E01] p-4 rounded-2xl mb-6 ${
+              isLoading ? "opacity-50" : ""
+            }`}
           >
             <Text className="text-white text-center text-lg font-semibold">
-              Add Property
+              {isLoading ? "Creating Property..." : "Add Property"}
             </Text>
           </TouchableOpacity>
         </ScrollView>

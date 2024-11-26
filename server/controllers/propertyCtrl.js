@@ -5,33 +5,71 @@ const {
 } = require("../models/propertyModel");
 const { PropertyType } = require("../models/propertyTypeModel");
 const Transaction = require("../models/transactionModel");
+const formidable = require("formidable").formidable;
+const { uploadToCloudinary } = require("../utils/cloudinary");
 
 const createProperty = asyncHandler(async (req, res) => {
-  const { id } = req.user;
-  const { typeSpecificFields, ...propertyData } = req.body;
+  const form = formidable({
+    multiples: true,
+    keepExtensions: true,
+    maxFileSize: 5 * 1024 * 1024, // 5MB limit per file
+  });
 
   try {
+    const [fields, files] = await form.parse(req);
+    const { id } = req.user;
+
     // Get property type and create discriminator
-    const propertyType = await PropertyType.findById(propertyData.propertyType);
+    const propertyType = await PropertyType.findById(fields.propertyType[0]);
     if (!propertyType) {
       return res.status(404).json({
         message: "Property type not found",
       });
     }
 
-    // Create property instance with base fields
-    const property = new Property({
-      ...propertyData,
-      owner: id,
-    });
+    // Upload images to Cloudinary
+    const imageUrls = [];
+    if (files.images) {
+      // Handle both single and multiple files
+      const imageFiles = Array.isArray(files.images)
+        ? files.images
+        : [files.images];
 
-    // Set type-specific fields using the Map
-    if (typeSpecificFields) {
-      Object.entries(typeSpecificFields).forEach(([key, value]) => {
-        property.typeSpecificFields.set(key, value);
-      });
+      for (const file of imageFiles) {
+        try {
+          const result = await uploadToCloudinary(file.filepath);
+          imageUrls.push(result.secure_url);
+        } catch (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          // Continue with other images if one fails
+        }
+      }
     }
 
+    // Parse typeSpecificFields if it exists
+    let typeSpecificFields = {};
+    if (fields.typeSpecificFields && fields.typeSpecificFields[0]) {
+      try {
+        typeSpecificFields = JSON.parse(fields.typeSpecificFields[0]);
+      } catch (error) {
+        console.error("Error parsing typeSpecificFields:", error);
+      }
+    }
+
+    // Create property instance with base fields
+    const propertyData = {
+      title: fields.title[0],
+      description: fields.description[0],
+      price: parseFloat(fields.price[0]),
+      location: fields.location[0],
+      propertyType: fields.propertyType[0],
+      property_use: fields.property_use[0],
+      images: imageUrls,
+      owner: id,
+      typeSpecificFields,
+    };
+
+    const property = new Property(propertyData);
     await property.save();
 
     // Populate references before sending response
@@ -41,7 +79,10 @@ const createProperty = asyncHandler(async (req, res) => {
 
     res.status(201).json(populatedProperty);
   } catch (error) {
-    throw new Error(error);
+    console.error("Property creation error:", error);
+    res.status(500).json({
+      message: error.message || "Error creating property",
+    });
   }
 });
 
