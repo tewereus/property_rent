@@ -5,9 +5,10 @@ import "intl-pluralrules";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../locals/i18n";
 import ToastProvider from "react-native-toast-message";
+import React, { memo } from "react";
 import "./index.css";
-const _layout = () => {
-  // make it so that the routes are accessable for authenticated users, if user logged out and clicked back it goes back to the page
+// make it so that the routes are accessable for authenticated users, if user logged out and clicked back it goes back to the page
+const _layout = memo(() => {
   return (
     <Provider store={store}>
       <I18nextProvider i18n={i18n}>
@@ -34,6 +35,6 @@ const _layout = () => {
       </I18nextProvider>
     </Provider>
   );
-};
+});
 
 export default _layout;

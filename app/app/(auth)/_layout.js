@@ -1,8 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-const AuthLayout = () => {
+const AuthLayout = memo(() => {
   return (
     <>
       <Stack>
@@ -12,6 +12,6 @@ const AuthLayout = () => {
       <StatusBar backgroundColor="#161622" style="light" />
     </>
   );
-};
+});
 
 export default AuthLayout;

@@ -1,6 +1,7 @@
 import {
   View,
   Text,
+  TextInput,
   FlatList,
   TouchableOpacity,
   Modal,
@@ -9,7 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, memo } from "react";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +28,310 @@ import {
 import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+// Memoize the PropertyItem component to prevent unnecessary re-renders
+const PropertyItem = memo(({ item, onPress, onFavorite }) => (
+  <TouchableOpacity
+    onPress={() => onPress(item)}
+    className="bg-white rounded-2xl shadow-lg m-2 overflow-hidden"
+    style={{
+      width: 280,
+      elevation: 5,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+    }}
+  >
+    <View className="relative">
+      <Image
+        source={{ uri: item.image }}
+        className="w-full h-48"
+        resizeMode="cover"
+        // defaultSource={require('../../assets/default-property.png')}
+      />
+
+      {/* Price Tag */}
+      <View className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full">
+        <Text className="text-blue-600 font-bold">{item.price}</Text>
+      </View>
+
+      {/* Favorite Button */}
+      <TouchableOpacity
+        className="absolute top-4 right-4 bg-white/90 p-2 rounded-full"
+        onPress={() => onFavorite(item)}
+      >
+        <Ionicons
+          name={item.isFavorite ? "heart" : "heart-outline"}
+          size={20}
+          color={item.isFavorite ? "#EF4444" : "#6B7280"}
+        />
+      </TouchableOpacity>
+    </View>
+
+    {/* Content Container */}
+    <View className="pl-4 pr-4 pb-4">
+      {/* Property Name */}
+      <Text className="text-lg font-bold text-gray-800 mb-1">{item.name}</Text>
+
+      {/* Location */}
+      <View className="flex-row items-center mb-2">
+        <Ionicons name="location-outline" size={16} color="#6B7280" />
+        <Text className="text-gray-500 text-sm ml-1">
+          {item.location || "Location not specified"}
+        </Text>
+      </View>
+
+      {/* Property Details */}
+      <View className="flex-row justify-between mt-2 pt-2 border-t border-gray-100">
+        {/* Bedrooms */}
+        <View className="flex-row items-center">
+          <Ionicons name="bed-outline" size={16} color="#6B7280" />
+          <Text className="text-gray-600 text-sm ml-1">
+            {item.bedrooms || "3"} beds
+          </Text>
+        </View>
+
+        {/* Bathrooms */}
+        <View className="flex-row items-center">
+          <Ionicons name="water-outline" size={16} color="#6B7280" />
+          <Text className="text-gray-600 text-sm ml-1">
+            {item.bathrooms || "2"} baths
+          </Text>
+        </View>
+
+        {/* Area */}
+        <View className="flex-row items-center">
+          <Ionicons name="square-outline" size={16} color="#6B7280" />
+          <Text className="text-gray-600 text-sm ml-1">
+            {item.area || "1,200"} sqft
+          </Text>
+        </View>
+      </View>
+
+      {/* Date and Status */}
+      <View className="flex-row justify-between items-center mt-3 pt-2 border-t border-gray-100">
+        <Text className="text-gray-500 text-xs">
+          Listed {new Date(item.createdAt).toLocaleDateString()}
+        </Text>
+        <View className="bg-green-100 px-2 py-1 rounded-full">
+          <Text className="text-green-600 text-xs font-medium">
+            {item.status || "Available"}
+          </Text>
+        </View>
+      </View>
+    </View>
+  </TouchableOpacity>
+));
+
+// Create a separate memoized modal component
+const PropertyModal = memo(
+  ({
+    visible,
+    onClose,
+    property,
+    favouriteOn,
+    onFavourite,
+    onBuy,
+    onScheduleVisit,
+    isPurchasing,
+    isSchedulingVisit,
+    showPaymentOptions,
+    setShowPaymentOptions,
+    paymentMethod,
+    setPaymentMethod,
+  }) => {
+    if (!visible || !property) return null;
+
+    return (
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View className="flex-1 bg-white dark:bg-gray-900">
+          <View className="relative bg-white dark:bg-gray-900 pt-12 pb-4 px-5">
+            <TouchableOpacity
+              onPress={onClose}
+              className="absolute left-5 top-12 z-10 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+            >
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+            <Text className="text-center text-xl font-bold text-gray-800 dark:text-white">
+              Property Details
+            </Text>
+          </View>
+
+          <ScrollView
+            className="flex-1"
+            showsVerticalScrollIndicator={false}
+            removeClippedSubviews={true}
+          >
+            <View className="relative">
+              <Image
+                source={{ uri: property.image }}
+                className="w-screen h-72"
+                resizeMode="cover"
+              />
+              <TouchableOpacity
+                onPress={onFavourite}
+                className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
+              >
+                <Ionicons
+                  name={favouriteOn ? "heart" : "heart-outline"}
+                  size={24}
+                  color={favouriteOn ? "#EF4444" : "#6B7280"}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Rest of the modal content */}
+            {/* ... */}
+          </ScrollView>
+
+          {/* Bottom Action Button */}
+          <View className="p-5 border-t border-gray-200 dark:border-gray-800">
+            {showPaymentOptions ? (
+              <View>
+                <PaymentMethodSelector
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                />
+                <TouchableOpacity
+                  onPress={onBuy}
+                  disabled={isPurchasing}
+                  className={`${
+                    isPurchasing ? "bg-gray-400" : "bg-blue-600"
+                  } rounded-xl py-4 px-6`}
+                >
+                  {isPurchasing ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-base">
+                      Confirm{" "}
+                      {property?.property_use === "rent"
+                        ? "Rental"
+                        : "Purchase"}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowPaymentOptions(true)}
+                className="bg-blue-600 rounded-xl py-4 px-6"
+              >
+                <Text className="text-white text-center font-semibold text-base">
+                  {property?.property_use === "rent"
+                    ? "Rent Property"
+                    : "Buy Property"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+);
+
+// Memoize PaymentMethodSelector
+const PaymentMethodSelector = memo(({ paymentMethod, setPaymentMethod }) => (
+  <View className="mb-4">
+    <Text className="text-gray-800 dark:text-white font-semibold mb-2">
+      Select Payment Method
+    </Text>
+    {["cash", "bank_transfer", "mortgage"].map((method) => (
+      <TouchableOpacity
+        key={method}
+        onPress={() => setPaymentMethod(method)}
+        className={`flex-row items-center p-4 rounded-xl mb-2 ${
+          paymentMethod === method
+            ? "bg-blue-100 dark:bg-blue-900"
+            : "bg-gray-100 dark:bg-gray-800"
+        }`}
+      >
+        <Ionicons
+          name={
+            method === "cash"
+              ? "cash-outline"
+              : method === "bank_transfer"
+              ? "card-outline"
+              : "business-outline"
+          }
+          size={24}
+          color={paymentMethod === method ? "#3B82F6" : "#6B7280"}
+        />
+        <Text
+          className={`ml-3 capitalize ${
+            paymentMethod === method
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-gray-600 dark:text-gray-400"
+          }`}
+        >
+          {method.replace("_", " ")}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+));
+
+// Add this new component for section headers
+const SectionHeader = memo(({ title }) => (
+  <View className="flex-row justify-between items-center mb-3 px-5">
+    <Text className="text-lg font-bold dark:text-white">{title}</Text>
+    <TouchableOpacity>
+      <Text className="text-blue-600 dark:text-blue-400">See All</Text>
+    </TouchableOpacity>
+  </View>
+));
+
+// Update the property item render function
+const renderPropertyItem = ({ item }) => (
+  <TouchableOpacity
+    onPress={() => handlePress(item)}
+    className="bg-white dark:bg-gray-800 rounded-lg shadow-md mx-2 w-56 overflow-hidden"
+  >
+    <Image
+      source={{ uri: item.image }}
+      className="w-full h-32"
+      resizeMode="cover"
+    />
+    <View className="p-3">
+      <Text className="text-blue-600 dark:text-blue-400 font-bold text-base mb-1">
+        ${item.price}
+      </Text>
+      <Text
+        className="text-gray-800 dark:text-white font-semibold mb-1"
+        numberOfLines={1}
+      >
+        {item.title}
+      </Text>
+      <View className="flex-row items-center mb-2">
+        <Ionicons name="location-outline" size={14} color="#6B7280" />
+        <Text
+          className="text-gray-500 dark:text-gray-400 text-sm ml-1"
+          numberOfLines={1}
+        >
+          {item.location}
+        </Text>
+      </View>
+      <View className="flex-row justify-between items-center">
+        <Text className="text-gray-500 dark:text-gray-400 text-xs">
+          {item.bedrooms} Beds • {item.bathrooms} Baths
+        </Text>
+        <TouchableOpacity onPress={() => handleFavourite(item)}>
+          <Ionicons
+            name={item.isFavorite ? "heart" : "heart-outline"}
+            size={20}
+            color={item.isFavorite ? "#EF4444" : "#6B7280"}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  </TouchableOpacity>
+);
+
 const Home = () => {
   const dispatch = useDispatch();
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -37,6 +342,7 @@ const Home = () => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadColorScheme = async () => {
     try {
@@ -60,121 +366,37 @@ const Home = () => {
 
   const { t, i18n } = useTranslation();
 
-  const handlePress = (prop) => {
+  // Memoize callback functions
+  const handlePress = useCallback((prop) => {
     setSelectedProperty(prop);
     setFavouriteOn(prop.isFavorite);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleFavourite = () => {
+  const handleFavourite = useCallback(() => {
     const data = {
       prodId: selectedProperty?._id,
     };
     dispatch(addToWishlist(data));
     setFavouriteOn(!favouriteOn);
-  };
+  }, [selectedProperty, favouriteOn]);
 
-  const renderPropertyItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => handlePress(item)}
-      className="bg-white rounded-2xl shadow-lg m-2 overflow-hidden"
-      style={{
-        width: 280,
-        elevation: 5,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      }}
-    >
-      {/* Image Container */}
-      <View className="relative">
-        <Image
-          source={{
-            uri:
-              item.image ||
-              "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop",
-          }}
-          className="w-full h-48"
-          resizeMode="cover"
-        />
-
-        {/* Price Tag */}
-        <View className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full">
-          <Text className="text-blue-600 font-bold">{item.price}</Text>
-        </View>
-
-        {/* Favorite Button */}
-        <TouchableOpacity
-          className="absolute top-4 right-4 bg-white/90 p-2 rounded-full"
-          onPress={() => handleFavourite(item)}
-        >
-          <Ionicons
-            name={item.isFavorite ? "heart" : "heart-outline"}
-            size={20}
-            color={item.isFavorite ? "#EF4444" : "#6B7280"}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Content Container */}
-      <View className="pl-4 pr-4 pb-4">
-        {/* Property Name */}
-        <Text className="text-lg font-bold text-gray-800 mb-1">
-          {item.name}
-        </Text>
-
-        {/* Location */}
-        <View className="flex-row items-center mb-2">
-          <Ionicons name="location-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-500 text-sm ml-1">
-            {item.location || "Location not specified"}
-          </Text>
-        </View>
-
-        {/* Property Details */}
-        <View className="flex-row justify-between mt-2 pt-2 border-t border-gray-100">
-          {/* Bedrooms */}
-          <View className="flex-row items-center">
-            <Ionicons name="bed-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-600 text-sm ml-1">
-              {item.bedrooms || "3"} beds
-            </Text>
-          </View>
-
-          {/* Bathrooms */}
-          <View className="flex-row items-center">
-            <Ionicons name="water-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-600 text-sm ml-1">
-              {item.bathrooms || "2"} baths
-            </Text>
-          </View>
-
-          {/* Area */}
-          <View className="flex-row items-center">
-            <Ionicons name="square-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-600 text-sm ml-1">
-              {item.area || "1,200"} sqft
-            </Text>
-          </View>
-        </View>
-
-        {/* Date and Status */}
-        <View className="flex-row justify-between items-center mt-3 pt-2 border-t border-gray-100">
-          <Text className="text-gray-500 text-xs">
-            Listed {new Date(item.createdAt).toLocaleDateString()}
-          </Text>
-          <View className="bg-green-100 px-2 py-1 rounded-full">
-            <Text className="text-green-600 text-xs font-medium">
-              {item.status || "Available"}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+  // Optimize FlatList rendering
+  const renderPropertyItem = useCallback(
+    ({ item }) => (
+      <PropertyItem
+        item={item}
+        onPress={handlePress}
+        onFavorite={handleFavourite}
+      />
+    ),
+    [handlePress, handleFavourite]
   );
 
-  const changeLanguage = (lng) => {
+  const keyExtractor = useCallback((item) => item._id, []);
+  const ItemSeparator = useCallback(() => <View style={{ width: 15 }} />, []);
+
+  const handleLanguageChange = (lng) => {
     const data = {
       preference: {
         language: lng,
@@ -183,16 +405,6 @@ const Home = () => {
     i18n.changeLanguage(lng);
     dispatch(changeLanguageMode(data));
   };
-
-  // Update the placeholderImages array with real estate placeholder images
-  const placeholderImages = [
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop",
-  ];
-
-  // Add state for carousel
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const handleBuyProperty = async () => {
     if (!selectedProperty?._id) return;
@@ -246,123 +458,186 @@ const Home = () => {
     );
   };
 
-  const PaymentMethodSelector = () => (
-    <View className="mb-4">
-      <Text className="text-gray-800 dark:text-white font-semibold mb-2">
-        Select Payment Method
+  const categories = [
+    { icon: "home", label: "Apartment" },
+    { icon: "car", label: "Cars" },
+    { icon: "map", label: "Land" },
+    { icon: "business", label: "Villas" },
+    { icon: "storefront", label: "Commercial" },
+    { icon: "grid", label: "Office" },
+    { icon: "home-outline", label: "Houses" },
+  ];
+
+  const renderCategory = ({ item }) => (
+    <TouchableOpacity className="items-center mx-4">
+      <View className="bg-white dark:bg-gray-800 p-3 rounded-full mb-1">
+        <Ionicons name={item.icon} size={24} color="#6B7280" />
+      </View>
+      <Text className="text-xs text-gray-600 dark:text-gray-300">
+        {item.label}
       </Text>
-      {["cash", "bank_transfer", "mortgage"].map((method) => (
-        <TouchableOpacity
-          key={method}
-          onPress={() => setPaymentMethod(method)}
-          className={`flex-row items-center p-4 rounded-xl mb-2 ${
-            paymentMethod === method
-              ? "bg-blue-100 dark:bg-blue-900"
-              : "bg-gray-100 dark:bg-gray-800"
-          }`}
-        >
-          <Ionicons
-            name={
-              method === "cash"
-                ? "cash-outline"
-                : method === "bank_transfer"
-                ? "card-outline"
-                : "business-outline"
-            }
-            size={24}
-            color={paymentMethod === method ? "#3B82F6" : "#6B7280"}
-          />
-          <Text
-            className={`ml-3 capitalize ${
-              paymentMethod === method
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-600 dark:text-gray-400"
-            }`}
-          >
-            {method.replace("_", " ")}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    </TouchableOpacity>
+  );
+
+  const renderFeaturedListing = ({ item }) => (
+    <View className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mx-2 w-72">
+      <View className="bg-gray-200 dark:bg-gray-700 h-40 rounded-xl mb-4 justify-center items-center">
+        <Text className="text-gray-500 dark:text-gray-400">Property Image</Text>
+      </View>
+      <Text className="text-lg font-bold text-gray-800 dark:text-white">
+        Modern Apartment
+      </Text>
+      <Text className="text-gray-500 dark:text-gray-400">New York, USA</Text>
+      <Text className="text-blue-600 dark:text-blue-400">$2,500/month</Text>
     </View>
   );
 
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] flex-1">
       <View className="px-5 pt-5">
-        <View className="flex flex-row justify-between">
-          <Text className="text-2xl font-bold dark:text-slate-300 mb-4">
-            Home
+        {/* Header with Language Selection and Notification */}
+        <View className="flex flex-row justify-between items-center mb-4">
+          <Text className="text-2xl font-bold dark:text-slate-300">
+            Prime Property
           </Text>
-          <View className="flex-row mb-10">
+          <View className="flex-row items-center">
+            <View className="flex-row bg-white/90 dark:bg-gray-800/90 rounded-full mr-3 overflow-hidden">
+              <TouchableOpacity
+                onPress={() => handleLanguageChange("Eng")}
+                className="px-3 py-1"
+                style={{
+                  backgroundColor:
+                    i18n.language === "Eng" ? "#FF8E01" : "transparent",
+                }}
+              >
+                <Text
+                  className={`${
+                    i18n.language === "Eng"
+                      ? "text-white"
+                      : "text-gray-600 dark:text-gray-300"
+                  }`}
+                >
+                  EN
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleLanguageChange("Amh")}
+                className="px-3 py-1"
+                style={{
+                  backgroundColor:
+                    i18n.language === "Amh" ? "#FF8E01" : "transparent",
+                }}
+              >
+                <Text
+                  className={`${
+                    i18n.language === "Amh"
+                      ? "text-white"
+                      : "text-gray-600 dark:text-gray-300"
+                  }`}
+                >
+                  አማ
+                </Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
-              onPress={() => changeLanguage("Eng")}
-              className="dark:text-slate-300"
+              className="bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+              onPress={() => {
+                /* Handle notification press */
+              }}
             >
-              <Text className="mr-10 dark:text-slate-300">English</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => changeLanguage("Amh")}>
-              <Text className="dark:text-slate-300">ኣማርኛ</Text>
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color="#6B7280"
+              />
+              {/* Notification badge - if needed */}
+              <View className="absolute -top-1 -right-1 bg-red-500 w-4 h-4 rounded-full items-center justify-center">
+                <Text className="text-white text-xs">2</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      {propertiesByUse?.sell?.length > 0 ||
-      propertiesByUse?.rent?.length > 0 ? (
-        <ScrollView
-          className="flex-1"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: 100,
-          }}
-        >
-          {/* Sell Properties Section */}
-          <Text className="text-lg dark:text-white mt-4 mb-2">
-            {t("available_for_sale")}
-          </Text>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+      >
+        {/* Categories */}
+        <View className="mb-6">
+          <FlatList
+            data={categories}
+            renderItem={renderCategory}
+            keyExtractor={(item) => item.label}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 10 }}
+          />
+        </View>
+
+        {/* Featured Listings */}
+        <View className="mb-6">
+          <SectionHeader title="Featured Listings" />
+          <FlatList
+            data={[1, 2, 3]}
+            renderItem={renderFeaturedListing}
+            keyExtractor={(item) => item.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 10 }}
+          />
+        </View>
+
+        {/* Sell Properties Section */}
+        <View className="mb-6">
+          <SectionHeader title="Available for Sale" />
           <FlatList
             data={propertiesByUse.sell}
             keyExtractor={(item) => item._id}
             renderItem={renderPropertyItem}
             horizontal
             showsHorizontalScrollIndicator={false}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            initialNumToRender={3}
             contentContainerStyle={{
               paddingHorizontal: 10,
-              paddingVertical: 10,
             }}
             ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
             snapToAlignment="start"
             decelerationRate="fast"
-            snapToInterval={295}
+            snapToInterval={240}
           />
+        </View>
 
-          {/* Rent Properties Section */}
-          <Text className="text-lg dark:text-white mt-4 mb-2">
-            {t("available_for_rent")}
-          </Text>
+        {/* Rent Properties Section */}
+        <View className="mb-6">
+          <SectionHeader title="Available for Rent" />
           <FlatList
             data={propertiesByUse.rent}
             keyExtractor={(item) => item._id}
             renderItem={renderPropertyItem}
             horizontal
             showsHorizontalScrollIndicator={false}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            initialNumToRender={3}
             contentContainerStyle={{
               paddingHorizontal: 10,
-              paddingVertical: 10,
-              paddingBottom: 20, // Add extra padding at bottom
             }}
             ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
             snapToAlignment="start"
             decelerationRate="fast"
-            snapToInterval={295}
+            snapToInterval={240}
           />
-          <View style={{ height: 100 }} />
-        </ScrollView>
-      ) : (
-        <Text className="text-center dark:text-white">
-          No properties listed
-        </Text>
-      )}
+        </View>
+      </ScrollView>
 
       {/* Property Detail Modal */}
       <Modal
@@ -387,37 +662,13 @@ const Home = () => {
 
           {selectedProperty && (
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              {/* Image Carousel with Favorite Button */}
+              {/* Property Image */}
               <View className="relative">
-                <ScrollView
-                  horizontal
-                  pagingEnabled
-                  showsHorizontalScrollIndicator={false}
-                  onMomentumScrollEnd={(event) => {
-                    const slideSize = event.nativeEvent.layoutMeasurement.width;
-                    const index = event.nativeEvent.contentOffset.x / slideSize;
-                    setActiveImageIndex(Math.round(index));
-                  }}
-                >
-                  {(selectedProperty?.images?.length > 0
-                    ? selectedProperty.images
-                    : placeholderImages
-                  ).map((image, index) => (
-                    <Image
-                      key={index}
-                      source={{
-                        uri:
-                          typeof image === "string"
-                            ? image
-                            : image.url || placeholderImages[0],
-                      }}
-                      className="w-screen h-72"
-                      resizeMode="cover"
-                    />
-                  ))}
-                </ScrollView>
-
-                {/* Favorite Button - Now positioned over the image */}
+                <Image
+                  source={{ uri: selectedProperty.image }}
+                  className="w-screen h-72"
+                  resizeMode="cover"
+                />
                 <TouchableOpacity
                   onPress={handleFavourite}
                   className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
@@ -428,23 +679,6 @@ const Home = () => {
                     color={favouriteOn ? "#EF4444" : "#6B7280"}
                   />
                 </TouchableOpacity>
-              </View>
-
-              {/* Carousel Indicators */}
-              <View className="flex-row justify-center mt-2">
-                {(selectedProperty?.images?.length > 0
-                  ? selectedProperty.images
-                  : placeholderImages
-                ).map((_, index) => (
-                  <View
-                    key={index}
-                    className={`h-2 w-2 rounded-full mx-1 ${
-                      index === activeImageIndex
-                        ? "bg-blue-600 w-4"
-                        : "bg-gray-300"
-                    }`}
-                  />
-                ))}
               </View>
 
               {/* Content */}
@@ -467,9 +701,8 @@ const Home = () => {
                           name="calendar-outline"
                           size={20}
                           color="white"
-                          className="mr-2"
                         />
-                        <Text className="text-white font-semibold ml-1">
+                        <Text className="text-white font-semibold ml-2">
                           Schedule Visit
                         </Text>
                       </>
@@ -532,7 +765,7 @@ const Home = () => {
                   onPress={handleBuyProperty}
                   disabled={isPurchasing}
                   className={`${
-                    isPurchasing ? "bg-gray-400" : "bg-blue-600"
+                    isPurchasing ? "bg-gray-400" : "bg-[#FF8E01]"
                   } rounded-xl py-4 px-6`}
                 >
                   {isPurchasing ? (
@@ -550,7 +783,7 @@ const Home = () => {
             ) : (
               <TouchableOpacity
                 onPress={() => setShowPaymentOptions(true)}
-                className="bg-blue-600 rounded-xl py-4 px-6"
+                className="bg-[#FF8E01] rounded-xl py-4 px-6"
               >
                 <Text className="text-white text-center font-semibold text-base">
                   {selectedProperty?.property_use === "rent"
@@ -566,4 +799,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default memo(Home);

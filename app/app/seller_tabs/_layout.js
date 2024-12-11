@@ -1,10 +1,10 @@
 import { View, Text, Image } from "react-native";
-import React from "react";
-import { Tabs, Redirect } from "expo-router";
+import React, { memo } from "react";
+import { Tabs } from "expo-router";
 import { icons } from "../../constants";
 import { useColorScheme } from "nativewind";
 
-const TabIcon = ({ icon, color, name, focused }) => {
+const TabIcon = memo(({ icon, color, name, focused }) => {
   return (
     <View className="items-center justify-center gap-2">
       <Image
@@ -21,9 +21,9 @@ const TabIcon = ({ icon, color, name, focused }) => {
       </Text>
     </View>
   );
-};
+});
 
-const SellerTabs = () => {
+const SellerTabs = memo(() => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -118,6 +118,6 @@ const SellerTabs = () => {
       />
     </Tabs>
   );
-};
+});
 
 export default SellerTabs;

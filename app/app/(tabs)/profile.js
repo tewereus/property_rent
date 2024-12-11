@@ -6,7 +6,7 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, memo } from "react";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -19,7 +19,8 @@ import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const ProfileOption = ({ icon, label, value, onPress, rightElement }) => (
+// Memoize the ProfileOption component
+const ProfileOption = memo(({ icon, label, value, onPress, rightElement }) => (
   <TouchableOpacity
     onPress={onPress}
     className="flex-row items-center justify-between bg-white dark:bg-gray-700 p-4 rounded-2xl mb-4 shadow-sm"
@@ -34,7 +35,7 @@ const ProfileOption = ({ icon, label, value, onPress, rightElement }) => (
       <Ionicons name="chevron-forward" size={24} color="#6B7280" />
     )}
   </TouchableOpacity>
-);
+));
 
 const Profile = () => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -42,46 +43,39 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { user, isSuccess } = useSelector((state) => state.auth);
 
-  // Save color scheme to local storage
-  // const saveColorScheme = async (scheme) => {
-  //   try {
-  //     await AsyncStorage.setItem("colorScheme", scheme);
-  //   } catch (error) {
-  //     console.error("Failed to save color scheme:", error);
-  //   }
-  // };
+  const saveColorScheme = useCallback(
+    async (scheme) => {
+      try {
+        const userData = JSON.parse(await AsyncStorage.getItem("user"));
+        if (userData) {
+          userData.preference.mode = scheme;
+          await AsyncStorage.setItem("user", JSON.stringify(userData));
 
-  const saveColorScheme = async (scheme) => {
-    try {
-      const userData = JSON.parse(await AsyncStorage.getItem("user"));
-      if (userData) {
-        userData.preference.mode = scheme; // Update mode in user data
-        await AsyncStorage.setItem("user", JSON.stringify(userData)); // Save updated user data
-
-        // Dispatch the action and handle then/catch
-        return dispatch(toggleDarkMode({ preference: { mode: scheme } }))
-          .unwrap() // If using Redux Toolkit, unwrap to get the promise
-          .then(() => {
-            if (isSuccess) {
-              console.log("Color scheme updated successfully");
-              dispatch(resetAuthState());
-            }
-          })
-          .catch((error) => {
-            console.error("Failed to update dark mode:", error);
-          });
+          return dispatch(toggleDarkMode({ preference: { mode: scheme } }))
+            .unwrap()
+            .then(() => {
+              if (isSuccess) {
+                console.log("Color scheme updated successfully");
+                dispatch(resetAuthState());
+              }
+            })
+            .catch((error) => {
+              console.error("Failed to update dark mode:", error);
+            });
+        }
+      } catch (error) {
+        console.error("Failed to save color scheme:", error);
       }
-    } catch (error) {
-      console.error("Failed to save color scheme:", error);
-    }
-  };
+    },
+    [dispatch, isSuccess]
+  );
 
-  const handleToggleColorScheme = () => {
+  const handleToggleColorScheme = useCallback(() => {
     toggleColorScheme();
-    saveColorScheme(colorScheme === "dark" ? "light" : "dark"); // Toggle and save the new scheme
-  };
+    saveColorScheme(colorScheme === "dark" ? "light" : "dark");
+  }, [colorScheme, saveColorScheme, toggleColorScheme]);
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     const data = {
       mode: "seller",
     };
@@ -93,19 +87,19 @@ const Profile = () => {
     } else if (user?.seller_tab === "active") {
       dispatch(changeMode(data))
         .unwrap()
-        .then((response) => {
+        .then(() => {
           router.push("/seller_tabs");
         })
         .catch((error) => {
           console.log(error);
         });
     }
-  };
+  }, [user, router, dispatch]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(logout());
     router.push("/sign-in");
-  };
+  }, [dispatch, router]);
 
   return (
     <View className="flex-1 bg-gray-100 dark:bg-gray-900">
@@ -206,4 +200,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default memo(Profile);

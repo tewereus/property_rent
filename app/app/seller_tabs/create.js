@@ -5,7 +5,7 @@ import {
   Animated,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback, memo } from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllPropertyTypes } from "../../store/propertyType/propertyTypeSlice";
@@ -29,35 +29,44 @@ const Create = () => {
   const usePropertyData = ["rent", "sell"];
   const { propertyTypes } = useSelector((state) => state.propertyType);
 
-  const animateDropdown = (show) => {
-    Animated.spring(dropdownAnimation, {
-      toValue: show ? 1 : 0,
-      useNativeDriver: true,
-      tension: 20,
-      friction: 7,
-    }).start();
-  };
+  const animateDropdown = useCallback(
+    (show) => {
+      Animated.spring(dropdownAnimation, {
+        toValue: show ? 1 : 0,
+        useNativeDriver: true,
+        tension: 20,
+        friction: 7,
+      }).start();
+    },
+    [dropdownAnimation]
+  );
 
-  const handlePropertyTypeSelect = (type) => {
-    setSelectedPropertyId(type);
-    setPropertyTypeVisible(false);
-    animateDropdown(false);
-  };
+  const handlePropertyTypeSelect = useCallback(
+    (type) => {
+      setSelectedPropertyId(type);
+      setPropertyTypeVisible(false);
+      animateDropdown(false);
+    },
+    [animateDropdown]
+  );
 
-  const handlePropertyUseSelect = (use) => {
-    setSelectedPropertyUse(use);
-    setPropertyUseVisible(false);
-    animateDropdown(false);
-  };
+  const handlePropertyUseSelect = useCallback(
+    (use) => {
+      setSelectedPropertyUse(use);
+      setPropertyUseVisible(false);
+      animateDropdown(false);
+    },
+    [animateDropdown]
+  );
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     router.push({
       pathname: "/create_property",
       params: { type: selectedPropertyId, action: selectedPropertyUse },
     });
-  };
+  }, [router, selectedPropertyId, selectedPropertyUse]);
 
-  const handleOutsidePress = () => {
+  const handleOutsidePress = useCallback(() => {
     if (propertyTypeVisible) {
       setPropertyTypeVisible(false);
       animateDropdown(false);
@@ -66,9 +75,9 @@ const Create = () => {
       setPropertyUseVisible(false);
       animateDropdown(false);
     }
-  };
+  }, [propertyTypeVisible, propertyUseVisible, animateDropdown]);
 
-  const SelectBox = ({ label, value, onPress, icon, isOpen }) => {
+  const SelectBox = memo(({ label, value, onPress, icon, isOpen }) => {
     const getDisplayValue = () => {
       if (label === "Property Type" && value) {
         const selectedType = propertyTypes.find((type) => type._id === value);
@@ -157,7 +166,7 @@ const Create = () => {
         )}
       </View>
     );
-  };
+  });
 
   return (
     <View
@@ -219,4 +228,4 @@ const Create = () => {
   );
 };
 
-export default Create;
+export default memo(Create);
