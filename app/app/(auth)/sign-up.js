@@ -20,6 +20,8 @@ const SignUp = () => {
     name: "",
     email: "",
     password: "",
+    address: "",
+    phone: "",
   });
 
   const submit = async (e) => {
@@ -34,6 +36,8 @@ const SignUp = () => {
         name: form.name,
         email: form.email,
         password: form.password,
+        address: form.address,
+        phone: form.phone,
       };
       dispatch(register(data));
     } catch (error) {
@@ -97,6 +101,19 @@ const SignUp = () => {
             handleChangeText={(e) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
+          />
+
+          <FormField
+            title="phone"
+            value={form.phone}
+            handleChangeText={(e) => setForm({ ...form, phone: e })}
+            otherStyles="mt-6"
+          />
+          <FormField
+            title="address"
+            value={form.address}
+            handleChangeText={(e) => setForm({ ...form, address: e })}
+            otherStyles="mt-6"
           />
 
           <FormField
