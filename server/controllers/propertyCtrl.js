@@ -89,6 +89,7 @@ const createProperty = asyncHandler(async (req, res) => {
 const getAllProperties = asyncHandler(async (req, res) => {
   // const { id } = req.user;
   try {
+    console.log(req.query);
     const queryObj = { ...req.query };
     const excludeFields = [
       "page",
@@ -98,11 +99,27 @@ const getAllProperties = asyncHandler(async (req, res) => {
       "role",
       "search",
       "searchField",
+      "property_type",
     ];
     excludeFields.forEach((el) => delete queryObj[el]);
+
+    if (req.query.property_type) {
+      const propertyType = await PropertyType.findOne({
+        name: req.query.property_type,
+      });
+
+      if (propertyType) {
+        queryObj.propertyType = propertyType._id;
+      }
+    }
+
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     let query = Property.find(JSON.parse(queryStr));
+
+    query = query
+      .populate("propertyType")
+      .populate("owner", "firstname lastname");
 
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");

@@ -60,6 +60,7 @@ const getAllProperties = async ({
   maxPrice,
   location,
   propertyType,
+  propertyUse,
   numBed,
 }) => {
   const userData = await AsyncStorage.getItem("user");
@@ -71,7 +72,7 @@ const getAllProperties = async ({
     }`,
   };
 
-  let query = `?limit=${limit}`;
+  let query = `?limit=${5}`;
   if (minPrice) {
     query += `&price[gte]=${minPrice}`;
   }
@@ -83,6 +84,9 @@ const getAllProperties = async ({
   }
   if (propertyType) {
     query += `&property_type=${encodeURIComponent(propertyType)}`;
+  }
+  if (propertyUse) {
+    query += `&property_use=${encodeURIComponent(propertyUse)}`;
   }
   if (numBed) {
     query += `&num_bed=${numBed}`;

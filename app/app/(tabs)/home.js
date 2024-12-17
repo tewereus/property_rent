@@ -27,6 +27,7 @@ import {
 } from "../../store/auth/authSlice";
 import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 
 // Memoize the PropertyItem component to prevent unnecessary re-renders
 const PropertyItem = memo(({ item, onPress, onFavorite }) => (
@@ -47,7 +48,6 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => (
         source={{ uri: item.image }}
         className="w-full h-48"
         resizeMode="cover"
-        // defaultSource={require('../../assets/default-property.png')}
       />
 
       {/* Price Tag */}
@@ -277,10 +277,10 @@ const PaymentMethodSelector = memo(({ paymentMethod, setPaymentMethod }) => (
 ));
 
 // Add this new component for section headers
-const SectionHeader = memo(({ title }) => (
+const SectionHeader = memo(({ title, onSeeAll }) => (
   <View className="flex-row justify-between items-center mb-3 px-5">
     <Text className="text-lg font-bold dark:text-white">{title}</Text>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={onSeeAll}>
       <Text className="text-blue-600 dark:text-blue-400">See All</Text>
     </TouchableOpacity>
   </View>
@@ -343,6 +343,7 @@ const Home = () => {
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const loadColorScheme = async () => {
     try {
@@ -459,17 +460,27 @@ const Home = () => {
   };
 
   const categories = [
-    { icon: "home", label: "Apartment" },
-    { icon: "car", label: "Cars" },
-    { icon: "map", label: "Land" },
-    { icon: "business", label: "Villas" },
-    { icon: "storefront", label: "Commercial" },
-    { icon: "grid", label: "Office" },
-    { icon: "home-outline", label: "Houses" },
+    { icon: "home", label: "Apartment", type: "Apartment" },
+    { icon: "car", label: "Cars", type: "Vehicle" },
+    { icon: "map", label: "Land", type: "Land" },
+    { icon: "business", label: "Villas", type: "Villa" },
+    { icon: "storefront", label: "Commercial", type: "Commercial" },
+    { icon: "grid", label: "Office", type: "Office" },
+    { icon: "home-outline", label: "Houses", type: "House" },
   ];
 
+  const handleCategoryPress = (category) => {
+    router.push({
+      pathname: "/(tabs)/explore",
+      params: { filterType: category.type },
+    });
+  };
+
   const renderCategory = ({ item }) => (
-    <TouchableOpacity className="items-center mx-4">
+    <TouchableOpacity
+      className="items-center mx-4"
+      onPress={() => handleCategoryPress(item)}
+    >
       <View className="bg-white dark:bg-gray-800 p-3 rounded-full mb-1">
         <Ionicons name={item.icon} size={24} color="#6B7280" />
       </View>
@@ -491,6 +502,14 @@ const Home = () => {
       <Text className="text-blue-600 dark:text-blue-400">$2,500/month</Text>
     </View>
   );
+
+  const handleSeeAll = (propertyUse) => {
+    console.log(propertyUse);
+    router.push({
+      pathname: "/(tabs)/explore",
+      params: { propertyUse },
+    });
+  };
 
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] flex-1">
@@ -594,7 +613,10 @@ const Home = () => {
 
         {/* Sell Properties Section */}
         <View className="mb-6">
-          <SectionHeader title="Available for Sale" />
+          <SectionHeader
+            title="Available for Sale"
+            onSeeAll={() => handleSeeAll("sell")}
+          />
           <FlatList
             data={propertiesByUse.sell}
             keyExtractor={(item) => item._id}
@@ -617,7 +639,10 @@ const Home = () => {
 
         {/* Rent Properties Section */}
         <View className="mb-6">
-          <SectionHeader title="Available for Rent" />
+          <SectionHeader
+            title="Available for Rent"
+            onSeeAll={() => handleSeeAll("rent")}
+          />
           <FlatList
             data={propertiesByUse.rent}
             keyExtractor={(item) => item._id}

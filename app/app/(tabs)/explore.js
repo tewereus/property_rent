@@ -12,6 +12,7 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProperties } from "../../store/property/propertySlice";
 import { Ionicons } from "@expo/vector-icons"; // Import icons
+import { useLocalSearchParams } from "expo-router";
 
 // Memoize the FilterOption component
 const FilterOption = memo(({ icon, label, children }) => (
@@ -256,13 +257,39 @@ const FilterModal = memo(
 
 const Explore = () => {
   const dispatch = useDispatch();
+  const params = useLocalSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
   const [limit, setLimit] = useState(5);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
+  const [propertyUse, setPropertyUse] = useState("");
   const [bedrooms, setBedrooms] = useState("");
+  const [filters, setFilters] = useState({});
+
+  useEffect(() => {
+    // Get filters from route params
+    const { filterType, propertyUse } = params;
+
+    let newFilters = {};
+
+    // Add property type filter if exists
+    if (filterType) {
+      newFilters.propertyType = filterType;
+    }
+
+    // Add property use filter if exists
+    if (propertyUse) {
+      newFilters.propertyUse = propertyUse;
+    }
+
+    // Update filters state
+    setFilters(newFilters);
+
+    // Fetch properties with filters
+    dispatch(getAllProperties(newFilters));
+  }, [params.filterType, params.propertyUse]);
 
   // Memoize handlers
   const handlePress = useCallback((item) => {
@@ -280,6 +307,7 @@ const Explore = () => {
       maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
       location,
       propertyType,
+      propertyUse,
       numBed: bedrooms ? parseInt(bedrooms) : undefined,
     };
     dispatch(getAllProperties(obj));
