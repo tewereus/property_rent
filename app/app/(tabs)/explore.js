@@ -266,39 +266,26 @@ const Explore = () => {
   const [propertyType, setPropertyType] = useState("");
   const [propertyUse, setPropertyUse] = useState("");
   const [bedrooms, setBedrooms] = useState("");
-  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    // Get filters from route params
     const { filterType, propertyUse } = params;
 
     let newFilters = {};
 
-    // Add property type filter if exists
     if (filterType) {
       newFilters.propertyType = filterType;
     }
 
-    // Add property use filter if exists
     if (propertyUse) {
       newFilters.propertyUse = propertyUse;
     }
 
-    // Update filters state
-    setFilters(newFilters);
-
-    // Fetch properties with filters
     dispatch(getAllProperties(newFilters));
   }, [params.filterType, params.propertyUse]);
 
-  // Memoize handlers
-  const handlePress = useCallback((item) => {
-    // Handle property press
-  }, []);
+  const handlePress = useCallback((item) => {}, []);
 
-  const handleFavourite = useCallback((item) => {
-    // Handle favorite toggle
-  }, []);
+  const handleFavourite = useCallback((item) => {}, []);
 
   const handleSubmit = useCallback(() => {
     const obj = {
@@ -314,7 +301,6 @@ const Explore = () => {
     setModalVisible(false);
   }, [limit, minPrice, maxPrice, location, propertyType, bedrooms]);
 
-  // Memoize the render item function
   const renderProperties = useCallback(
     ({ item }) => (
       <PropertyCard
@@ -326,7 +312,6 @@ const Explore = () => {
     [handlePress, handleFavourite]
   );
 
-  // Memoize the key extractor
   const keyExtractor = useCallback((item) => item._id, []);
 
   useEffect(() => {
@@ -349,7 +334,6 @@ const Explore = () => {
         Explore Properties
       </Text>
 
-      {/* Filter Button */}
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         className="bg-white dark:bg-gray-800 p-4 rounded-2xl mb-4 flex-row items-center justify-between shadow-sm"
@@ -367,7 +351,6 @@ const Explore = () => {
         </View>
       </TouchableOpacity>
 
-      {/* Properties List */}
       <FlatList
         data={properties?.properties}
         keyExtractor={keyExtractor}
@@ -382,7 +365,6 @@ const Explore = () => {
         initialNumToRender={5}
       />
 
-      {/* Filter Modal */}
       <FilterModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}

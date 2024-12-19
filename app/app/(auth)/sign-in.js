@@ -18,16 +18,78 @@ const SignIn = () => {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
 
   const { user, isSuccess, isError } = useSelector((state) => state.auth);
 
-  const submit = () => {
-    const data = {
-      email: form.email,
-      password: form.password,
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      email: "",
+      password: "",
     };
-    dispatch(login(data));
-    // router.push("/home");
+
+    // Email validation
+    if (!form.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!form.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (form.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+    }
+  };
+
+  const submit = async () => {
+    if (!validateForm()) {
+      Toast.show({
+        type: "error",
+        text1: "Validation Error",
+        text2: "Please check the form for errors",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await dispatch(login(form)).unwrap();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: error?.message || "An error occurred during login",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -72,7 +134,6 @@ const SignIn = () => {
               className="w-[215px] h-[120px]"
             />
           </View>
-          <Text>{t("welcome")}</Text>
 
           <Text className="text-2xl font-semibold text-white mt-10">
             Log in to Prime
@@ -81,16 +142,22 @@ const SignIn = () => {
           <FormField
             title="Email"
             value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
+            handleChangeText={(value) => handleChange("email", value)}
             otherStyles="mt-7"
             keyboardType="email-address"
+            placeholder="email address"
+            error={errors.email}
+            autoCapitalize="none"
           />
 
           <FormField
             title="Password"
             value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
+            handleChangeText={(value) => handleChange("password", value)}
             otherStyles="mt-7"
+            placeholder="password"
+            secureTextEntry
+            error={errors.password}
           />
 
           <CustomButton
@@ -98,6 +165,9 @@ const SignIn = () => {
             handlePress={submit}
             containerStyles="mt-7"
             isLoading={isSubmitting}
+            disabled={
+              isSubmitting || Object.values(errors).some((error) => error)
+            }
           />
 
           <View className="flex justify-center pt-5 flex-row gap-2">

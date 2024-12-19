@@ -13,10 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getWishlists, addToWishlist } from "../../store/auth/authSlice";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const { width } = Dimensions.get("window");
-const cardHeight = 160;
-
-// Memoize the WishlistItem component
 const WishlistItem = memo(({ item, onPress }) => (
   <TouchableOpacity
     onPress={() => onPress(item)}
@@ -116,7 +112,6 @@ const Bookmark = () => {
 
   return (
     <View className="flex-1 bg-gray-100 dark:bg-[#09092B]">
-      {/* Header */}
       <View className="px-5 pt-8 pb-4">
         <Text className="text-3xl font-bold text-gray-800 dark:text-white">
           Favorites
@@ -126,7 +121,6 @@ const Bookmark = () => {
         </Text>
       </View>
 
-      {/* Vertical Scrolling List */}
       <FlatList
         data={wishlist?.wishlist}
         keyExtractor={(item) => item._id}
@@ -141,7 +135,6 @@ const Bookmark = () => {
         initialNumToRender={5}
       />
 
-      {/* Detail Modal */}
       {modalVisible && (
         <Modal
           animationType="none"
@@ -150,7 +143,6 @@ const Bookmark = () => {
           onRequestClose={() => setModalVisible(false)}
         >
           <View className="flex-1 bg-white dark:bg-gray-900">
-            {/* Modal Header */}
             <View className="relative bg-white dark:bg-gray-900 pt-12 pb-4 px-5">
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
@@ -248,7 +240,6 @@ const Bookmark = () => {
               </ScrollView>
             )}
 
-            {/* Bottom Actions */}
             <View className="p-5 border-t border-gray-200 dark:border-gray-800">
               <TouchableOpacity className="bg-blue-600 dark:bg-blue-500 py-4 px-6 rounded-2xl flex-row justify-center items-center">
                 <Ionicons
