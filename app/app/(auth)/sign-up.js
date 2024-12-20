@@ -11,7 +11,9 @@ import { register, resetAuthState } from "../../store/auth/authSlice";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  const { isLoading, isSuccess, isError } = useSelector((state) => state.auth);
+  const { isLoading, isSuccess, isError, message } = useSelector(
+    (state) => state.auth
+  );
 
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -116,6 +118,23 @@ const SignUp = () => {
     }
 
     setErrors(newErrors);
+
+    // Find the first error to show in toast
+    if (!isValid) {
+      const firstError = Object.entries(newErrors).find(
+        ([_, value]) => value !== ""
+      );
+      if (firstError) {
+        Toast.show({
+          type: "error",
+          text1: `${
+            firstError[0].charAt(0).toUpperCase() + firstError[0].slice(1)
+          } Error`,
+          text2: firstError[1],
+        });
+      }
+    }
+
     return isValid;
   };
 
@@ -135,11 +154,6 @@ const SignUp = () => {
 
   const submit = async () => {
     if (!validateForm()) {
-      Toast.show({
-        type: "error",
-        text1: "Validation Error",
-        text2: "Please check the form for errors",
-      });
       return;
     }
 
@@ -156,7 +170,7 @@ const SignUp = () => {
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: "Registration Error",
         text2: error?.message || "An error occurred during registration",
       });
     } finally {
@@ -165,7 +179,7 @@ const SignUp = () => {
   };
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && message === "Registered Successfully") {
       Toast.show({
         type: "success",
         text1: "Success",

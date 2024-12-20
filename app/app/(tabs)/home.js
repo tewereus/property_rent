@@ -460,13 +460,48 @@ const Home = () => {
   };
 
   const categories = [
-    { icon: "home", label: "Apartment", type: "Apartment" },
-    { icon: "car", label: "Cars", type: "Vehicle" },
-    { icon: "map", label: "Land", type: "Land" },
-    { icon: "business", label: "Villas", type: "Villa" },
-    { icon: "storefront", label: "Commercial", type: "Commercial" },
-    { icon: "grid", label: "Office", type: "Office" },
-    { icon: "home-outline", label: "Houses", type: "House" },
+    {
+      icon: "home-outline",
+      label: t("apartment"),
+      type: "Apartment",
+      color: "#FF8E01", // or any color you prefer
+    },
+    {
+      icon: "car-outline",
+      label: t("cars"),
+      type: "Vehicle",
+      color: "#4CAF50",
+    },
+    {
+      icon: "map-outline",
+      label: t("land"),
+      type: "Land",
+      color: "#2196F3",
+    },
+    {
+      icon: "business-outline",
+      label: t("villas"),
+      type: "Villa",
+      color: "#9C27B0",
+    },
+    {
+      icon: "storefront-outline",
+      label: t("commercial"),
+      type: "Commercial",
+      color: "#E91E63",
+    },
+    {
+      icon: "grid-outline",
+      label: t("office"),
+      type: "Office",
+      color: "#FF5722",
+    },
+    {
+      icon: "home",
+      label: t("houses"),
+      type: "House",
+      color: "#795548",
+    },
   ];
 
   const handleCategoryPress = (category) => {
@@ -478,13 +513,20 @@ const Home = () => {
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity
-      className="items-center mx-4"
+      className="items-center mx-3 mb-4"
       onPress={() => handleCategoryPress(item)}
     >
-      <View className="bg-white dark:bg-gray-800 p-3 rounded-full mb-1">
-        <Ionicons name={item.icon} size={24} color="#6B7280" />
+      <View
+        className="w-16 h-16 rounded-2xl mb-1 items-center justify-center"
+        style={{
+          backgroundColor: `${item.color}15`, // 15 is hex for 10% opacity
+          borderWidth: 1,
+          borderColor: `${item.color}30`, // 30 is hex for 20% opacity
+        }}
+      >
+        <Ionicons name={item.icon} size={24} color={item.color} />
       </View>
-      <Text className="text-xs text-gray-600 dark:text-gray-300">
+      <Text className="text-xs text-gray-600 dark:text-gray-300 mt-1">
         {item.label}
       </Text>
     </TouchableOpacity>
@@ -577,6 +619,7 @@ const Home = () => {
           </View>
         </View>
       </View>
+      {/* <Text>{t("welcome")}</Text> */}
 
       <ScrollView
         className="flex-1"
@@ -587,14 +630,16 @@ const Home = () => {
         }}
       >
         {/* Categories */}
-        <View className="mb-6">
+        <View className="mt-6">
           <FlatList
             data={categories}
             renderItem={renderCategory}
-            keyExtractor={(item) => item.label}
+            keyExtractor={(item) => item.type}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 10 }}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+            }}
           />
         </View>
 
@@ -614,7 +659,7 @@ const Home = () => {
         {/* Sell Properties Section */}
         <View className="mb-6">
           <SectionHeader
-            title="Available for Sale"
+            title={t("available_for_sell")}
             onSeeAll={() => handleSeeAll("sell")}
           />
           <FlatList
@@ -640,7 +685,7 @@ const Home = () => {
         {/* Rent Properties Section */}
         <View className="mb-6">
           <SectionHeader
-            title="Available for Rent"
+            title={t("available_for_rent")}
             onSeeAll={() => handleSeeAll("rent")}
           />
           <FlatList

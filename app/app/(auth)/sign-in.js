@@ -23,7 +23,9 @@ const SignIn = () => {
     password: "",
   });
 
-  const { user, isSuccess, isError } = useSelector((state) => state.auth);
+  const { user, isSuccess, isError, message } = useSelector(
+    (state) => state.auth
+  );
 
   const validateForm = () => {
     let isValid = true;
@@ -93,7 +95,7 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && user) {
       Toast.show({
         type: "success",
         text1: "Success",
