@@ -61,7 +61,6 @@ const getAllProperties = async ({
   location,
   propertyType,
   propertyUse,
-  numBed,
 }) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
@@ -72,7 +71,7 @@ const getAllProperties = async ({
     }`,
   };
 
-  let query = `?limit=${5}`;
+  let query = `?limit=${limit}`;
   if (minPrice) {
     query += `&price[gte]=${minPrice}`;
   }
@@ -83,13 +82,10 @@ const getAllProperties = async ({
     query += `&location=${encodeURIComponent(location)}`;
   }
   if (propertyType) {
-    query += `&property_type=${encodeURIComponent(propertyType)}`;
+    query += `&filterType=${encodeURIComponent(propertyType)}`;
   }
   if (propertyUse) {
     query += `&property_use=${encodeURIComponent(propertyUse)}`;
-  }
-  if (numBed) {
-    query += `&num_bed=${numBed}`;
   }
 
   const response = await axios.get(

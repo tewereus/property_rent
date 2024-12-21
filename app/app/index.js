@@ -1,4 +1,4 @@
-import {
+/*import {
   Image,
   ScrollView,
   StyleSheet,
@@ -47,11 +47,7 @@ const index = () => {
         }}
       >
         <View className="w-full justify-center items-center min-h-[85vh] px-4">
-          {/* <Image
-            source={images.logo}
-            className="w-[130px] h-[84px]"
-            resizeMode="contain"
-          /> */}
+        
 
           <Image
             source={images.logo}
@@ -75,7 +71,7 @@ const index = () => {
             Where Creativity Meets Innovation: Embark on a Journey of Limitless
             Exploration with Prime
           </Text>
-          {/* <CustomButton title="Continue with Email"/> */}
+
           <CustomButton
             title="Get Started"
             handlePress={handlePress}
@@ -88,7 +84,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default index;*/
 // import { Pressable, Text } from "react-native";
 // import { useColorScheme } from "nativewind";
 
@@ -109,3 +105,52 @@ export default index;
 // }
 
 // export default index;
+
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { router } from "expo-router";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loadUser, resetAuthState } from "../store/auth/authSlice";
+import SplashScreen from "../components/SplashScreen";
+import WelcomeScreen from "../components/WelcomeScreen"; // Move your current index content to this component
+
+const Index = () => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Load user data
+        await dispatch(loadUser()).unwrap();
+
+        // Check if user exists
+        const user = await AsyncStorage.getItem("user");
+
+        // Simulate minimum splash screen duration
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Navigate based on auth status
+        if (user) {
+          router.push("/home");
+        } else {
+          setIsLoading(false); // Show welcome screen
+        }
+      } catch (error) {
+        console.error("Initialization error:", error);
+        setIsLoading(false); // Show welcome screen on error
+      }
+    };
+
+    initializeApp();
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
+  return <WelcomeScreen />;
+};
+
+export default Index;

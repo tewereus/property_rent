@@ -120,139 +120,164 @@ const PropertyCard = memo(({ item, onPress, onFavorite }) => (
 
 // Memoize the filter modal content
 const FilterModal = memo(
-  ({ visible, onClose, filterValues, onChangeFilter, onSubmit }) => (
-    <Modal
-      animationType="none"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View className="flex-1 bg-black/20">
-        <View className="flex-1 bg-white dark:bg-gray-900 mt-24 rounded-t-3xl">
-          {/* Modal Header */}
-          <View className="relative border-b border-gray-200 dark:border-gray-800 p-6">
-            <TouchableOpacity
-              onPress={onClose}
-              className="absolute right-6 top-6 z-50 p-2"
-            >
-              <Ionicons name="close" size={24} color="#6B7280" />
-            </TouchableOpacity>
-            <Text className="text-xl font-bold text-gray-800 dark:text-white">
-              Filter Properties
-            </Text>
-            <Text className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              Customize your search preferences
-            </Text>
-          </View>
+  ({ visible, onClose, filterValues, onChangeFilter, onSubmit }) => {
+    const propertyUseOptions = [
+      { label: "All", value: "" },
+      { label: "Rent", value: "rent" },
+      { label: "Sell", value: "sell" },
+    ];
 
-          {/* Filter Content */}
-          <ScrollView className="p-6" showsVerticalScrollIndicator={false}>
-            {/* Limit */}
-            <FilterOption icon="filter-outline" label="Number of Results">
-              <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                <TextInput
-                  placeholder={`Current limit: ${filterValues.limit}`}
-                  keyboardType="numeric"
-                  value={filterValues.limit.toString()}
-                  onChangeText={(text) => onChangeFilter.setLimit(text)}
-                  className="text-gray-700 dark:text-gray-300 text-base"
-                  placeholderTextColor="#A0AEC0"
-                />
-              </View>
-            </FilterOption>
+    return (
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View className="flex-1 bg-black/20">
+          <View className="flex-1 bg-white dark:bg-gray-900 mt-24 rounded-t-3xl">
+            {/* Modal Header */}
+            <View className="relative border-b border-gray-200 dark:border-gray-800 p-6">
+              <TouchableOpacity
+                onPress={onClose}
+                className="absolute right-6 top-6 z-50 p-2"
+              >
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+              <Text className="text-xl font-bold text-gray-800 dark:text-white">
+                Filter Properties
+              </Text>
+              <Text className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                Customize your search preferences
+              </Text>
+            </View>
 
-            {/* Price Range */}
-            <FilterOption icon="cash-outline" label="Price Range">
+            {/* Filter Content */}
+            <ScrollView className="p-6" showsVerticalScrollIndicator={false}>
+              {/* Limit */}
+              <FilterOption icon="filter-outline" label="Number of Results">
+                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                  <TextInput
+                    placeholder={`Current limit: ${filterValues.limit}`}
+                    keyboardType="numeric"
+                    value={filterValues.limit.toString()}
+                    onChangeText={(text) => onChangeFilter.setLimit(text)}
+                    className="text-gray-700 dark:text-gray-300 text-base"
+                    placeholderTextColor="#A0AEC0"
+                  />
+                </View>
+              </FilterOption>
+
+              {/* Price Range */}
+              <FilterOption icon="cash-outline" label="Price Range">
+                <View className="flex-row space-x-4">
+                  <View className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                    <TextInput
+                      placeholder="Min Price"
+                      keyboardType="numeric"
+                      value={filterValues.minPrice.toString()}
+                      onChangeText={(text) => onChangeFilter.setMinPrice(text)}
+                      className="text-gray-700 dark:text-gray-300"
+                      placeholderTextColor="#A0AEC0"
+                    />
+                  </View>
+                  <View className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                    <TextInput
+                      placeholder="Max Price"
+                      keyboardType="numeric"
+                      value={filterValues.maxPrice.toString()}
+                      onChangeText={(text) => onChangeFilter.setMaxPrice(text)}
+                      className="text-gray-700 dark:text-gray-300"
+                      placeholderTextColor="#A0AEC0"
+                    />
+                  </View>
+                </View>
+              </FilterOption>
+
+              {/* Location */}
+              <FilterOption icon="location-outline" label="Location">
+                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                  <TextInput
+                    placeholder="Enter location"
+                    value={filterValues.location}
+                    onChangeText={(text) => onChangeFilter.setLocation(text)}
+                    className="text-gray-700 dark:text-gray-300"
+                    placeholderTextColor="#A0AEC0"
+                  />
+                </View>
+              </FilterOption>
+
+              {/* Property Type */}
+              <FilterOption icon="home-outline" label="Property Type">
+                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                  <TextInput
+                    placeholder="Enter property type"
+                    value={filterValues.propertyType}
+                    onChangeText={(text) =>
+                      onChangeFilter.setPropertyType(text)
+                    }
+                    className="text-gray-700 dark:text-gray-300"
+                    placeholderTextColor="#A0AEC0"
+                  />
+                </View>
+              </FilterOption>
+
+              {/* Property Use Selection */}
+              <FilterOption icon="repeat-outline" label="Property Use">
+                <View className="flex-row flex-wrap gap-2">
+                  {propertyUseOptions.map((option) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      onPress={() =>
+                        onChangeFilter.setPropertyUse(option.value)
+                      }
+                      className={`px-4 py-2 rounded-xl ${
+                        filterValues.propertyUse === option.value
+                          ? "bg-[#FF8E01] border-[#FF8E01]"
+                          : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                      } border`}
+                    >
+                      <Text
+                        className={`${
+                          filterValues.propertyUse === option.value
+                            ? "text-white"
+                            : "text-gray-700 dark:text-gray-300"
+                        } font-medium`}
+                      >
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </FilterOption>
+            </ScrollView>
+
+            {/* Action Buttons */}
+            <View className="p-6 border-t border-gray-200 dark:border-gray-800">
               <View className="flex-row space-x-4">
-                <View className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                  <TextInput
-                    placeholder="Min Price"
-                    keyboardType="numeric"
-                    value={filterValues.minPrice.toString()}
-                    onChangeText={(text) => onChangeFilter.setMinPrice(text)}
-                    className="text-gray-700 dark:text-gray-300"
-                    placeholderTextColor="#A0AEC0"
-                  />
-                </View>
-                <View className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                  <TextInput
-                    placeholder="Max Price"
-                    keyboardType="numeric"
-                    value={filterValues.maxPrice.toString()}
-                    onChangeText={(text) => onChangeFilter.setMaxPrice(text)}
-                    className="text-gray-700 dark:text-gray-300"
-                    placeholderTextColor="#A0AEC0"
-                  />
-                </View>
+                <TouchableOpacity
+                  onPress={onClose}
+                  className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-xl"
+                >
+                  <Text className="text-gray-700 dark:text-gray-300 text-center font-medium">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={onSubmit}
+                  className="flex-1 bg-[#FF8E01] p-4 rounded-xl"
+                >
+                  <Text className="text-white text-center font-medium">
+                    Apply Filters
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </FilterOption>
-
-            {/* Location */}
-            <FilterOption icon="location-outline" label="Location">
-              <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                <TextInput
-                  placeholder="Enter location"
-                  value={filterValues.location}
-                  onChangeText={(text) => onChangeFilter.setLocation(text)}
-                  className="text-gray-700 dark:text-gray-300"
-                  placeholderTextColor="#A0AEC0"
-                />
-              </View>
-            </FilterOption>
-
-            {/* Property Type */}
-            <FilterOption icon="home-outline" label="Property Type">
-              <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                <TextInput
-                  placeholder="Enter property type"
-                  value={filterValues.propertyType}
-                  onChangeText={(text) => onChangeFilter.setPropertyType(text)}
-                  className="text-gray-700 dark:text-gray-300"
-                  placeholderTextColor="#A0AEC0"
-                />
-              </View>
-            </FilterOption>
-
-            {/* Bedrooms */}
-            <FilterOption icon="bed-outline" label="Number of Bedrooms">
-              <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                <TextInput
-                  placeholder="Number of bedrooms"
-                  keyboardType="numeric"
-                  value={filterValues.bedrooms.toString()}
-                  onChangeText={(text) => onChangeFilter.setBedrooms(text)}
-                  className="text-gray-700 dark:text-gray-300"
-                  placeholderTextColor="#A0AEC0"
-                />
-              </View>
-            </FilterOption>
-          </ScrollView>
-
-          {/* Action Buttons */}
-          <View className="p-6 border-t border-gray-200 dark:border-gray-800">
-            <View className="flex-row space-x-4">
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-xl"
-              >
-                <Text className="text-gray-700 dark:text-gray-300 text-center font-medium">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={onSubmit}
-                className="flex-1 bg-blue-600 p-4 rounded-xl"
-              >
-                <Text className="text-white text-center font-medium">
-                  Apply Filters
-                </Text>
-              </TouchableOpacity>
             </View>
           </View>
         </View>
-      </View>
-    </Modal>
-  )
+      </Modal>
+    );
+  }
 );
 
 const Explore = () => {
@@ -264,8 +289,7 @@ const Explore = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [propertyUse, setPropertyUse] = useState("");
-  const [bedrooms, setBedrooms] = useState("");
+  const [propertyUse, setPropertyUse] = useState(params.propertyUse || "");
 
   useEffect(() => {
     const { filterType, propertyUse } = params;
@@ -273,12 +297,21 @@ const Explore = () => {
     let newFilters = {};
 
     if (filterType) {
+      setPropertyType(filterType);
       newFilters.propertyType = filterType;
     }
 
     if (propertyUse) {
+      setPropertyUse(propertyUse);
       newFilters.propertyUse = propertyUse;
     }
+
+    // Remove empty filters
+    Object.keys(newFilters).forEach((key) => {
+      if (!newFilters[key]) {
+        delete newFilters[key];
+      }
+    });
 
     dispatch(getAllProperties(newFilters));
   }, [params.filterType, params.propertyUse]);
@@ -294,12 +327,19 @@ const Explore = () => {
       maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
       location,
       propertyType,
-      propertyUse,
-      numBed: bedrooms ? parseInt(bedrooms) : undefined,
+      propertyUse, // Make sure propertyUse is included
     };
+
+    // Remove undefined or empty string values
+    Object.keys(obj).forEach((key) => {
+      if (obj[key] === undefined || obj[key] === "") {
+        delete obj[key];
+      }
+    });
+
     dispatch(getAllProperties(obj));
     setModalVisible(false);
-  }, [limit, minPrice, maxPrice, location, propertyType, bedrooms]);
+  }, [limit, minPrice, maxPrice, location, propertyType, propertyUse]); // Add propertyUse to dependencies
 
   const renderProperties = useCallback(
     ({ item }) => (
@@ -321,7 +361,6 @@ const Explore = () => {
       maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
       location,
       propertyType,
-      numBed: bedrooms ? parseInt(bedrooms) : undefined,
     };
     dispatch(getAllProperties(obj));
   }, []);
@@ -374,7 +413,7 @@ const Explore = () => {
           maxPrice,
           location,
           propertyType,
-          bedrooms,
+          propertyUse,
         }}
         onChangeFilter={{
           setLimit,
@@ -382,7 +421,7 @@ const Explore = () => {
           setMaxPrice,
           setLocation,
           setPropertyType,
-          setBedrooms,
+          setPropertyUse,
         }}
         onSubmit={handleSubmit}
       />
