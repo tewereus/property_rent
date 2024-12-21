@@ -71,7 +71,7 @@ const getAllProperties = async ({
     }`,
   };
 
-  let query = `?limit=${limit}`;
+  let query = `?limit=5`;
   if (minPrice) {
     query += `&price[gte]=${minPrice}`;
   }

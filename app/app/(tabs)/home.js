@@ -33,32 +33,17 @@ import { useRouter } from "expo-router";
 const PropertyItem = memo(({ item, onPress, onFavorite }) => (
   <TouchableOpacity
     onPress={() => onPress(item)}
-    className="bg-white rounded-2xl shadow-lg m-2 overflow-hidden"
-    style={{
-      width: 280,
-      elevation: 5,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-    }}
+    className="bg-white dark:bg-gray-800/90 rounded-2xl shadow-sm mx-2 w-[280px] overflow-hidden"
   >
     <View className="relative">
       <Image
         source={{ uri: item.image }}
-        className="w-full h-48"
+        className="w-full h-[160px]"
         resizeMode="cover"
       />
-
-      {/* Price Tag */}
-      <View className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full">
-        <Text className="text-blue-600 font-bold">{item.price}</Text>
-      </View>
-
-      {/* Favorite Button */}
       <TouchableOpacity
-        className="absolute top-4 right-4 bg-white/90 p-2 rounded-full"
         onPress={() => onFavorite(item)}
+        className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
       >
         <Ionicons
           name={item.isFavorite ? "heart" : "heart-outline"}
@@ -66,56 +51,66 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => (
           color={item.isFavorite ? "#EF4444" : "#6B7280"}
         />
       </TouchableOpacity>
+      {/* Property Use Badge */}
+      <View className="absolute bottom-3 left-3 bg-black/50 px-3 py-1 rounded-full">
+        <Text className="text-white text-xs font-medium capitalize">
+          For {item.property_use}
+        </Text>
+      </View>
     </View>
 
     {/* Content Container */}
-    <View className="pl-4 pr-4 pb-4">
-      {/* Property Name */}
-      <Text className="text-lg font-bold text-gray-800 mb-1">{item.name}</Text>
+    <View className="p-4">
+      {/* Price */}
+      <View className="flex-row items-center justify-between mb-2">
+        <Text className="text-blue-600 dark:text-blue-400 font-bold text-lg">
+          ${item.price.toLocaleString()}
+        </Text>
+        <View className="flex-row items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
+          <Ionicons name="star" size={14} color="#3B82F6" />
+          <Text className="text-blue-600 dark:text-blue-400 text-xs ml-1 font-medium">
+            4.8
+          </Text>
+        </View>
+      </View>
+
+      {/* Title */}
+      <Text
+        className="text-gray-800 dark:text-white font-semibold mb-2"
+        numberOfLines={1}
+      >
+        {item.title}
+      </Text>
 
       {/* Location */}
-      <View className="flex-row items-center mb-2">
-        <Ionicons name="location-outline" size={16} color="#6B7280" />
-        <Text className="text-gray-500 text-sm ml-1">
-          {item.location || "Location not specified"}
+      <View className="flex-row items-center mb-3">
+        <Ionicons name="location-outline" size={14} color="#6B7280" />
+        <Text
+          className="text-gray-500 dark:text-gray-400 text-sm ml-1"
+          numberOfLines={1}
+        >
+          {item.location}
         </Text>
       </View>
 
-      {/* Property Details */}
-      <View className="flex-row justify-between mt-2 pt-2 border-t border-gray-100">
-        {/* Bedrooms */}
+      {/* Property Features */}
+      <View className="flex-row items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
         <View className="flex-row items-center">
           <Ionicons name="bed-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-600 text-sm ml-1">
-            {item.bedrooms || "3"} beds
+          <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+            {item.bedrooms} Beds
           </Text>
         </View>
-
-        {/* Bathrooms */}
         <View className="flex-row items-center">
           <Ionicons name="water-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-600 text-sm ml-1">
-            {item.bathrooms || "2"} baths
+          <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+            {item.bathrooms} Baths
           </Text>
         </View>
-
-        {/* Area */}
         <View className="flex-row items-center">
           <Ionicons name="square-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-600 text-sm ml-1">
-            {item.area || "1,200"} sqft
-          </Text>
-        </View>
-      </View>
-
-      {/* Date and Status */}
-      <View className="flex-row justify-between items-center mt-3 pt-2 border-t border-gray-100">
-        <Text className="text-gray-500 text-xs">
-          Listed {new Date(item.createdAt).toLocaleDateString()}
-        </Text>
-        <View className="bg-green-100 px-2 py-1 rounded-full">
-          <Text className="text-green-600 text-xs font-medium">
-            {item.status || "Available"}
+          <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+            {item.area} m²
           </Text>
         </View>
       </View>
@@ -286,52 +281,6 @@ const SectionHeader = memo(({ title, onSeeAll }) => (
   </View>
 ));
 
-// Update the property item render function
-const renderPropertyItem = ({ item }) => (
-  <TouchableOpacity
-    onPress={() => handlePress(item)}
-    className="bg-white dark:bg-gray-800 rounded-lg shadow-md mx-2 w-56 overflow-hidden"
-  >
-    <Image
-      source={{ uri: item.image }}
-      className="w-full h-32"
-      resizeMode="cover"
-    />
-    <View className="p-3">
-      <Text className="text-blue-600 dark:text-blue-400 font-bold text-base mb-1">
-        ${item.price}
-      </Text>
-      <Text
-        className="text-gray-800 dark:text-white font-semibold mb-1"
-        numberOfLines={1}
-      >
-        {item.title}
-      </Text>
-      <View className="flex-row items-center mb-2">
-        <Ionicons name="location-outline" size={14} color="#6B7280" />
-        <Text
-          className="text-gray-500 dark:text-gray-400 text-sm ml-1"
-          numberOfLines={1}
-        >
-          {item.location}
-        </Text>
-      </View>
-      <View className="flex-row justify-between items-center">
-        <Text className="text-gray-500 dark:text-gray-400 text-xs">
-          {item.bedrooms} Beds • {item.bathrooms} Baths
-        </Text>
-        <TouchableOpacity onPress={() => handleFavourite(item)}>
-          <Ionicons
-            name={item.isFavorite ? "heart" : "heart-outline"}
-            size={20}
-            color={item.isFavorite ? "#EF4444" : "#6B7280"}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  </TouchableOpacity>
-);
-
 const Home = () => {
   const dispatch = useDispatch();
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -372,27 +321,33 @@ const Home = () => {
     setSelectedProperty(prop);
     setFavouriteOn(prop.isFavorite);
     setModalVisible(true);
+    setShowPaymentOptions(false);
   }, []);
 
-  const handleFavourite = useCallback(() => {
-    const data = {
-      prodId: selectedProperty?._id,
-    };
-    dispatch(addToWishlist(data));
-    setFavouriteOn(!favouriteOn);
-  }, [selectedProperty, favouriteOn]);
+  const handleFavourite = useCallback(
+    (prop) => {
+      const data = {
+        prodId: prop._id,
+      };
+      dispatch(addToWishlist(data));
+      if (selectedProperty?._id === prop._id) {
+        setFavouriteOn(!favouriteOn);
+      }
+    },
+    [selectedProperty, favouriteOn]
+  );
 
   // Optimize FlatList rendering
-  const renderPropertyItem = useCallback(
-    ({ item }) => (
-      <PropertyItem
-        item={item}
-        onPress={handlePress}
-        onFavorite={handleFavourite}
-      />
-    ),
-    [handlePress, handleFavourite]
-  );
+  // const renderPropertyItem = useCallback(
+  //   ({ item }) => (
+  //     <PropertyItem
+  //       item={item}
+  //       onPress={handlePress}
+  //       onFavorite={handleFavourite}
+  //     />
+  //   ),
+  //   [handlePress, handleFavourite]
+  // );
 
   const keyExtractor = useCallback((item) => item._id, []);
   const ItemSeparator = useCallback(() => <View style={{ width: 15 }} />, []);
@@ -553,6 +508,17 @@ const Home = () => {
     });
   };
 
+  const renderPropertyItem = useCallback(
+    ({ item }) => (
+      <PropertyItem
+        item={item}
+        onPress={handlePress}
+        onFavorite={handleFavourite}
+      />
+    ),
+    [handlePress, handleFavourite]
+  );
+
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] flex-1">
       <View className="px-5 pt-5">
@@ -673,12 +639,13 @@ const Home = () => {
             windowSize={5}
             initialNumToRender={3}
             contentContainerStyle={{
-              paddingHorizontal: 10,
+              paddingHorizontal: 16,
+              paddingVertical: 8,
             }}
-            ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
+            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
             snapToAlignment="start"
             decelerationRate="fast"
-            snapToInterval={240}
+            snapToInterval={296} // 280 (card width) + 16 (separator width)
           />
         </View>
 
