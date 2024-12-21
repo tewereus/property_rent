@@ -51,12 +51,6 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => (
           color={item.isFavorite ? "#EF4444" : "#6B7280"}
         />
       </TouchableOpacity>
-      {/* Property Use Badge */}
-      <View className="absolute bottom-3 left-3 bg-black/50 px-3 py-1 rounded-full">
-        <Text className="text-white text-xs font-medium capitalize">
-          For {item.property_use}
-        </Text>
-      </View>
     </View>
 
     {/* Content Container */}
@@ -67,9 +61,9 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => (
           ${item.price.toLocaleString()}
         </Text>
         <View className="flex-row items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
-          <Ionicons name="star" size={14} color="#3B82F6" />
+          <Ionicons name="eye-outline" size={14} color="#3B82F6" />
           <Text className="text-blue-600 dark:text-blue-400 text-xs ml-1 font-medium">
-            4.8
+            {item.views || 0}
           </Text>
         </View>
       </View>
@@ -291,7 +285,6 @@ const Home = () => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   const loadColorScheme = async () => {
@@ -336,21 +329,6 @@ const Home = () => {
     },
     [selectedProperty, favouriteOn]
   );
-
-  // Optimize FlatList rendering
-  // const renderPropertyItem = useCallback(
-  //   ({ item }) => (
-  //     <PropertyItem
-  //       item={item}
-  //       onPress={handlePress}
-  //       onFavorite={handleFavourite}
-  //     />
-  //   ),
-  //   [handlePress, handleFavourite]
-  // );
-
-  const keyExtractor = useCallback((item) => item._id, []);
-  const ItemSeparator = useCallback(() => <View style={{ width: 15 }} />, []);
 
   const handleLanguageChange = (lng) => {
     const data = {
