@@ -30,87 +30,97 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 
 // Memoize the PropertyItem component to prevent unnecessary re-renders
-const PropertyItem = memo(({ item, onPress, onFavorite }) => (
-  <TouchableOpacity
-    onPress={() => onPress(item)}
-    className="bg-white dark:bg-gray-800/90 rounded-2xl shadow-sm mx-2 w-[280px] overflow-hidden"
-  >
-    <View className="relative">
-      <Image
-        source={{ uri: item.image }}
-        className="w-full h-[160px]"
-        resizeMode="cover"
-      />
-      <TouchableOpacity
-        onPress={() => onFavorite(item)}
-        className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
-      >
-        <Ionicons
-          name={item.isFavorite ? "heart" : "heart-outline"}
-          size={20}
-          color={item.isFavorite ? "#EF4444" : "#6B7280"}
-        />
-      </TouchableOpacity>
-    </View>
+const PropertyItem = memo(({ item, onPress, onFavorite }) => {
+  const [isFavorite, setIsFavorite] = useState(item.isFavorite);
 
-    {/* Content Container */}
-    <View className="p-4">
-      {/* Price */}
-      <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-blue-600 dark:text-blue-400 font-bold text-lg">
-          ${item.price.toLocaleString()}
-        </Text>
-        <View className="flex-row items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
-          <Ionicons name="eye-outline" size={14} color="#3B82F6" />
-          <Text className="text-blue-600 dark:text-blue-400 text-xs ml-1 font-medium">
-            {item.views || 0}
-          </Text>
-        </View>
+  const handleFavoritePress = (e) => {
+    e.stopPropagation();
+    setIsFavorite(!isFavorite); // Immediately update UI
+    onFavorite(item);
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={() => onPress(item)}
+      className="bg-white dark:bg-gray-800/90 rounded-2xl shadow-sm mx-2 w-[280px] overflow-hidden"
+    >
+      <View className="relative">
+        <Image
+          source={{ uri: item.image }}
+          className="w-full h-[160px]"
+          resizeMode="cover"
+        />
+        <TouchableOpacity
+          onPress={handleFavoritePress}
+          className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+        >
+          <Ionicons
+            name={isFavorite ? "heart" : "heart-outline"}
+            size={20}
+            color={isFavorite ? "#EF4444" : "#6B7280"}
+          />
+        </TouchableOpacity>
       </View>
 
-      {/* Title */}
-      <Text
-        className="text-gray-800 dark:text-white font-semibold mb-2"
-        numberOfLines={1}
-      >
-        {item.title}
-      </Text>
+      {/* Content Container */}
+      <View className="p-4">
+        {/* Price */}
+        <View className="flex-row items-center justify-between mb-2">
+          <Text className="text-blue-600 dark:text-blue-400 font-bold text-lg">
+            ${item.price.toLocaleString()}
+          </Text>
+          <View className="flex-row items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
+            <Ionicons name="eye-outline" size={14} color="#3B82F6" />
+            <Text className="text-blue-600 dark:text-blue-400 text-xs ml-1 font-medium">
+              {item.views || 0}
+            </Text>
+          </View>
+        </View>
 
-      {/* Location */}
-      <View className="flex-row items-center mb-3">
-        <Ionicons name="location-outline" size={14} color="#6B7280" />
+        {/* Title */}
         <Text
-          className="text-gray-500 dark:text-gray-400 text-sm ml-1"
+          className="text-gray-800 dark:text-white font-semibold mb-2"
           numberOfLines={1}
         >
-          {item.location}
+          {item.title}
         </Text>
-      </View>
 
-      {/* Property Features */}
-      <View className="flex-row items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-        <View className="flex-row items-center">
-          <Ionicons name="bed-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
-            {item.bedrooms} Beds
+        {/* Location */}
+        <View className="flex-row items-center mb-3">
+          <Ionicons name="location-outline" size={14} color="#6B7280" />
+          <Text
+            className="text-gray-500 dark:text-gray-400 text-sm ml-1"
+            numberOfLines={1}
+          >
+            {item.location}
           </Text>
         </View>
-        <View className="flex-row items-center">
-          <Ionicons name="water-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
-            {item.bathrooms} Baths
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <Ionicons name="square-outline" size={16} color="#6B7280" />
-          <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
-            {item.area} m²
-          </Text>
+
+        {/* Property Features */}
+        <View className="flex-row items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+          <View className="flex-row items-center">
+            <Ionicons name="bed-outline" size={16} color="#6B7280" />
+            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+              {item.bedrooms} Beds
+            </Text>
+          </View>
+          <View className="flex-row items-center">
+            <Ionicons name="water-outline" size={16} color="#6B7280" />
+            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+              {item.bathrooms} Baths
+            </Text>
+          </View>
+          <View className="flex-row items-center">
+            <Ionicons name="square-outline" size={16} color="#6B7280" />
+            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+              {item.area} m²
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
-  </TouchableOpacity>
-));
+    </TouchableOpacity>
+  );
+});
 
 // Create a separate memoized modal component
 const PropertyModal = memo(
@@ -310,25 +320,28 @@ const Home = () => {
   const { t, i18n } = useTranslation();
 
   // Memoize callback functions
+  const handleFavourite = useCallback(
+    async (prop) => {
+      try {
+        setFavouriteOn(!favouriteOn); // Immediately update UI
+        const data = {
+          prodId: prop._id,
+        };
+        await dispatch(addToWishlist(data)).unwrap();
+      } catch (error) {
+        console.error("Error updating favorite:", error);
+        setFavouriteOn(favouriteOn); // Revert on error
+      }
+    },
+    [favouriteOn, dispatch]
+  );
+
   const handlePress = useCallback((prop) => {
     setSelectedProperty(prop);
-    setFavouriteOn(prop.isFavorite);
+    setFavouriteOn(prop.isFavorite); // Set initial favorite state
     setModalVisible(true);
     setShowPaymentOptions(false);
   }, []);
-
-  const handleFavourite = useCallback(
-    (prop) => {
-      const data = {
-        prodId: prop._id,
-      };
-      dispatch(addToWishlist(data));
-      if (selectedProperty?._id === prop._id) {
-        setFavouriteOn(!favouriteOn);
-      }
-    },
-    [selectedProperty, favouriteOn]
-  );
 
   const handleLanguageChange = (lng) => {
     const data = {

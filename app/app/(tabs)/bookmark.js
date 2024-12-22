@@ -9,11 +9,12 @@ import {
   Dimensions,
 } from "react-native";
 import React, { useEffect, useState, useCallback, memo } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { getWishlists, addToWishlist } from "../../store/auth/authSlice";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const WishlistItem = memo(({ item, onPress }) => (
+const WishlistItem = memo(({ item, onPress, onFavorite }) => (
   <TouchableOpacity
     onPress={() => onPress(item)}
     className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden mb-4 mx-4"
@@ -33,11 +34,14 @@ const WishlistItem = memo(({ item, onPress }) => (
       </View>
       {/* Favorite Button */}
       <TouchableOpacity
-        onPress={() => onPress(item)}
+        onPress={(e) => {
+          e.stopPropagation();
+          onFavorite(item);
+        }}
         className="absolute top-2 right-2"
       >
         <View className="bg-white rounded-full p-1">
-          <Ionicons name="heart" size={20} color="#EF4444" />
+          <Ionicons name="close" size={20} color="#EF4444" />
         </View>
       </TouchableOpacity>
     </View>
@@ -79,17 +83,13 @@ const Bookmark = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [favouriteOn, setFavouriteOn] = useState(true);
 
-  useEffect(() => {
-    dispatch(getWishlists());
-  }, [dispatch]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getWishlists());
+    }, [dispatch])
+  );
 
   const { wishlist } = useSelector((state) => state.auth);
-
-  const handleWishlist = useCallback((wish) => {
-    setSelectedWishlist(wish);
-    setFavouriteOn(true);
-    setModalVisible(true);
-  }, []);
 
   const handleFavourite = useCallback(() => {
     const data = {
@@ -97,17 +97,45 @@ const Bookmark = () => {
     };
     dispatch(addToWishlist(data))
       .unwrap()
-      .then((response) => {
-        if (response.payload) {
-          setFavouriteOn(!favouriteOn);
-          dispatch(getWishlists());
-        }
+      .then(() => {
+        setFavouriteOn(!favouriteOn);
+        dispatch(getWishlists());
+      })
+      .catch((error) => {
+        console.error("Error updating favorite:", error);
+        setFavouriteOn(favouriteOn);
       });
   }, [selectedWishlist, favouriteOn, dispatch]);
 
+  const handleWishlist = useCallback((wish) => {
+    setSelectedWishlist(wish);
+    setFavouriteOn(true);
+    setModalVisible(true);
+  }, []);
+
+  const handleRemoveFromWishlist = useCallback(
+    (item) => {
+      const data = {
+        prodId: item._id,
+      };
+      dispatch(addToWishlist(data))
+        .unwrap()
+        .then(() => {
+          dispatch(getWishlists());
+        });
+    },
+    [dispatch]
+  );
+
   const renderWishlist = useCallback(
-    ({ item }) => <WishlistItem item={item} onPress={handleWishlist} />,
-    [handleWishlist]
+    ({ item }) => (
+      <WishlistItem
+        item={item}
+        onPress={handleWishlist}
+        onFavorite={handleRemoveFromWishlist}
+      />
+    ),
+    [handleWishlist, handleRemoveFromWishlist]
   );
 
   return (
