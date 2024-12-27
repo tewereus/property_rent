@@ -5,14 +5,14 @@ const {
   editRegion,
   deleteRegion,
   deleteAllRegions,
-} = require("../../controllers/address/regionCtrl");
-const { adminAuthMiddleware } = require("../../middlewares/authMiddleware");
+} = require("../controllers/regionCtrl");
+// const { adminAuthMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
-router.post("/add-region", adminAuthMiddleware, addRegion);
+router.post("/add-region", addRegion);
 router.get("/all-regions", getAllRegions);
-router.put("/edit-region/:addrId", adminAuthMiddleware, editRegion);
-router.delete("/delete/:addrId", adminAuthMiddleware, deleteRegion);
-router.delete("/delete-all", adminAuthMiddleware, deleteAllRegions);
+router.put("/edit-region/:addrId", editRegion);
+router.delete("/delete/:addrId", deleteRegion);
+router.delete("/delete-all", deleteAllRegions);
 
 module.exports = router;

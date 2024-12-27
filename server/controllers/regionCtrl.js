@@ -1,5 +1,4 @@
-const Region = require("../../models/address/regionModel");
-const validateMongoDbId = require("../../utils/validateMongoDbId");
+const Region = require("../models/regionModel");
 const asyncHandler = require("express-async-handler");
 
 const addRegion = asyncHandler(async (req, res) => {

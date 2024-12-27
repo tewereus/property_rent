@@ -1,5 +1,4 @@
-const Location = require("../../models/address/locationModel");
-const validateMongoDbId = require("../../utils/validateMongoDbId");
+const Location = require("../models/locationModel");
 const asyncHandler = require("express-async-handler");
 
 const addLocation = asyncHandler(async (req, res) => {

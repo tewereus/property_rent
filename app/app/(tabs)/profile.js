@@ -5,8 +5,10 @@ import {
   Switch,
   Image,
   ScrollView,
+  Modal,
+  TextInput,
 } from "react-native";
-import React, { useEffect, useCallback, memo } from "react";
+import React, { useEffect, useCallback, memo, useState } from "react";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -42,6 +44,9 @@ const Profile = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { user, isSuccess } = useSelector((state) => state.auth);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
 
   const saveColorScheme = useCallback(
     async (scheme) => {
@@ -101,6 +106,14 @@ const Profile = () => {
     router.push("/sign-in");
   }, [dispatch, router]);
 
+  const saveChanges = useCallback(() => {
+    const updatedUser = { name, email };
+    console.log(updatedUser);
+    // Dispatch an action to update user info in the store
+    // await dispatch(updateUser(updatedUser)); // Uncomment and implement this
+    setModalVisible(false);
+  }, []);
+
   return (
     <View className="flex-1 bg-gray-100 dark:bg-gray-900">
       {/* Profile Header */}
@@ -152,9 +165,7 @@ const Profile = () => {
         <ProfileOption
           icon="settings-outline"
           label="Account Settings"
-          onPress={() => {
-            /* Add navigation to settings */
-          }}
+          onPress={() => setModalVisible(true)}
         />
 
         {/* Help & Support */}
@@ -196,6 +207,49 @@ const Profile = () => {
           <Text className="text-white text-lg font-medium ml-2">Logout</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Account Settings Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center">
+          <View className="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12">
+            <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+              Edit Account Settings
+            </Text>
+            <TextInput
+              placeholder="Name"
+              value={name}
+              onChangeText={setName}
+              className="border border-gray-300 rounded-lg p-2 mb-4"
+            />
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              className="border border-gray-300 rounded-lg p-2 mb-4"
+              keyboardType="email-address"
+            />
+            <View className="flex-row justify-between">
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                className="bg-gray-300 p-2 rounded-lg flex-1 mr-2"
+              >
+                <Text className="text-center text-gray-800">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={saveChanges}
+                className="bg-blue-500 p-2 rounded-lg flex-1 ml-2"
+              >
+                <Text className="text-center text-white">Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
