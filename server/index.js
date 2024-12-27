@@ -13,6 +13,9 @@ const managerRouter = require("./routes/managerRoutes");
 const propertyTypeRouter = require("./routes/propertyTypeRoutes");
 const propertyRouter = require("./routes/propertyRoutes");
 const transactionRouter = require("./routes/transactionRoutes");
+const locationRouter = require("./routes/locationRoutes");
+const regionRouter = require("./routes/regionRoutes");
+const subRegionRouter = require("./routes/subRegionRoutes");
 const PORT = process.env.PORT || 9001;
 // const User = require("./models/userModel");
 
@@ -48,6 +51,9 @@ app.use("/api/v1/manager", managerRouter);
 app.use("/api/v1/property", propertyRouter);
 app.use("/api/v1/property-type", propertyTypeRouter);
 app.use("/api/v1/transaction", transactionRouter);
+app.use("/api/v1/region", regionRouter);
+app.use("/api/v1/subregion", subRegionRouter);
+app.use("/api/v1/location", locationRouter);
 
 // const updateUsers = async () => {
 //   try {

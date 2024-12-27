@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 var propertyCategory = new mongoose.Schema({
-  num_bed: {
-    type: Number,
+  category_name: {
+    type: String,
     required: true,
   },
 });

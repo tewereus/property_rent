@@ -1,0 +1,4 @@
+view count
+address in register, filter, profile, create property
+property type in filter
+add property category
