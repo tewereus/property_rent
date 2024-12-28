@@ -8,7 +8,7 @@ import {
 } from "../store/property/propertySlice";
 import { useDispatch, useSelector } from "react-redux";
 import PropertyForm from "../components/PropertyForm";
-import MapComponent from "../components/MapComponent";
+// import MapComponent from "../components/MapComponent";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -142,7 +142,7 @@ const CreateProperty = () => {
           onRequestClose={() => setShowMapModal(false)}
         >
           <View className="flex-1">
-            <MapComponent onLocationSelect={handleLocationSelect} />
+            {/* <MapComponent onLocationSelect={handleLocationSelect} /> */}
             <View className="p-6">
               <TouchableOpacity
                 onPress={() => setShowMapModal(false)}

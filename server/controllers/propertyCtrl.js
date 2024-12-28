@@ -7,6 +7,7 @@ const { PropertyType } = require("../models/propertyTypeModel");
 const Transaction = require("../models/transactionModel");
 const formidable = require("formidable").formidable;
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const User = require("../models/userModel");
 
 const createProperty = asyncHandler(async (req, res) => {
   const form = formidable({
@@ -312,6 +313,39 @@ const buyProperty = asyncHandler(async (req, res) => {
   }
 });
 
+const changeViewCount = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { propertyId } = req.body;
+  try {
+    console.log(id);
+    const user = await User.findById(id);
+    console.log(user);
+    if (!user) throw new Error("user not found");
+    const property = await Property.findById(propertyId);
+    console.log(property.view.user);
+    const alreadyExists = property.view.user.includes(id);
+    console.log(alreadyExists);
+    if (alreadyExists) {
+      res.json("user already exists in property");
+      return;
+    }
+
+    const count = await Property.findByIdAndUpdate(
+      propertyId,
+      {
+        $push: { "view.user": id },
+        $inc: { "view.count": 1 },
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(count);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProperty,
   getAllProperties,
@@ -322,4 +356,5 @@ module.exports = {
   getPropertiesByType,
   getPropertiesByUse,
   buyProperty,
+  changeViewCount,
 };
