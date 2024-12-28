@@ -36,7 +36,7 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    address: "",
+    // address: "",
     phone: "",
     region: "",
     subregion: "",
@@ -145,19 +145,19 @@ const SignUp = () => {
     if (!form.phone) {
       newErrors.phone = "Phone number is required";
       isValid = false;
-    } else if (!/^\+?[\d\s-]{10,}$/.test(form.phone)) {
+    } else if (!/^\+?[\d\s-]{9,}$/.test(form.phone)) {
       newErrors.phone = "Please enter a valid phone number";
       isValid = false;
     }
 
     // Address validation
-    if (!form.address.trim()) {
-      newErrors.address = "Address is required";
-      isValid = false;
-    } else if (form.address.trim().length < 5) {
-      newErrors.address = "Address must be at least 5 characters";
-      isValid = false;
-    }
+    // if (!form.address.trim()) {
+    //   newErrors.address = "Address is required";
+    //   isValid = false;
+    // } else if (form.address.trim().length < 5) {
+    //   newErrors.address = "Address must be at least 5 characters";
+    //   isValid = false;
+    // }
 
     // Password validation
     if (!form.password) {
@@ -253,9 +253,14 @@ const SignUp = () => {
         name: form.name.trim(),
         email: form.email.toLowerCase(),
         password: form.password,
-        address: form.address.trim(),
+        address: {
+          region: form.region,
+          subregion: form.subregion,
+          location: form.location,
+        },
         phone: form.phone.trim(),
       };
+      console.log(data);
       await dispatch(register(data)).unwrap();
     } catch (error) {
       Toast.show({
@@ -340,14 +345,14 @@ const SignUp = () => {
             error={errors.phone}
           />
 
-          <FormField
+          {/* <FormField
             title="Address"
             value={form.address}
             handleChangeText={(value) => handleChange("address", value)}
             placeholder="address"
             otherStyles="mt-6"
             error={errors.address}
-          />
+          /> */}
 
           <FormField
             title="Password"
@@ -426,7 +431,7 @@ const SignUp = () => {
                 </option>
               ))}
             </select>
-            {errors.subRegion && (
+            {errors.subregion && (
               <p className="mt-1 text-sm text-red-500">{errors.subRegion}</p>
             )}
           </div>

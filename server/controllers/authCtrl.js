@@ -9,11 +9,7 @@ const register = asyncHandler(async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user) throw new Error("user already exists");
-    const newUser = await User.create({
-      name,
-      email,
-      password,
-    });
+    const newUser = await User.create(req.body);
     res.json(newUser);
   } catch (error) {
     throw new Error(error);

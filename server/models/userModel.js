@@ -31,7 +31,7 @@ var userSchema = new mongoose.Schema(
         ref: "Region",
         required: true,
       },
-      subRegion: {
+      subregion: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubRegion",
         required: true,

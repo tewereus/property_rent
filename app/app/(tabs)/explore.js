@@ -13,6 +13,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllProperties } from "../../store/property/propertySlice";
 import { Ionicons } from "@expo/vector-icons"; // Import icons
 import { useLocalSearchParams } from "expo-router";
+import {
+  getAllLocations,
+  getAllRegions,
+  getAllSubRegions,
+} from "../../store/address/addressSlice";
 
 // Memoize the FilterOption component
 const FilterOption = memo(({ icon, label, children }) => (
@@ -207,6 +212,91 @@ const FilterModal = memo(
                 </View>
               </FilterOption>
 
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  onClick={() => console.log(filterValues.region)}
+                >
+                  Region *
+                </label>
+                <select
+                  name="region"
+                  value={filterValues.region}
+                  onChange={(text) => onChangeFilter.setRegion(text)}
+                  className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  required
+                  // disabled={!form.country}
+                >
+                  <option value="">Select Region</option>
+                  {filterValues.regions.map((region) => (
+                    <option key={region._id} value={region._id}>
+                      {region.region_name}
+                    </option>
+                  ))}
+                </select>
+                {/* {errors.region && (
+                  <p className="mt-1 text-sm text-red-500">{errors.region}</p>
+                )} */}
+              </div>
+
+              {/* Sub Region */}
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  onClick={() => console.log(filterValues.subregion)}
+                >
+                  Sub Region *
+                </label>
+                <select
+                  name="subregion"
+                  value={filterValues.subregion}
+                  onChange={(text) => onChangeFilter.setSubregion(text)}
+                  className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  required
+                  disabled={!filterValues.region}
+                >
+                  <option value="">Select Sub Region</option>
+                  {filterValues.filteredSubRegions.map((subRegion) => (
+                    <option key={subRegion._id} value={subRegion._id}>
+                      {subRegion.subregion_name}
+                    </option>
+                  ))}
+                </select>
+                {/* {errors.subregion && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.subRegion}
+                  </p>
+                )} */}
+              </div>
+
+              {/* Location */}
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  onClick={() => console.log(filterValues.location)}
+                >
+                  Location *
+                </label>
+                <select
+                  name="location"
+                  value={filterValues.location}
+                  onChange={(text) => onChangeFilter.setLocation(text)}
+                  className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  required
+                  disabled={!filterValues.subregion}
+                >
+                  <option value="">Select Location</option>
+                  {filterValues.filteredLocations.map((location) => (
+                    <option key={location._id} value={location._id}>
+                      {location.location}
+                    </option>
+                  ))}
+                </select>
+                {/* {errors.location && (
+                  <p className="mt-1 text-sm text-red-500">{errors.location}</p>
+                )} */}
+              </div>
+
               {/* Property Type */}
               <FilterOption icon="home-outline" label="Property Type">
                 <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
@@ -288,8 +378,23 @@ const Explore = () => {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [location, setLocation] = useState("");
+  const [region, setRegion] = useState("");
+  const [subregion, setSubregion] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [propertyUse, setPropertyUse] = useState(params.propertyUse || "");
+
+  const [filteredSubRegions, setFilteredSubRegions] = useState([]);
+  const [filteredLocations, setFilteredLocations] = useState([]);
+
+  useEffect(() => {
+    dispatch(getAllRegions());
+    dispatch(getAllSubRegions());
+    dispatch(getAllLocations());
+  }, []);
+
+  const { regions, subregions, locations } = useSelector(
+    (state) => state.address
+  );
 
   useEffect(() => {
     const { filterType, propertyUse } = params;
@@ -316,6 +421,32 @@ const Explore = () => {
     dispatch(getAllProperties(newFilters));
   }, [params.filterType, params.propertyUse]);
 
+  useEffect(() => {
+    if (region) {
+      const regionSubRegions = subregions.filter(
+        (subRegion) => subRegion.region_id?._id === region
+      );
+      setFilteredSubRegions(regionSubRegions);
+      // Reset dependent fields
+      // setRegion("");
+      // setLocation("");
+      setFilteredLocations([]);
+    }
+  }, [region, subregions]);
+
+  // Handle subregion selection
+  useEffect(() => {
+    if (subregion) {
+      // console.log("subRegionLocations");
+      const subRegionLocations = locations.filter(
+        (location) => location?.subregion_id?._id === subregion
+      );
+      console.log(subRegionLocations);
+      setFilteredLocations(subRegionLocations);
+      // setLocation("");
+    }
+  }, [subregion, region, locations]);
+
   const handlePress = useCallback((item) => {}, []);
 
   const handleFavourite = useCallback((item) => {}, []);
@@ -327,7 +458,10 @@ const Explore = () => {
       maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
       location,
       propertyType,
-      propertyUse, // Make sure propertyUse is included
+      propertyUse,
+      region,
+      subregion,
+      location,
     };
 
     // Remove undefined or empty string values
@@ -336,7 +470,7 @@ const Explore = () => {
         delete obj[key];
       }
     });
-
+    console.log(obj);
     dispatch(getAllProperties(obj));
     setModalVisible(false);
   }, [limit, minPrice, maxPrice, location, propertyType, propertyUse]); // Add propertyUse to dependencies
@@ -414,6 +548,12 @@ const Explore = () => {
           location,
           propertyType,
           propertyUse,
+          region,
+          subregion,
+          location,
+          regions,
+          filteredSubRegions,
+          filteredLocations,
         }}
         onChangeFilter={{
           setLimit,
@@ -422,6 +562,9 @@ const Explore = () => {
           setLocation,
           setPropertyType,
           setPropertyUse,
+          setRegion,
+          setSubregion,
+          setLocation,
         }}
         onSubmit={handleSubmit}
       />
