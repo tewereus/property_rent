@@ -11,12 +11,29 @@ import PropertyForm from "../components/PropertyForm";
 // import MapComponent from "../components/MapComponent";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {
+  getAllRegions,
+  getAllSubRegions,
+  getAllLocations,
+} from "../store/address/addressSlice";
 
 const CreateProperty = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { type, action } = useLocalSearchParams();
   const { propertyTypes } = useSelector((state) => state.propertyType);
+  const [filteredSubRegions, setFilteredSubRegions] = useState([]);
+  const [filteredLocations, setFilteredLocations] = useState([]);
+
+  useEffect(() => {
+    dispatch(getAllRegions());
+    dispatch(getAllSubRegions());
+    dispatch(getAllLocations());
+  }, []);
+
+  const { regions, subregions, locations } = useSelector(
+    (state) => state.address
+  );
 
   const selectedPropertyType = propertyTypes?.find((pt) => pt._id === type);
 
@@ -25,11 +42,46 @@ const CreateProperty = () => {
     location: "",
     price: 0,
     description: "",
+    region: "",
+    subregion: "",
+    location: "",
     propertyType: type,
     property_use: action,
     typeSpecificFields: {},
     images: [],
   });
+
+  useEffect(() => {
+    if (formData.region) {
+      const regionSubRegions = subregions.filter(
+        (subRegion) => subRegion.region_id?._id === formData.region
+      );
+      setFilteredSubRegions(regionSubRegions);
+      // Reset dependent fields
+      setFormData((prev) => ({
+        ...prev,
+        subregion: "",
+        location: "",
+      }));
+      setFilteredLocations([]);
+    }
+  }, [formData.region, subregions]);
+
+  // Handle subregion selection
+  useEffect(() => {
+    if (formData.subregion) {
+      // console.log("subRegionLocations");
+      const subRegionLocations = locations.filter(
+        (location) => location?.subregion_id?._id === formData.subregion
+      );
+      // console.log(subRegionLocations);
+      setFilteredLocations(subRegionLocations);
+      setFormData((prev) => ({
+        ...prev,
+        location: "",
+      }));
+    }
+  }, [formData.subregion, formData.region, locations]);
 
   const [showMapModal, setShowMapModal] = useState(false);
 
@@ -55,13 +107,23 @@ const CreateProperty = () => {
     setShowMapModal(false);
   };
 
+  const handleInputChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleSubmit = () => {
     // Validation
     if (
       !formData.title ||
       !formData.location ||
       !formData.price ||
-      !formData.description
+      !formData.description ||
+      !formData.region ||
+      !formData.subregion ||
+      !formData.location
     ) {
       alert("Please fill in all required fields");
       return;
@@ -77,6 +139,8 @@ const CreateProperty = () => {
       propertyType: type,
       property_use: action,
     };
+
+    console.log(data);
 
     dispatch(createProperty(data));
   };
@@ -105,6 +169,89 @@ const CreateProperty = () => {
               propertyType={selectedPropertyType}
             />
           </View>
+
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              onClick={() => console.log(formData.region)}
+            >
+              Region *
+            </label>
+            <select
+              name="region"
+              value={formData.region}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+              required
+              // disabled={!form.country}
+            >
+              <option value="">Select Region</option>
+              {regions.map((region) => (
+                <option key={region._id} value={region._id}>
+                  {region.region_name}
+                </option>
+              ))}
+            </select>
+            {/* {errors.region && (
+              <p className="mt-1 text-sm text-red-500">{errors.region}</p>
+            )} */}
+          </div>
+
+          {/* Sub Region */}
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              onClick={() => console.log(formData.subregion)}
+            >
+              Sub Region *
+            </label>
+            <select
+              name="subregion"
+              value={formData.subregion}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+              required
+              disabled={!formData.region}
+            >
+              <option value="">Select Sub Region</option>
+              {filteredSubRegions.map((subRegion) => (
+                <option key={subRegion._id} value={subRegion._id}>
+                  {subRegion.subregion_name}
+                </option>
+              ))}
+            </select>
+            {/* {errors.subregion && (
+              <p className="mt-1 text-sm text-red-500">{errors.subRegion}</p>
+            )} */}
+          </div>
+
+          {/* Location */}
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              onClick={() => console.log(formData.location)}
+            >
+              Location *
+            </label>
+            <select
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+              required
+              disabled={!formData.subregion}
+            >
+              <option value="">Select Location</option>
+              {filteredLocations.map((location) => (
+                <option key={location._id} value={location._id}>
+                  {location.location}
+                </option>
+              ))}
+            </select>
+            {/* {errors.location && (
+              <p className="mt-1 text-sm text-red-500">{errors.location}</p>
+            )} */}
+          </div>
 
           <TouchableOpacity
             onPress={() => setShowMapModal(true)}
