@@ -14,8 +14,8 @@ const addLocation = asyncHandler(async (req, res) => {
 const getAllLocations = asyncHandler(async (req, res) => {
   try {
     const location = await Location.find()
-      .populate("region", "region_name")
-      .populate("subregion", "subregion_name");
+      .populate("region_id", "region_name")
+      .populate("subregion_id", "subregion_name");
     res.json(location);
   } catch (error) {
     throw new Error(error);

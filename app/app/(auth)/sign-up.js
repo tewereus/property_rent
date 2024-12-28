@@ -8,6 +8,11 @@ import { images } from "../../constants";
 import CustomButton from "../../components/CustomButton";
 import FormField from "../../components/FormField";
 import { register, resetAuthState } from "../../store/auth/authSlice";
+import {
+  getAllRegions,
+  getAllSubRegions,
+  getAllLocations,
+} from "../../store/address/addressSlice";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -15,7 +20,17 @@ const SignUp = () => {
     (state) => state.auth
   );
 
+  useEffect(() => {
+    dispatch(getAllRegions());
+    dispatch(getAllSubRegions());
+    dispatch(getAllLocations());
+  }, []);
+  const { regions, subregions, locations } = useSelector(
+    (state) => state.address
+  );
   const [isSubmitting, setSubmitting] = useState(false);
+  const [filteredSubRegions, setFilteredSubRegions] = useState([]);
+  const [filteredLocations, setFilteredLocations] = useState([]);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -23,7 +38,61 @@ const SignUp = () => {
     confirmPassword: "",
     address: "",
     phone: "",
+    region: "",
+    subregion: "",
+    location: "",
   });
+
+  // useEffect(() => {
+  //   if (form.country) {
+  //     const countryRegions = regions.filter(
+  //       (region) => region.country?._id === form.country
+  //     );
+  //     setFilteredRegions(countryRegions);
+  //     // Reset dependent fields
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       region: "",
+  //       subRegion: "",
+  //       location: "",
+  //     }));
+  //     setFilteredSubRegions([]);
+  //     setFilteredLocations([]);
+  //   }
+  // }, [form.country, regions]);
+
+  // Handle region selection
+  useEffect(() => {
+    if (form.region) {
+      const regionSubRegions = subregions.filter(
+        (subRegion) => subRegion.region_id?._id === form.region
+      );
+      setFilteredSubRegions(regionSubRegions);
+      // Reset dependent fields
+      setForm((prev) => ({
+        ...prev,
+        subRegion: "",
+        location: "",
+      }));
+      setFilteredLocations([]);
+    }
+  }, [form.region, subregions]);
+
+  // Handle subregion selection
+  useEffect(() => {
+    if (form.subregion) {
+      // console.log("subRegionLocations");
+      const subRegionLocations = locations.filter(
+        (location) => location?.subregion_id?._id === form.subregion
+      );
+      console.log(subRegionLocations);
+      setFilteredLocations(subRegionLocations);
+      setForm((prev) => ({
+        ...prev,
+        location: "",
+      }));
+    }
+  }, [form.subregion, form.region, locations]);
 
   const [errors, setErrors] = useState({
     name: "",
@@ -32,6 +101,9 @@ const SignUp = () => {
     confirmPassword: "",
     address: "",
     phone: "",
+    region: "",
+    subregion: "",
+    location: "",
   });
 
   const validateForm = () => {
@@ -43,6 +115,9 @@ const SignUp = () => {
       confirmPassword: "",
       address: "",
       phone: "",
+      region: "",
+      subregion: "",
+      location: "",
     };
 
     // Name validation
@@ -148,6 +223,21 @@ const SignUp = () => {
       setErrors((prev) => ({
         ...prev,
         [field]: "",
+      }));
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
       }));
     }
   };
@@ -278,6 +368,100 @@ const SignUp = () => {
             secureTextEntry
             error={errors.confirmPassword}
           />
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              onClick={() => console.log(form.region)}
+            >
+              Region *
+            </label>
+            <select
+              name="region"
+              value={form.region}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.region
+                  ? "border-red-500"
+                  : "border-gray-300 dark:border-gray-600"
+              } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+              required
+              // disabled={!form.country}
+            >
+              <option value="">Select Region</option>
+              {regions.map((region) => (
+                <option key={region._id} value={region._id}>
+                  {region.region_name}
+                </option>
+              ))}
+            </select>
+            {errors.region && (
+              <p className="mt-1 text-sm text-red-500">{errors.region}</p>
+            )}
+          </div>
+
+          {/* Sub Region */}
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              onClick={() => console.log(form.subregion)}
+            >
+              Sub Region *
+            </label>
+            <select
+              name="subregion"
+              value={form.subregion}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.subregion
+                  ? "border-red-500"
+                  : "border-gray-300 dark:border-gray-600"
+              } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+              required
+              disabled={!form.region}
+            >
+              <option value="">Select Sub Region</option>
+              {filteredSubRegions.map((subRegion) => (
+                <option key={subRegion._id} value={subRegion._id}>
+                  {subRegion.subregion_name}
+                </option>
+              ))}
+            </select>
+            {errors.subRegion && (
+              <p className="mt-1 text-sm text-red-500">{errors.subRegion}</p>
+            )}
+          </div>
+
+          {/* Location */}
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              onClick={() => console.log(form.location)}
+            >
+              Location *
+            </label>
+            <select
+              name="location"
+              value={form.location}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.location
+                  ? "border-red-500"
+                  : "border-gray-300 dark:border-gray-600"
+              } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+              required
+              disabled={!form.subregion}
+            >
+              <option value="">Select Location</option>
+              {filteredLocations.map((location) => (
+                <option key={location._id} value={location._id}>
+                  {location.location}
+                </option>
+              ))}
+            </select>
+            {errors.location && (
+              <p className="mt-1 text-sm text-red-500">{errors.location}</p>
+            )}
+          </div>
 
           <CustomButton
             title="Sign Up"

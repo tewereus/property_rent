@@ -14,7 +14,7 @@ const addSubRegion = asyncHandler(async (req, res) => {
 // Get All SubRegions
 const getAllSubRegions = asyncHandler(async (req, res) => {
   try {
-    const subRegions = await SubRegion.find().populate("region");
+    const subRegions = await SubRegion.find().populate("region_id");
     res.json(subRegions);
   } catch (error) {
     throw new Error(error);

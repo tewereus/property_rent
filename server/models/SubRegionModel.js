@@ -6,7 +6,7 @@ const subRegionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    region: {
+    region_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Region",
       required: true,
