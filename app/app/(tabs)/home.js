@@ -19,6 +19,8 @@ import {
   getAllSellProperties,
   getPropertiesByUse,
   buyProperty,
+  getAllViews,
+  changeView,
 } from "../../store/property/propertySlice";
 import {
   addToWishlist,
@@ -35,7 +37,7 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => {
 
   const handleFavoritePress = (e) => {
     e.stopPropagation();
-    setIsFavorite(!isFavorite); // Immediately update UI
+    setIsFavorite(!isFavorite);
     onFavorite(item);
   };
 
@@ -72,7 +74,7 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => {
           <View className="flex-row items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
             <Ionicons name="eye-outline" size={14} color="#3B82F6" />
             <Text className="text-blue-600 dark:text-blue-400 text-xs ml-1 font-medium">
-              {item.views || 0}
+              {item?.views?.count || 0}
             </Text>
           </View>
         </View>
@@ -313,9 +315,12 @@ const Home = () => {
     loadColorScheme();
     dispatch(getPropertiesByUse("sell"));
     dispatch(getPropertiesByUse("rent"));
+    dispatch(getAllViews());
   }, []);
 
-  const { propertiesByUse, isSuccess } = useSelector((state) => state.property);
+  const { propertiesByUse, views, isSuccess } = useSelector(
+    (state) => state.property
+  );
 
   const { t, i18n } = useTranslation();
 
@@ -337,10 +342,14 @@ const Home = () => {
   );
 
   const handlePress = useCallback((prop) => {
+    const data = {
+      propertyId: prop._id,
+    };
     setSelectedProperty(prop);
     setFavouriteOn(prop.isFavorite); // Set initial favorite state
     setModalVisible(true);
     setShowPaymentOptions(false);
+    dispatch(changeView(data));
   }, []);
 
   const handleLanguageChange = (lng) => {
@@ -515,7 +524,10 @@ const Home = () => {
       <View className="px-5 pt-5">
         {/* Header with Language Selection and Notification */}
         <View className="flex flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-bold dark:text-slate-300">
+          <Text
+            className="text-2xl font-bold dark:text-slate-300"
+            onPress={() => console.log(views)}
+          >
             Prime Property
           </Text>
           <View className="flex-row items-center">

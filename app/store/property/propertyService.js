@@ -2,6 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseUrl } from "../../constants/axiosConfig";
 import axios from "axios";
 
+const getAuthToken = () => {
+  const userData = localStorage.getItem("user");
+  const user = userData ? JSON.parse(userData) : null;
+  return user?.token || "";
+};
+
 const createProperty = async (propertyData) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
@@ -184,6 +190,24 @@ const getUserTransactions = async () => {
   return response.data;
 };
 
+const changeView = async (data) => {
+  console.log(data);
+  const token = getAuthToken();
+
+  const response = await axios.post(`${baseUrl}/property/change-view`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+const getAllViews = async () => {
+  const response = await axios.get(`${baseUrl}/property/all-views`);
+  return response.data;
+};
+
 const propertyService = {
   createProperty,
   getAllProperties,
@@ -191,6 +215,8 @@ const propertyService = {
   getUserProperties,
   buyProperty,
   getUserTransactions,
+  changeView,
+  getAllViews,
 };
 
 export default propertyService;

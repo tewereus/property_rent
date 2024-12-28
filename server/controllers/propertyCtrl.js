@@ -154,20 +154,20 @@ const getAllProperties = asyncHandler(async (req, res) => {
 });
 
 const getProperty = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  try {
-    const property = await Property.findById(id)
-      .populate("propertyType")
-      .populate("owner", "firstname lastname");
-    if (!property) {
-      return res.status(404).json({
-        message: "Property not found",
-      });
-    }
-    res.json(property);
-  } catch (error) {
-    throw new Error(error);
-  }
+  // const { id } = req.params;
+  // try {
+  //   const property = await Property.findById(id)
+  //     .populate("propertyType")
+  //     .populate("owner", "firstname lastname");
+  //   if (!property) {
+  //     return res.status(404).json({
+  //       message: "Property not found",
+  //     });
+  //   }
+  //   res.json(property);
+  // } catch (error) {
+  //   throw new Error(error);
+  // }
 });
 
 const updateProperty = asyncHandler(async (req, res) => {
@@ -314,17 +314,18 @@ const buyProperty = asyncHandler(async (req, res) => {
 });
 
 const changeViewCount = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const { id } = req.user;
   const { propertyId } = req.body;
+  console.log(propertyId);
   try {
-    console.log(id);
+    // const id = "676433bc7ee7a80845d39dc9";
     const user = await User.findById(id);
     console.log(user);
     if (!user) throw new Error("user not found");
     const property = await Property.findById(propertyId);
-    console.log(property.view.user);
-    const alreadyExists = property.view.user.includes(id);
-    console.log(alreadyExists);
+    console.log(property);
+    const alreadyExists = property.views.user.includes(id);
     if (alreadyExists) {
       res.json("user already exists in property");
       return;
@@ -333,14 +334,26 @@ const changeViewCount = asyncHandler(async (req, res) => {
     const count = await Property.findByIdAndUpdate(
       propertyId,
       {
-        $push: { "view.user": id },
-        $inc: { "view.count": 1 },
+        $push: { "views.user": id },
+        $inc: { "views.count": 1 },
       },
       {
         new: true,
       }
     );
     res.json(count);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllViews = asyncHandler(async (req, res) => {
+  // const { id } = req.user;
+  // const { propertyId } = req.body;
+  try {
+    const property = await Property.find().select("views.count -_id");
+
+    res.json(property);
   } catch (error) {
     throw new Error(error);
   }
@@ -357,4 +370,5 @@ module.exports = {
   getPropertiesByUse,
   buyProperty,
   changeViewCount,
+  getAllViews,
 };

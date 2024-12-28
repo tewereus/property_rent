@@ -43,7 +43,7 @@ const propertySchema = new mongoose.Schema(
       enum: ["available", "sold", "rented", "pending"],
       default: "available",
     },
-    view: {
+    views: {
       user: [
         {
           type: mongoose.Schema.Types.ObjectId,

@@ -93,6 +93,28 @@ export const getUserTransactions = createAsyncThunk(
   }
 );
 
+export const changeView = createAsyncThunk(
+  "property/change-view",
+  async (data, thunkAPI) => {
+    try {
+      return await propertyService.changeView(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getAllViews = createAsyncThunk(
+  "property/all-views",
+  async (_, thunkAPI) => {
+    try {
+      return await propertyService.getAllViews();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const propertySlice = createSlice({
   name: "property",
   initialState: {
@@ -212,6 +234,32 @@ export const propertySlice = createSlice({
         state.transactions = action.payload;
       })
       .addCase(getUserTransactions.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(changeView.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(changeView.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.viewCount = action.payload;
+      })
+      .addCase(changeView.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(getAllViews.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllViews.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.views = action.payload;
+      })
+      .addCase(getAllViews.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
