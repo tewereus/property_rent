@@ -2,6 +2,12 @@ import axios from "axios";
 import { baseUrl } from "../../constants/axiosConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const getAuthToken = () => {
+  const userData = localStorage.getItem("user");
+  const user = userData ? JSON.parse(userData) : null;
+  return user?.token || "";
+};
+
 const register = async (data) => {
   const response = await axios.post(`${baseUrl}/auth/register`, data);
   console.log(response.data);
@@ -34,6 +40,17 @@ const toggleDarkMode = async (data) => {
     withCredentials: true,
   });
 
+  return response.data;
+};
+
+const updateUser = async (data) => {
+  const token = getAuthToken();
+  const response = await axios.put(`${baseUrl}/auth/update-user`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    withCredentials: true,
+  });
   return response.data;
 };
 
@@ -137,6 +154,7 @@ const changeLanguageMode = async (data) => {
 const authService = {
   register,
   login,
+  updateUser,
   toggleDarkMode,
   verifySeller,
   addToWishlist,

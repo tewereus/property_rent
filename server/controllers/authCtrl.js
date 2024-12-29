@@ -56,6 +56,16 @@ const login = asyncHandler(async (req, res) => {
   }
 });
 
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(user);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const ToggleDarkMode = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { mode } = req.body.preference;
@@ -188,6 +198,7 @@ const changeLanguage = asyncHandler(async (req, res) => {
 module.exports = {
   register,
   login,
+  updateUser,
   ToggleDarkMode,
   verifySeller,
   getWishlist,

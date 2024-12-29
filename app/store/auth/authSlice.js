@@ -35,6 +35,17 @@ export const register = createAsyncThunk(
   }
 );
 
+export const updateUser = createAsyncThunk(
+  "auth/update-user",
+  async (data, thunkAPI) => {
+    try {
+      return await authService.updateUser(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const toggleDarkMode = createAsyncThunk(
   "user/dark-mode",
   async (data, thunkAPI) => {
@@ -153,6 +164,22 @@ const authSlice = createSlice({
         state.message = "Registered Successfully";
       })
       .addCase(register.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = "error";
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.message = "updated Successfully";
+        state.user = action.payload;
+      })
+      .addCase(updateUser.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;

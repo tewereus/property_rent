@@ -8,12 +8,14 @@ const {
   getWishlist,
   changeMode,
   changeLanguage,
+  updateUser,
 } = require("../controllers/authCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.put("/update-user", authMiddleware, updateUser);
 router.put("/dark-mode", authMiddleware, ToggleDarkMode);
 router.put("/verify-seller", authMiddleware, verifySeller);
 router.put("/add-wishlist", authMiddleware, addToWishlist);

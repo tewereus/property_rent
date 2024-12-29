@@ -16,6 +16,7 @@ import {
   logout,
   resetAuthState,
   toggleDarkMode,
+  updateUser,
 } from "../../store/auth/authSlice";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -107,11 +108,10 @@ const Profile = () => {
   }, [dispatch, router]);
 
   const saveChanges = useCallback(() => {
-    const updatedUser = { name, email };
-    console.log(updatedUser);
-    // Dispatch an action to update user info in the store
-    // await dispatch(updateUser(updatedUser)); // Uncomment and implement this
-    setModalVisible(false);
+    const data = { name, email };
+    console.log(data);
+    dispatch(updateUser(data));
+    // setModalVisible(false);
   }, []);
 
   return (
