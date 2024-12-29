@@ -249,7 +249,13 @@ const getUserProperties = asyncHandler(async (req, res) => {
   const { id } = req.user;
   try {
     const properties = await Property.find({ owner: id });
-    res.json(properties);
+    const totalProperties = properties.length;
+    // const len = 0;
+    // const totalViews = properties?.map((prop) => (len += prop?.views?.count));
+    // console.log(totalViews);
+    //// const activeProperites = properties?.map((prop) => (len += prop?.views?.count));
+    // console.log(activeProperties);
+    res.json({ properties, totalProperties });
   } catch (error) {
     throw new Error(error);
   }
