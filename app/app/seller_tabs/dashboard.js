@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserProperties } from "../../store/property/propertySlice";
 
 // Mock data
 const dashboardData = {
@@ -41,6 +43,13 @@ const StatCard = ({ icon, label, value, color }) => (
 );
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getUserProperties());
+  }, []);
+
+  const { totalProperties } = useSelector((state) => state.property);
   return (
     <ScrollView className="bg-slate-300 dark:bg-[#09092B] flex-1">
       <View className="p-5">
@@ -60,7 +69,7 @@ const Dashboard = () => {
           <StatCard
             icon="home"
             label="Total Properties"
-            value={dashboardData.summary.totalProperties}
+            value={totalProperties}
             color="bg-blue-500"
           />
           <StatCard

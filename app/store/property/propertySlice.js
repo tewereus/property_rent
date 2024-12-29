@@ -158,7 +158,8 @@ export const propertySlice = createSlice({
         state.isSuccess = true;
         state.isError = false;
         state.message = "success";
-        state.userProperties = action.payload;
+        state.userProperties = action.payload.properties;
+        state.totalProperties = action.payload.totalProperties;
       })
       .addCase(getUserProperties.rejected, (state, action) => {
         state.isLoading = false;
