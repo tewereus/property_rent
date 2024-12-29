@@ -67,9 +67,14 @@ const getAllProperties = async ({
   location,
   propertyType,
   propertyUse,
+  region,
+  subregion,
+  // location,
 }) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  console.log(region, subregion, location);
 
   const headers = {
     Authorization: `Bearer ${
@@ -83,6 +88,12 @@ const getAllProperties = async ({
   }
   if (maxPrice) {
     query += `&price[lte]=${maxPrice}`;
+  }
+  if (region) {
+    query += `&region=${encodeURIComponent(region)}`;
+  }
+  if (subregion) {
+    query += `&subregion=${encodeURIComponent(subregion)}`;
   }
   if (location) {
     query += `&location=${encodeURIComponent(location)}`;

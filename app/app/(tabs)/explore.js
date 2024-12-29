@@ -222,7 +222,7 @@ const FilterModal = memo(
                 <select
                   name="region"
                   value={filterValues.region}
-                  onChange={(text) => onChangeFilter.setRegion(text)}
+                  onChange={(e) => onChangeFilter.setRegion(e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   required
                   // disabled={!form.country}
@@ -250,7 +250,7 @@ const FilterModal = memo(
                 <select
                   name="subregion"
                   value={filterValues.subregion}
-                  onChange={(text) => onChangeFilter.setSubregion(text)}
+                  onChange={(e) => onChangeFilter.setSubregion(e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   required
                   disabled={!filterValues.region}
@@ -280,7 +280,7 @@ const FilterModal = memo(
                 <select
                   name="location"
                   value={filterValues.location}
-                  onChange={(text) => onChangeFilter.setLocation(text)}
+                  onChange={(e) => onChangeFilter.setLocation(e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   required
                   disabled={!filterValues.subregion}
@@ -461,9 +461,9 @@ const Explore = () => {
       propertyUse,
       region,
       subregion,
-      location,
     };
 
+    console.log(obj);
     // Remove undefined or empty string values
     Object.keys(obj).forEach((key) => {
       if (obj[key] === undefined || obj[key] === "") {
@@ -471,9 +471,10 @@ const Explore = () => {
       }
     });
     console.log(obj);
+
     dispatch(getAllProperties(obj));
     setModalVisible(false);
-  }, [limit, minPrice, maxPrice, location, propertyType, propertyUse]); // Add propertyUse to dependencies
+  }, [limit, minPrice, maxPrice, location, propertyType, propertyUse]);
 
   const renderProperties = useCallback(
     ({ item }) => (

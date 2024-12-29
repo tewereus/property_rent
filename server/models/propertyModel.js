@@ -14,9 +14,22 @@ const propertySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    location: {
-      type: String,
-      required: true,
+    address: {
+      region: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Region",
+        required: true,
+      },
+      subregion: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubRegion",
+        required: true,
+      },
+      location: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Location",
+        required: true,
+      },
     },
     propertyType: {
       type: mongoose.Schema.Types.ObjectId,

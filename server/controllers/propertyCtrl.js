@@ -56,13 +56,18 @@ const createProperty = asyncHandler(async (req, res) => {
         console.error("Error parsing typeSpecificFields:", error);
       }
     }
-
+    console.log(fields);
     // Create property instance with base fields
     const propertyData = {
       title: fields.title[0],
       description: fields.description[0],
       price: parseFloat(fields.price[0]),
-      location: fields.location[0],
+      address: {
+        region: fields.region[0],
+        subregion: fields.subregion[0],
+        location: fields.location[0],
+      },
+
       propertyType: fields.propertyType[0],
       property_use: fields.property_use[0],
       images: imageUrls,
@@ -104,6 +109,31 @@ const getAllProperties = asyncHandler(async (req, res) => {
     ];
     excludeFields.forEach((el) => delete queryObj[el]);
 
+    if (req.query.region) {
+      const region = await Property.find({
+        "address.region": req.query.region,
+      });
+      // console.log(region);
+      if (region) {
+        queryObj.region = req.query.region;
+      }
+      console.log(queryObj);
+    }
+
+    if (req.query.subregion) {
+      const subregion = await Property.find({ subregion: req.query.subregion });
+      if (subregion) {
+        queryObj.subregion = subregion._id;
+      }
+    }
+
+    if (req.query.location) {
+      const location = await Property.find({ location: req.query.location });
+      if (location) {
+        queryObj.location = location._id;
+      }
+    }
+
     if (req.query.property_type) {
       const propertyType = await PropertyType.findOne({
         name: req.query.property_type,
@@ -117,6 +147,7 @@ const getAllProperties = asyncHandler(async (req, res) => {
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     let query = Property.find(JSON.parse(queryStr));
+    // console.log(query);
 
     query = query
       .populate("propertyType")
