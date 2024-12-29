@@ -134,9 +134,9 @@ const getAllProperties = asyncHandler(async (req, res) => {
       }
     }
 
-    if (req.query.property_type) {
+    if (req.query.propertyType) {
       const propertyType = await PropertyType.findOne({
-        name: req.query.property_type,
+        name: req.query.propertyType,
       });
 
       if (propertyType) {

@@ -82,7 +82,7 @@ const getAllProperties = async ({
     }`,
   };
 
-  let query = `?limit=5`;
+  let query = `?limit=10`;
   if (minPrice) {
     query += `&price[gte]=${minPrice}`;
   }
@@ -99,7 +99,7 @@ const getAllProperties = async ({
     query += `&location=${encodeURIComponent(location)}`;
   }
   if (propertyType) {
-    query += `&filterType=${encodeURIComponent(propertyType)}`;
+    query += `&propertyType=${encodeURIComponent(propertyType)}`;
   }
   if (propertyUse) {
     query += `&property_use=${encodeURIComponent(propertyUse)}`;
