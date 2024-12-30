@@ -3,6 +3,7 @@ var propertyCategory = new mongoose.Schema({
   category_name: {
     type: String,
     required: true,
+    // capitalize: true,
   },
 });
 

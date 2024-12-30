@@ -7,6 +7,10 @@ const basePropertyTypeSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PropertyCategory",
+    },
     fields: {
       type: [
         {
