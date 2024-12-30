@@ -396,6 +396,22 @@ const getAllViews = asyncHandler(async (req, res) => {
   }
 });
 
+const featured = asyncHandler(async (req, res) => {
+  const { propId } = req.params;
+  try {
+    const property = await Property.findByIdAndUpdate(
+      propId,
+      {
+        isFeatured: true,
+      },
+      { new: true }
+    );
+    res.json(property);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProperty,
   getAllProperties,
@@ -408,4 +424,5 @@ module.exports = {
   buyProperty,
   changeViewCount,
   getAllViews,
+  featured,
 };

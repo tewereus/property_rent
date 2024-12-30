@@ -68,6 +68,10 @@ const propertySchema = new mongoose.Schema(
         default: 0,
       },
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     transactionHistory: [
       {
         type: mongoose.Schema.Types.ObjectId,
