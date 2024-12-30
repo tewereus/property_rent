@@ -12,7 +12,7 @@ const {
   buyProperty,
   changeViewCount,
   getAllViews,
-  featured,
+  changeFeatured,
 } = require("../controllers/propertyCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 // const { uploadImages } = require("../middlewares/uploadImages");
@@ -24,7 +24,7 @@ router.get("/type/:typeId", getPropertiesByType);
 router.get("/use/:use", getPropertiesByUse);
 router.get("/users-properties", authMiddleware, getUserProperties);
 router.get("/:id", getProperty);
-router.put("/change-featured", featured);
+router.put("/change-featured", changeFeatured);
 
 // Protected routes
 router.use(authMiddleware);

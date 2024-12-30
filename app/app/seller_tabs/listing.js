@@ -9,14 +9,17 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState, useCallback, memo } from "react";
-import { getUserProperties } from "../../store/property/propertySlice";
+import {
+  changeFeatured,
+  getUserProperties,
+} from "../../store/property/propertySlice";
 import { useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const cardHeight = 160;
 
 // Memoize the PropertyCard component
-const PropertyCard = memo(({ item, onPress }) => (
+const PropertyCard = memo(({ item, onPress, handleBoost }) => (
   <TouchableOpacity className="mb-4 mx-4" onPress={() => onPress(item)}>
     <View
       className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md flex-row"
@@ -46,9 +49,9 @@ const PropertyCard = memo(({ item, onPress }) => (
               ${item.price || "0"}
             </Text>
             <View className="bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">
-              <Text className="text-blue-600 dark:text-blue-400 text-xs font-medium">
-                {item.propertyType}
-              </Text>
+              <TouchableOpacity onPress={() => handleBoost(item)}>
+                <Text className="text-white px-2">Boost</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -96,8 +99,22 @@ const Listing = () => {
     setModalVisible(true);
   }, []);
 
+  const handleBoostProperty = useCallback((property) => {
+    // console.log("property", property);
+    const data = {
+      propId: property._id,
+    };
+    dispatch(changeFeatured(data));
+  });
+
   const renderProperties = useCallback(
-    ({ item }) => <PropertyCard item={item} onPress={handlePropertyPress} />,
+    ({ item }) => (
+      <PropertyCard
+        item={item}
+        onPress={handlePropertyPress}
+        handleBoost={handleBoostProperty}
+      />
+    ),
     [handlePropertyPress]
   );
 

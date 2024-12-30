@@ -219,6 +219,13 @@ const getAllViews = async () => {
   return response.data;
 };
 
+const changeFeatured = async (data) => {
+  const response = await axios.put(
+    `${baseUrl}/property/change-featured/${data}`
+  );
+  return response.data;
+};
+
 const propertyService = {
   createProperty,
   getAllProperties,
@@ -228,6 +235,7 @@ const propertyService = {
   getUserTransactions,
   changeView,
   getAllViews,
+  changeFeatured,
 };
 
 export default propertyService;
