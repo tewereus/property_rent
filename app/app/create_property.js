@@ -1,5 +1,12 @@
 // app/app/create_property.js
-import { View, Text, ScrollView, Modal, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Modal,
+  TouchableOpacity,
+  // Picker,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -16,6 +23,7 @@ import {
   getAllSubRegions,
   getAllLocations,
 } from "../store/address/addressSlice";
+import { Picker } from "@react-native-picker/picker";
 
 const CreateProperty = () => {
   const router = useRouter();
@@ -107,13 +115,6 @@ const CreateProperty = () => {
     setShowMapModal(false);
   };
 
-  const handleInputChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
   const handleSubmit = () => {
     // Validation
     if (
@@ -170,88 +171,82 @@ const CreateProperty = () => {
             />
           </View>
 
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              onClick={() => console.log(formData.region)}
-            >
+          {/* Region Picker */}
+          <View className="mb-6">
+            <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Region *
-            </label>
-            <select
-              name="region"
-              value={formData.region}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-              required
-              // disabled={!form.country}
-            >
-              <option value="">Select Region</option>
-              {regions.map((region) => (
-                <option key={region._id} value={region._id}>
-                  {region.region_name}
-                </option>
-              ))}
-            </select>
-            {/* {errors.region && (
-              <p className="mt-1 text-sm text-red-500">{errors.region}</p>
-            )} */}
-          </div>
+            </Text>
+            <View className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+              <Picker
+                selectedValue={formData.region}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, region: value }))
+                }
+                style={{ height: 50, width: "100%" }}
+              >
+                <Picker.Item label="Select Region" value="" />
+                {regions.map((region) => (
+                  <Picker.Item
+                    key={region._id}
+                    label={region.region_name}
+                    value={region._id}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </View>
 
-          {/* Sub Region */}
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              onClick={() => console.log(formData.subregion)}
-            >
+          {/* Sub Region Picker */}
+          <View className="mb-6">
+            <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Sub Region *
-            </label>
-            <select
-              name="subregion"
-              value={formData.subregion}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-              required
-              disabled={!formData.region}
-            >
-              <option value="">Select Sub Region</option>
-              {filteredSubRegions.map((subRegion) => (
-                <option key={subRegion._id} value={subRegion._id}>
-                  {subRegion.subregion_name}
-                </option>
-              ))}
-            </select>
-            {/* {errors.subregion && (
-              <p className="mt-1 text-sm text-red-500">{errors.subRegion}</p>
-            )} */}
-          </div>
+            </Text>
+            <View className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+              <Picker
+                selectedValue={formData.subregion}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, subregion: value }))
+                }
+                style={{ height: 50, width: "100%" }}
+                enabled={!!formData.region}
+              >
+                <Picker.Item label="Select Sub Region" value="" />
+                {filteredSubRegions.map((subRegion) => (
+                  <Picker.Item
+                    key={subRegion._id}
+                    label={subRegion.subregion_name}
+                    value={subRegion._id}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </View>
 
-          {/* Location */}
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              onClick={() => console.log(formData.location)}
-            >
+          {/* Location Picker */}
+          <View className="mb-6">
+            <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Location *
-            </label>
-            <select
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-              required
-              disabled={!formData.subregion}
-            >
-              <option value="">Select Location</option>
-              {filteredLocations.map((location) => (
-                <option key={location._id} value={location._id}>
-                  {location.location}
-                </option>
-              ))}
-            </select>
-            {/* {errors.location && (
-              <p className="mt-1 text-sm text-red-500">{errors.location}</p>
-            )} */}
-          </div>
+            </Text>
+            <View className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+              <Picker
+                selectedValue={formData.location}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, location: value }))
+                }
+                style={{ height: 50, width: "100%" }}
+                enabled={!!formData.subregion}
+              >
+                <Picker.Item label="Select Location" value="" />
+                {filteredLocations.map((location) => (
+                  <Picker.Item
+                    key={location._id}
+                    label={location.location}
+                    value={location._id}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </View>
 
           <TouchableOpacity
             onPress={() => setShowMapModal(true)}

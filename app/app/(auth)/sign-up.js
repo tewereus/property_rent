@@ -13,6 +13,7 @@ import {
   getAllSubRegions,
   getAllLocations,
 } from "../../store/address/addressSlice";
+import { Picker } from "@react-native-picker/picker";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -227,21 +228,6 @@ const SignUp = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
-
   const submit = async () => {
     if (!validateForm()) {
       return;
@@ -373,100 +359,86 @@ const SignUp = () => {
             secureTextEntry
             error={errors.confirmPassword}
           />
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              onClick={() => console.log(form.region)}
-            >
+          <View className="mt-4">
+            <Text className="text-sm font-medium text-white mb-1">
               Region *
-            </label>
-            <select
-              name="region"
-              value={form.region}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 rounded-lg border ${
-                errors.region
-                  ? "border-red-500"
-                  : "border-gray-300 dark:border-gray-600"
-              } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-              required
-              // disabled={!form.country}
-            >
-              <option value="">Select Region</option>
-              {regions.map((region) => (
-                <option key={region._id} value={region._id}>
-                  {region.region_name}
-                </option>
-              ))}
-            </select>
+            </Text>
+            <View className="border rounded-lg overflow-hidden bg-white">
+              <Picker
+                selectedValue={form.region}
+                onValueChange={(value) => handleChange("region", value)}
+                style={{ height: 50, width: "100%" }}
+              >
+                <Picker.Item label="Select Region" value="" />
+                {regions.map((region) => (
+                  <Picker.Item
+                    key={region._id}
+                    label={region.region_name}
+                    value={region._id}
+                  />
+                ))}
+              </Picker>
+            </View>
             {errors.region && (
-              <p className="mt-1 text-sm text-red-500">{errors.region}</p>
+              <Text className="mt-1 text-sm text-red-500">{errors.region}</Text>
             )}
-          </div>
+          </View>
 
-          {/* Sub Region */}
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              onClick={() => console.log(form.subregion)}
-            >
+          <View className="mt-4">
+            <Text className="text-sm font-medium text-white mb-1">
               Sub Region *
-            </label>
-            <select
-              name="subregion"
-              value={form.subregion}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 rounded-lg border ${
-                errors.subregion
-                  ? "border-red-500"
-                  : "border-gray-300 dark:border-gray-600"
-              } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-              required
-              disabled={!form.region}
-            >
-              <option value="">Select Sub Region</option>
-              {filteredSubRegions.map((subRegion) => (
-                <option key={subRegion._id} value={subRegion._id}>
-                  {subRegion.subregion_name}
-                </option>
-              ))}
-            </select>
+            </Text>
+            <View className="border rounded-lg overflow-hidden bg-white">
+              <Picker
+                selectedValue={form.subregion}
+                onValueChange={(value) => handleChange("subregion", value)}
+                style={{ height: 50, width: "100%" }}
+                enabled={!!form.region}
+              >
+                <Picker.Item label="Select Sub Region" value="" />
+                {filteredSubRegions.map((subRegion) => (
+                  <Picker.Item
+                    key={subRegion._id}
+                    label={subRegion.subregion_name}
+                    value={subRegion._id}
+                  />
+                ))}
+              </Picker>
+            </View>
             {errors.subregion && (
-              <p className="mt-1 text-sm text-red-500">{errors.subRegion}</p>
+              <Text className="mt-1 text-sm text-red-500">
+                {errors.subregion}
+              </Text>
             )}
-          </div>
+          </View>
 
-          {/* Location */}
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              onClick={() => console.log(form.location)}
-            >
+          <View className="mt-4">
+            <Text className="text-sm font-medium text-white mb-1">
               Location *
-            </label>
-            <select
-              name="location"
-              value={form.location}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 rounded-lg border ${
-                errors.location
-                  ? "border-red-500"
-                  : "border-gray-300 dark:border-gray-600"
-              } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-              required
-              disabled={!form.subregion}
-            >
-              <option value="">Select Location</option>
-              {filteredLocations.map((location) => (
-                <option key={location._id} value={location._id}>
-                  {location.location}
-                </option>
-              ))}
-            </select>
+            </Text>
+            <View className="border rounded-lg overflow-hidden bg-white">
+              <Picker
+                selectedValue={form.location}
+                onValueChange={(value) => handleChange("location", value)}
+                style={{ height: 50, width: "100%" }}
+                enabled={!!form.subregion}
+              >
+                <Picker.Item label="Select Location" value="" />
+                {filteredLocations.map((location) => (
+                  <Picker.Item
+                    key={location._id}
+                    label={location.location}
+                    value={location._id}
+                  />
+                ))}
+              </Picker>
+            </View>
             {errors.location && (
-              <p className="mt-1 text-sm text-red-500">{errors.location}</p>
+              <Text className="mt-1 text-sm text-red-500">
+                {errors.location}
+              </Text>
             )}
-          </div>
+          </View>
 
           <CustomButton
             title="Sign Up"

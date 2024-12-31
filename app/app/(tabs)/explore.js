@@ -7,6 +7,7 @@ import {
   Modal,
   Image,
   ScrollView,
+  // Picker,
 } from "react-native";
 import React, { useEffect, useState, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,7 @@ import {
   getAllRegions,
   getAllSubRegions,
 } from "../../store/address/addressSlice";
+import { Picker } from "@react-native-picker/picker";
 
 // Memoize the FilterOption component
 const FilterOption = memo(({ icon, label, children }) => (
@@ -212,90 +214,69 @@ const FilterModal = memo(
                 </View>
               </FilterOption>
 
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  onClick={() => console.log(filterValues.region)}
-                >
-                  Region *
-                </label>
-                <select
-                  name="region"
-                  value={filterValues.region}
-                  onChange={(e) => onChangeFilter.setRegion(e.target.value)}
-                  className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-                  required
-                  // disabled={!form.country}
-                >
-                  <option value="">Select Region</option>
-                  {filterValues.regions.map((region) => (
-                    <option key={region._id} value={region._id}>
-                      {region.region_name}
-                    </option>
-                  ))}
-                </select>
-                {/* {errors.region && (
-                  <p className="mt-1 text-sm text-red-500">{errors.region}</p>
-                )} */}
-              </div>
+              {/* Region Picker */}
+              <FilterOption icon="location-outline" label="Region">
+                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
+                  <Picker
+                    selectedValue={filterValues.region}
+                    onValueChange={(value) => onChangeFilter.setRegion(value)}
+                    style={{ height: 50, width: "100%" }}
+                  >
+                    <Picker.Item label="Select Region" value="" />
+                    {filterValues.regions.map((region) => (
+                      <Picker.Item
+                        key={region._id}
+                        label={region.region_name}
+                        value={region._id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </FilterOption>
 
-              {/* Sub Region */}
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  onClick={() => console.log(filterValues.subregion)}
-                >
-                  Sub Region *
-                </label>
-                <select
-                  name="subregion"
-                  value={filterValues.subregion}
-                  onChange={(e) => onChangeFilter.setSubregion(e.target.value)}
-                  className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-                  required
-                  disabled={!filterValues.region}
-                >
-                  <option value="">Select Sub Region</option>
-                  {filterValues.filteredSubRegions.map((subRegion) => (
-                    <option key={subRegion._id} value={subRegion._id}>
-                      {subRegion.subregion_name}
-                    </option>
-                  ))}
-                </select>
-                {/* {errors.subregion && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.subRegion}
-                  </p>
-                )} */}
-              </div>
+              {/* Sub Region Picker */}
+              <FilterOption icon="location-outline" label="Sub Region">
+                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
+                  <Picker
+                    selectedValue={filterValues.subregion}
+                    onValueChange={(value) =>
+                      onChangeFilter.setSubregion(value)
+                    }
+                    style={{ height: 50, width: "100%" }}
+                    enabled={!!filterValues.region}
+                  >
+                    <Picker.Item label="Select Sub Region" value="" />
+                    {filterValues.filteredSubRegions.map((subRegion) => (
+                      <Picker.Item
+                        key={subRegion._id}
+                        label={subRegion.subregion_name}
+                        value={subRegion._id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </FilterOption>
 
-              {/* Location */}
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  onClick={() => console.log(filterValues.location)}
-                >
-                  Location *
-                </label>
-                <select
-                  name="location"
-                  value={filterValues.location}
-                  onChange={(e) => onChangeFilter.setLocation(e.target.value)}
-                  className={`w-full px-4 py-2 rounded-lg border  bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-                  required
-                  disabled={!filterValues.subregion}
-                >
-                  <option value="">Select Location</option>
-                  {filterValues.filteredLocations.map((location) => (
-                    <option key={location._id} value={location._id}>
-                      {location.location}
-                    </option>
-                  ))}
-                </select>
-                {/* {errors.location && (
-                  <p className="mt-1 text-sm text-red-500">{errors.location}</p>
-                )} */}
-              </div>
+              {/* Location Picker */}
+              <FilterOption icon="location-outline" label="Location">
+                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
+                  <Picker
+                    selectedValue={filterValues.location}
+                    onValueChange={(value) => onChangeFilter.setLocation(value)}
+                    style={{ height: 50, width: "100%" }}
+                    enabled={!!filterValues.subregion}
+                  >
+                    <Picker.Item label="Select Location" value="" />
+                    {filterValues.filteredLocations.map((location) => (
+                      <Picker.Item
+                        key={location._id}
+                        label={location.location}
+                        value={location._id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </FilterOption>
 
               {/* Property Type */}
               <FilterOption icon="home-outline" label="Property Type">
