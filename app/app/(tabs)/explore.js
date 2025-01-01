@@ -7,11 +7,17 @@ import {
   Modal,
   Image,
   ScrollView,
-  // Picker,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProperties } from "../../store/property/propertySlice";
+import {
+  getAllProperties,
+  buyProperty,
+  changeView,
+  getAllViews,
+} from "../../store/property/propertySlice";
 import { Ionicons } from "@expo/vector-icons"; // Import icons
 import { useLocalSearchParams } from "expo-router";
 import {
@@ -20,6 +26,7 @@ import {
   getAllSubRegions,
 } from "../../store/address/addressSlice";
 import { Picker } from "@react-native-picker/picker";
+import { addToWishlist } from "../../store/auth/authSlice";
 
 // Memoize the FilterOption component
 const FilterOption = memo(({ icon, label, children }) => (
@@ -367,15 +374,26 @@ const Explore = () => {
   const [filteredSubRegions, setFilteredSubRegions] = useState([]);
   const [filteredLocations, setFilteredLocations] = useState([]);
 
+  const [propertyDetailModalVisible, setPropertyDetailModalVisible] =
+    useState(false);
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [favouriteOn, setFavouriteOn] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+
+  const { regions, subregions, locations } = useSelector(
+    (state) => state.address
+  );
+
+  const { properties, views } = useSelector((state) => state.property);
+
   useEffect(() => {
     dispatch(getAllRegions());
     dispatch(getAllSubRegions());
     dispatch(getAllLocations());
   }, []);
-
-  const { regions, subregions, locations } = useSelector(
-    (state) => state.address
-  );
 
   useEffect(() => {
     const { filterType, propertyUse } = params;
@@ -428,9 +446,91 @@ const Explore = () => {
     }
   }, [subregion, region, locations]);
 
-  const handlePress = useCallback((item) => {}, []);
+  const handlePress = useCallback(
+    async (prop) => {
+      try {
+        const data = {
+          propertyId: prop._id,
+        };
+        setSelectedProperty(prop);
+        setFavouriteOn(prop.isFavorite);
+        setPropertyDetailModalVisible(true);
+        setShowPaymentOptions(false);
 
-  const handleFavourite = useCallback((item) => {}, []);
+        await dispatch(changeView(data)).unwrap();
+      } catch (error) {
+        console.log("Error updating view:", error);
+      }
+    },
+    [dispatch]
+  );
+
+  const handleFavourite = useCallback(
+    async (prop) => {
+      try {
+        setFavouriteOn(!favouriteOn);
+        const data = {
+          prodId: prop._id,
+        };
+        await dispatch(addToWishlist(data)).unwrap();
+      } catch (error) {
+        console.error("Error updating favorite:", error);
+        setFavouriteOn(favouriteOn);
+      }
+    },
+    [favouriteOn, dispatch]
+  );
+
+  const handleScheduleVisit = () => {
+    setIsSchedulingVisit(true);
+    Alert.alert(
+      "Schedule Visit",
+      "Our agent will contact you shortly to arrange a visit.",
+      [
+        {
+          text: "OK",
+          onPress: () => setIsSchedulingVisit(false),
+        },
+      ]
+    );
+  };
+
+  const handleBuyProperty = async () => {
+    if (!selectedProperty?._id) return;
+
+    setIsPurchasing(true);
+    try {
+      await dispatch(
+        buyProperty({
+          propertyId: selectedProperty._id,
+          paymentMethod: paymentMethod,
+        })
+      ).unwrap();
+
+      Alert.alert(
+        "Success",
+        "Property purchase initiated successfully! Check your transactions for details.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setPropertyDetailModalVisible(false);
+              setShowPaymentOptions(false);
+              setPaymentMethod("cash");
+              dispatch(getAllProperties({}));
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error || "Failed to initiate property purchase. Please try again later."
+      );
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
 
   const handleSubmit = useCallback(() => {
     const obj = {
@@ -466,6 +566,54 @@ const Explore = () => {
     subregion,
   ]);
 
+  useEffect(() => {
+    if (!propertyDetailModalVisible) {
+      setSelectedProperty(null);
+      setShowPaymentOptions(false);
+      setPaymentMethod("cash");
+    }
+  }, [propertyDetailModalVisible]);
+
+  const PaymentMethodSelector = memo(({ paymentMethod, setPaymentMethod }) => (
+    <View className="mb-4">
+      <Text className="text-gray-800 dark:text-white font-semibold mb-2">
+        Select Payment Method
+      </Text>
+      {["cash", "bank_transfer", "mortgage"].map((method) => (
+        <TouchableOpacity
+          key={method}
+          onPress={() => setPaymentMethod(method)}
+          className={`flex-row items-center p-4 rounded-xl mb-2 ${
+            paymentMethod === method
+              ? "bg-blue-100 dark:bg-blue-900"
+              : "bg-gray-100 dark:bg-gray-800"
+          }`}
+        >
+          <Ionicons
+            name={
+              method === "cash"
+                ? "cash-outline"
+                : method === "bank_transfer"
+                ? "card-outline"
+                : "business-outline"
+            }
+            size={24}
+            color={paymentMethod === method ? "#3B82F6" : "#6B7280"}
+          />
+          <Text
+            className={`ml-3 capitalize ${
+              paymentMethod === method
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-600 dark:text-gray-400"
+            }`}
+          >
+            {method.replace("_", " ")}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  ));
+
   const renderProperties = useCallback(
     ({ item }) => (
       <PropertyCard
@@ -489,8 +637,6 @@ const Explore = () => {
     };
     dispatch(getAllProperties(obj));
   }, []);
-
-  const { properties } = useSelector((state) => state.property);
 
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] w-full min-h-screen p-5">
@@ -559,6 +705,156 @@ const Explore = () => {
         }}
         onSubmit={handleSubmit}
       />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={propertyDetailModalVisible}
+        onRequestClose={() => setPropertyDetailModalVisible(false)}
+      >
+        <View className="flex-1 bg-white dark:bg-gray-900">
+          <View className="relative bg-white dark:bg-gray-900 pt-12 pb-4 px-5">
+            <TouchableOpacity
+              onPress={() => setPropertyDetailModalVisible(false)}
+              className="absolute left-5 top-12 z-10 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+            >
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+            <Text className="text-center text-xl font-bold text-gray-800 dark:text-white">
+              Property Details
+            </Text>
+          </View>
+
+          {selectedProperty && (
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              <View className="relative">
+                <Image
+                  source={{ uri: selectedProperty.image }}
+                  className="w-screen h-72"
+                  resizeMode="cover"
+                />
+                <TouchableOpacity
+                  onPress={() => handleFavourite(selectedProperty)}
+                  className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
+                >
+                  <Ionicons
+                    name={favouriteOn ? "heart" : "heart-outline"}
+                    size={24}
+                    color={favouriteOn ? "#EF4444" : "#6B7280"}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <View className="p-5">
+                <View className="flex-row justify-between items-center mb-4">
+                  <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    ${selectedProperty.price.toLocaleString()}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={handleScheduleVisit}
+                    disabled={isSchedulingVisit}
+                    className="flex-row items-center bg-green-500 px-4 py-2 rounded-full"
+                  >
+                    {isSchedulingVisit ? (
+                      <ActivityIndicator color="white" size="small" />
+                    ) : (
+                      <>
+                        <Ionicons
+                          name="calendar-outline"
+                          size={20}
+                          color="white"
+                        />
+                        <Text className="text-white font-semibold ml-2">
+                          Schedule Visit
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+                <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                  {selectedProperty.title}
+                </Text>
+
+                <View className="flex-row items-center mb-4">
+                  <Ionicons name="location" size={20} color="#6B7280" />
+                  <Text className="text-gray-600 dark:text-gray-300 ml-2 text-base">
+                    {selectedProperty.location}
+                  </Text>
+                </View>
+
+                <View className="flex-row justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4">
+                  <View className="items-center">
+                    <Ionicons name="bed-outline" size={24} color="#6B7280" />
+                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
+                      {selectedProperty.bedrooms || "3"} Beds
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Ionicons name="water-outline" size={24} color="#6B7280" />
+                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
+                      {selectedProperty.bathrooms || "2"} Baths
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Ionicons name="square-outline" size={24} color="#6B7280" />
+                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
+                      {selectedProperty.area || "1,200"} sqft
+                    </Text>
+                  </View>
+                </View>
+
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                  Description
+                </Text>
+                <Text className="text-gray-600 dark:text-gray-300 mb-4">
+                  {selectedProperty.description || "No description available"}
+                </Text>
+              </View>
+            </ScrollView>
+          )}
+
+          <View className="p-5 border-t border-gray-200 dark:border-gray-800">
+            {showPaymentOptions ? (
+              <View>
+                <PaymentMethodSelector
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                />
+                <TouchableOpacity
+                  onPress={handleBuyProperty}
+                  disabled={isPurchasing}
+                  className={`${
+                    isPurchasing ? "bg-gray-400" : "bg-[#FF8E01]"
+                  } rounded-xl py-4 px-6`}
+                >
+                  {isPurchasing ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-base">
+                      Confirm{" "}
+                      {selectedProperty?.property_use === "rent"
+                        ? "Rental"
+                        : "Purchase"}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowPaymentOptions(true)}
+                className="bg-[#FF8E01] rounded-xl py-4 px-6"
+              >
+                <Text className="text-white text-center font-semibold text-base">
+                  {selectedProperty?.property_use === "rent"
+                    ? "Rent Property"
+                    : "Buy Property"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
