@@ -7,6 +7,7 @@ import {
   ScrollView,
   Modal,
   TextInput,
+  Alert,
 } from "react-native";
 import React, { useEffect, useCallback, memo, useState } from "react";
 import { useRouter } from "expo-router";
@@ -21,6 +22,12 @@ import {
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {
+  getAllRegions,
+  getAllSubRegions,
+  getAllLocations,
+} from "../../store/address/addressSlice";
+import { Picker } from "@react-native-picker/picker";
 
 // Memoize the ProfileOption component
 const ProfileOption = memo(({ icon, label, value, onPress, rightElement }) => (
@@ -46,8 +53,53 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { user, isSuccess } = useSelector((state) => state.auth);
   const [modalVisible, setModalVisible] = useState(false);
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    region: user?.address?.region || "",
+    subregion: user?.address?.subregion || "",
+    location: user?.address?.location || "",
+  });
+  const [filteredSubRegions, setFilteredSubRegions] = useState([]);
+  const [filteredLocations, setFilteredLocations] = useState([]);
+  const { regions, subregions, locations } = useSelector(
+    (state) => state.address
+  );
+
+  useEffect(() => {
+    dispatch(getAllRegions());
+    dispatch(getAllSubRegions());
+    dispatch(getAllLocations());
+  }, []);
+
+  useEffect(() => {
+    if (formData.region) {
+      const regionSubRegions = subregions.filter(
+        (subRegion) => subRegion.region_id?._id === formData.region
+      );
+      setFilteredSubRegions(regionSubRegions);
+      setFormData((prev) => ({
+        ...prev,
+        subregion: "",
+        location: "",
+      }));
+      setFilteredLocations([]);
+    }
+  }, [formData.region, subregions]);
+
+  useEffect(() => {
+    if (formData.subregion) {
+      const subRegionLocations = locations.filter(
+        (location) => location?.subregion_id?._id === formData.subregion
+      );
+      setFilteredLocations(subRegionLocations);
+      setFormData((prev) => ({
+        ...prev,
+        location: "",
+      }));
+    }
+  }, [formData.subregion, locations]);
 
   const saveColorScheme = useCallback(
     async (scheme) => {
@@ -108,11 +160,26 @@ const Profile = () => {
   }, [dispatch, router]);
 
   const saveChanges = useCallback(() => {
-    const data = { name, email };
-    console.log(data);
-    dispatch(updateUser(data));
-    // setModalVisible(false);
-  }, []);
+    const data = {
+      name: formData.name,
+      email: formData.email,
+      address: {
+        region: formData.region,
+        subregion: formData.subregion,
+        location: formData.location,
+      },
+    };
+
+    dispatch(updateUser(data))
+      .unwrap()
+      .then(() => {
+        setModalVisible(false);
+        setEditMode(false);
+      })
+      .catch((error) => {
+        Alert.alert("Error", error.message || "Failed to update profile");
+      });
+  }, [formData, dispatch]);
 
   return (
     <View className="flex-1 bg-gray-100 dark:bg-gray-900">
@@ -165,7 +232,7 @@ const Profile = () => {
         <ProfileOption
           icon="settings-outline"
           label="Account Settings"
-          onPress={() => setModalVisible(true)}
+          onPress={() => router.push("/profile_management")}
         />
 
         {/* Help & Support */}
@@ -207,49 +274,6 @@ const Profile = () => {
           <Text className="text-white text-lg font-medium ml-2">Logout</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* Account Settings Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12">
-            <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-              Edit Account Settings
-            </Text>
-            <TextInput
-              placeholder="Name"
-              value={name}
-              onChangeText={setName}
-              className="border border-gray-300 rounded-lg p-2 mb-4"
-            />
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              className="border border-gray-300 rounded-lg p-2 mb-4"
-              keyboardType="email-address"
-            />
-            <View className="flex-row justify-between">
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                className="bg-gray-300 p-2 rounded-lg flex-1 mr-2"
-              >
-                <Text className="text-center text-gray-800">Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={saveChanges}
-                className="bg-blue-500 p-2 rounded-lg flex-1 ml-2"
-              >
-                <Text className="text-center text-white">Save</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };

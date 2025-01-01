@@ -24,6 +24,10 @@ const _layout = memo(() => {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="profile_management"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="transaction_history"
             options={{
               headerShown: false,
