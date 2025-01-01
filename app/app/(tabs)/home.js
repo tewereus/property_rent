@@ -341,16 +341,26 @@ const Home = () => {
     [favouriteOn, dispatch]
   );
 
-  const handlePress = useCallback((prop) => {
-    const data = {
-      propertyId: prop._id,
-    };
-    setSelectedProperty(prop);
-    setFavouriteOn(prop.isFavorite); // Set initial favorite state
-    setModalVisible(true);
-    setShowPaymentOptions(false);
-    dispatch(changeView(data));
-  }, []);
+  const handlePress = useCallback(
+    async (prop) => {
+      try {
+        const data = {
+          propertyId: prop._id,
+        };
+        setSelectedProperty(prop);
+        setFavouriteOn(prop.isFavorite);
+        setModalVisible(true);
+        setShowPaymentOptions(false);
+
+        // Dispatch the view change and handle any errors
+        await dispatch(changeView(data)).unwrap();
+      } catch (error) {
+        // Silently handle the error or show a toast message
+        console.log("Error updating view:", error);
+      }
+    },
+    [dispatch]
+  );
 
   const handleLanguageChange = (lng) => {
     const data = {
@@ -518,6 +528,23 @@ const Home = () => {
     ),
     [handlePress, handleFavourite]
   );
+
+  // Add error handling for the modal visibility state
+  useEffect(() => {
+    if (!modalVisible) {
+      setSelectedProperty(null);
+      setShowPaymentOptions(false);
+      setPaymentMethod("cash");
+    }
+  }, [modalVisible]);
+
+  // In the PropertyModal component, add error handling for the close action
+  const handleModalClose = useCallback(() => {
+    setModalVisible(false);
+    setSelectedProperty(null);
+    setShowPaymentOptions(false);
+    setPaymentMethod("cash");
+  }, []);
 
   return (
     <View className="bg-slate-300 dark:bg-[#09092B] flex-1">

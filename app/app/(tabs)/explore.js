@@ -444,18 +444,27 @@ const Explore = () => {
       subregion,
     };
 
-    console.log(obj);
-    // Remove undefined or empty string values
-    Object.keys(obj).forEach((key) => {
-      if (obj[key] === undefined || obj[key] === "") {
-        delete obj[key];
+    // Remove undefined, null, or empty string values
+    const cleanedObj = Object.entries(obj).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        acc[key] = value;
       }
-    });
-    console.log(obj);
+      return acc;
+    }, {});
 
-    dispatch(getAllProperties(obj));
+    console.log("Submitting filters:", cleanedObj);
+    dispatch(getAllProperties(cleanedObj));
     setModalVisible(false);
-  }, [limit, minPrice, maxPrice, location, propertyType, propertyUse]);
+  }, [
+    limit,
+    minPrice,
+    maxPrice,
+    location,
+    propertyType,
+    propertyUse,
+    region,
+    subregion,
+  ]);
 
   const renderProperties = useCallback(
     ({ item }) => (

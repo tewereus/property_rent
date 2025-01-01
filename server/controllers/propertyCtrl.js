@@ -93,7 +93,6 @@ const createProperty = asyncHandler(async (req, res) => {
 });
 
 const getAllProperties = asyncHandler(async (req, res) => {
-  // const { id } = req.user;
   try {
     console.log(req.query);
     const queryObj = { ...req.query };
@@ -110,28 +109,15 @@ const getAllProperties = asyncHandler(async (req, res) => {
     excludeFields.forEach((el) => delete queryObj[el]);
 
     if (req.query.region) {
-      const region = await Property.find({
-        "address.region": req.query.region,
-      });
-      // console.log(region);
-      if (region) {
-        queryObj.region = req.query.region;
-      }
-      console.log(queryObj);
+      queryObj["address.region"] = req.query.region;
     }
 
     if (req.query.subregion) {
-      const subregion = await Property.find({ subregion: req.query.subregion });
-      if (subregion) {
-        queryObj.subregion = subregion._id;
-      }
+      queryObj["address.subregion"] = req.query.subregion;
     }
 
     if (req.query.location) {
-      const location = await Property.find({ location: req.query.location });
-      if (location) {
-        queryObj.location = location._id;
-      }
+      queryObj["address.location"] = req.query.location;
     }
 
     if (req.query.propertyType) {
@@ -147,7 +133,6 @@ const getAllProperties = asyncHandler(async (req, res) => {
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     let query = Property.find(JSON.parse(queryStr));
-    // console.log(query);
 
     query = query
       .populate("propertyType")

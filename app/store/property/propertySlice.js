@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import propertyService from "./propertyService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const initialState = {
   isLoading: false,
@@ -99,7 +101,9 @@ export const changeView = createAsyncThunk(
     try {
       return await propertyService.changeView(data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -261,7 +265,7 @@ export const propertySlice = createSlice({
       .addCase(changeView.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.message = action.payload;
+        state.message = action.payload || "Failed to update view";
       })
       .addCase(getAllViews.pending, (state) => {
         state.isLoading = true;

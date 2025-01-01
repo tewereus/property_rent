@@ -25,23 +25,7 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: "inactive",
     },
-    address: {
-      region: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Region",
-        required: true,
-      },
-      subregion: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SubRegion",
-        required: true,
-      },
-      location: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Location",
-        required: true,
-      },
-    },
+
     mode: {
       type: String,
       enum: ["customer", "seller"],

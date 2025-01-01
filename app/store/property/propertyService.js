@@ -3,7 +3,7 @@ import { baseUrl } from "../../constants/axiosConfig";
 import axios from "axios";
 
 const getAuthToken = () => {
-  const userData = localStorage.getItem("user");
+  const userData = AsyncStorage.getItem("user");
   const user = userData ? JSON.parse(userData) : null;
   return user?.token || "";
 };
@@ -69,12 +69,9 @@ const getAllProperties = async ({
   propertyUse,
   region,
   subregion,
-  // location,
 }) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
-
-  console.log(region, subregion, location);
 
   const headers = {
     Authorization: `Bearer ${
@@ -82,31 +79,20 @@ const getAllProperties = async ({
     }`,
   };
 
-  let query = `?limit=10`;
-  if (minPrice) {
-    query += `&price[gte]=${minPrice}`;
-  }
-  if (maxPrice) {
-    query += `&price[lte]=${maxPrice}`;
-  }
-  if (region) {
-    query += `&region=${encodeURIComponent(region)}`;
-  }
-  if (subregion) {
-    query += `&subregion=${encodeURIComponent(subregion)}`;
-  }
-  if (location) {
-    query += `&location=${encodeURIComponent(location)}`;
-  }
-  if (propertyType) {
-    query += `&propertyType=${encodeURIComponent(propertyType)}`;
-  }
-  if (propertyUse) {
-    query += `&property_use=${encodeURIComponent(propertyUse)}`;
-  }
+  // Build query parameters
+  const params = new URLSearchParams();
+
+  if (limit) params.append("limit", limit);
+  if (minPrice) params.append("price[gte]", minPrice);
+  if (maxPrice) params.append("price[lte]", maxPrice);
+  if (region) params.append("address.region", region);
+  if (subregion) params.append("address.subregion", subregion);
+  if (location) params.append("address.location", location);
+  if (propertyType) params.append("propertyType", propertyType);
+  if (propertyUse) params.append("property_use", propertyUse);
 
   const response = await axios.get(
-    `${baseUrl}/property/all-properties${query}`,
+    `${baseUrl}/property/all-properties?${params.toString()}`,
     {
       headers,
       withCredentials: true,
@@ -202,15 +188,22 @@ const getUserTransactions = async () => {
 };
 
 const changeView = async (data) => {
-  console.log(data);
-  const token = getAuthToken();
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
-  const response = await axios.post(`${baseUrl}/property/change-view`, data, {
+  const config = {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+      }`,
     },
     withCredentials: true,
-  });
+  };
+  const response = await axios.post(
+    `${baseUrl}/property/change-view`,
+    data,
+    config
+  );
   return response.data;
 };
 

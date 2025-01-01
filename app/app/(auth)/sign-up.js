@@ -8,12 +8,6 @@ import { images } from "../../constants";
 import CustomButton from "../../components/CustomButton";
 import FormField from "../../components/FormField";
 import { register, resetAuthState } from "../../store/auth/authSlice";
-import {
-  getAllRegions,
-  getAllSubRegions,
-  getAllLocations,
-} from "../../store/address/addressSlice";
-import { Picker } from "@react-native-picker/picker";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -21,79 +15,15 @@ const SignUp = () => {
     (state) => state.auth
   );
 
-  useEffect(() => {
-    dispatch(getAllRegions());
-    dispatch(getAllSubRegions());
-    dispatch(getAllLocations());
-  }, []);
-  const { regions, subregions, locations } = useSelector(
-    (state) => state.address
-  );
   const [isSubmitting, setSubmitting] = useState(false);
-  const [filteredSubRegions, setFilteredSubRegions] = useState([]);
-  const [filteredLocations, setFilteredLocations] = useState([]);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    // address: "",
+    address: "",
     phone: "",
-    region: "",
-    subregion: "",
-    location: "",
   });
-
-  // useEffect(() => {
-  //   if (form.country) {
-  //     const countryRegions = regions.filter(
-  //       (region) => region.country?._id === form.country
-  //     );
-  //     setFilteredRegions(countryRegions);
-  //     // Reset dependent fields
-  //     setForm((prev) => ({
-  //       ...prev,
-  //       region: "",
-  //       subRegion: "",
-  //       location: "",
-  //     }));
-  //     setFilteredSubRegions([]);
-  //     setFilteredLocations([]);
-  //   }
-  // }, [form.country, regions]);
-
-  // Handle region selection
-  useEffect(() => {
-    if (form.region) {
-      const regionSubRegions = subregions.filter(
-        (subRegion) => subRegion.region_id?._id === form.region
-      );
-      setFilteredSubRegions(regionSubRegions);
-      // Reset dependent fields
-      setForm((prev) => ({
-        ...prev,
-        subRegion: "",
-        location: "",
-      }));
-      setFilteredLocations([]);
-    }
-  }, [form.region, subregions]);
-
-  // Handle subregion selection
-  useEffect(() => {
-    if (form.subregion) {
-      // console.log("subRegionLocations");
-      const subRegionLocations = locations.filter(
-        (location) => location?.subregion_id?._id === form.subregion
-      );
-      console.log(subRegionLocations);
-      setFilteredLocations(subRegionLocations);
-      setForm((prev) => ({
-        ...prev,
-        location: "",
-      }));
-    }
-  }, [form.subregion, form.region, locations]);
 
   const [errors, setErrors] = useState({
     name: "",
@@ -102,9 +32,6 @@ const SignUp = () => {
     confirmPassword: "",
     address: "",
     phone: "",
-    region: "",
-    subregion: "",
-    location: "",
   });
 
   const validateForm = () => {
@@ -116,9 +43,6 @@ const SignUp = () => {
       confirmPassword: "",
       address: "",
       phone: "",
-      region: "",
-      subregion: "",
-      location: "",
     };
 
     // Name validation
@@ -146,19 +70,19 @@ const SignUp = () => {
     if (!form.phone) {
       newErrors.phone = "Phone number is required";
       isValid = false;
-    } else if (!/^\+?[\d\s-]{9,}$/.test(form.phone)) {
+    } else if (!/^\+?[\d\s-]{10,}$/.test(form.phone)) {
       newErrors.phone = "Please enter a valid phone number";
       isValid = false;
     }
 
     // Address validation
-    // if (!form.address.trim()) {
-    //   newErrors.address = "Address is required";
-    //   isValid = false;
-    // } else if (form.address.trim().length < 5) {
-    //   newErrors.address = "Address must be at least 5 characters";
-    //   isValid = false;
-    // }
+    if (!form.address.trim()) {
+      newErrors.address = "Address is required";
+      isValid = false;
+    } else if (form.address.trim().length < 5) {
+      newErrors.address = "Address must be at least 5 characters";
+      isValid = false;
+    }
 
     // Password validation
     if (!form.password) {
@@ -239,14 +163,9 @@ const SignUp = () => {
         name: form.name.trim(),
         email: form.email.toLowerCase(),
         password: form.password,
-        address: {
-          region: form.region,
-          subregion: form.subregion,
-          location: form.location,
-        },
+        address: form.address.trim(),
         phone: form.phone.trim(),
       };
-      console.log(data);
       await dispatch(register(data)).unwrap();
     } catch (error) {
       Toast.show({
@@ -331,14 +250,14 @@ const SignUp = () => {
             error={errors.phone}
           />
 
-          {/* <FormField
+          <FormField
             title="Address"
             value={form.address}
             handleChangeText={(value) => handleChange("address", value)}
             placeholder="address"
             otherStyles="mt-6"
             error={errors.address}
-          /> */}
+          />
 
           <FormField
             title="Password"
@@ -359,86 +278,6 @@ const SignUp = () => {
             secureTextEntry
             error={errors.confirmPassword}
           />
-          <View className="mt-4">
-            <Text className="text-sm font-medium text-white mb-1">
-              Region *
-            </Text>
-            <View className="border rounded-lg overflow-hidden bg-white">
-              <Picker
-                selectedValue={form.region}
-                onValueChange={(value) => handleChange("region", value)}
-                style={{ height: 50, width: "100%" }}
-              >
-                <Picker.Item label="Select Region" value="" />
-                {regions.map((region) => (
-                  <Picker.Item
-                    key={region._id}
-                    label={region.region_name}
-                    value={region._id}
-                  />
-                ))}
-              </Picker>
-            </View>
-            {errors.region && (
-              <Text className="mt-1 text-sm text-red-500">{errors.region}</Text>
-            )}
-          </View>
-
-          <View className="mt-4">
-            <Text className="text-sm font-medium text-white mb-1">
-              Sub Region *
-            </Text>
-            <View className="border rounded-lg overflow-hidden bg-white">
-              <Picker
-                selectedValue={form.subregion}
-                onValueChange={(value) => handleChange("subregion", value)}
-                style={{ height: 50, width: "100%" }}
-                enabled={!!form.region}
-              >
-                <Picker.Item label="Select Sub Region" value="" />
-                {filteredSubRegions.map((subRegion) => (
-                  <Picker.Item
-                    key={subRegion._id}
-                    label={subRegion.subregion_name}
-                    value={subRegion._id}
-                  />
-                ))}
-              </Picker>
-            </View>
-            {errors.subregion && (
-              <Text className="mt-1 text-sm text-red-500">
-                {errors.subregion}
-              </Text>
-            )}
-          </View>
-
-          <View className="mt-4">
-            <Text className="text-sm font-medium text-white mb-1">
-              Location *
-            </Text>
-            <View className="border rounded-lg overflow-hidden bg-white">
-              <Picker
-                selectedValue={form.location}
-                onValueChange={(value) => handleChange("location", value)}
-                style={{ height: 50, width: "100%" }}
-                enabled={!!form.subregion}
-              >
-                <Picker.Item label="Select Location" value="" />
-                {filteredLocations.map((location) => (
-                  <Picker.Item
-                    key={location._id}
-                    label={location.location}
-                    value={location._id}
-                  />
-                ))}
-              </Picker>
-            </View>
-            {errors.location && (
-              <Text className="mt-1 text-sm text-red-500">
-                {errors.location}
-              </Text>
-            )}
-          </View>
 
           <CustomButton
             title="Sign Up"
