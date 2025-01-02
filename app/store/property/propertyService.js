@@ -212,9 +212,10 @@ const getAllViews = async () => {
   return response.data;
 };
 
-const changeFeatured = async (data) => {
+const changeFeatured = async (prodId) => {
+  console.log(prodId);
   const response = await axios.put(
-    `${baseUrl}/property/change-featured/${data}`
+    `${baseUrl}/property/change-featured/${prodId}`
   );
   return response.data;
 };

@@ -101,9 +101,7 @@ export const changeView = createAsyncThunk(
     try {
       return await propertyService.changeView(data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -173,8 +171,13 @@ export const propertySlice = createSlice({
         state.isSuccess = true;
         state.isError = false;
         state.message = "success";
-        state.userProperties = action.payload.properties;
-        state.totalProperties = action.payload.totalProperties;
+        state.userProperties = {
+          properties: action.payload.properties,
+          totalProperties: action.payload.totalProperties,
+          totalViews: action.payload.totalViews,
+          activeProperties: action.payload.activeProperties,
+          totalFavorites: action.payload.totalFavorites,
+        };
       })
       .addCase(getUserProperties.rejected, (state, action) => {
         state.isLoading = false;

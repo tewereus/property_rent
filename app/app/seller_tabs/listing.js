@@ -101,10 +101,10 @@ const Listing = () => {
 
   const handleBoostProperty = useCallback((property) => {
     // console.log("property", property);
-    const data = {
-      propId: property._id,
-    };
-    dispatch(changeFeatured(data));
+    // const data = {
+    //   propId: property._id,
+    // };
+    dispatch(changeFeatured(property._id));
   });
 
   const renderProperties = useCallback(
@@ -125,13 +125,13 @@ const Listing = () => {
           My Listings
         </Text>
         <Text className="text-gray-500 dark:text-gray-400 mt-1 text-base">
-          {userProperties?.length || 0} active properties
+          {userProperties?.properties?.length || 0} active properties
         </Text>
       </View>
 
-      {userProperties?.length > 0 ? (
+      {userProperties?.properties?.length > 0 ? (
         <FlatList
-          data={userProperties}
+          data={userProperties?.properties}
           keyExtractor={(item) => item._id}
           renderItem={renderProperties}
           contentContainerStyle={{ paddingVertical: 10 }}

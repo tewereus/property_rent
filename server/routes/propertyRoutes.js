@@ -24,7 +24,7 @@ router.get("/type/:typeId", getPropertiesByType);
 router.get("/use/:use", getPropertiesByUse);
 router.get("/users-properties", authMiddleware, getUserProperties);
 router.get("/:id", getProperty);
-router.put("/change-featured", changeFeatured);
+router.put("/change-featured/:prodId", changeFeatured);
 
 // Protected routes
 router.use(authMiddleware);

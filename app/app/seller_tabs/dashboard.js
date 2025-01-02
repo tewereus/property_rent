@@ -49,7 +49,9 @@ const Dashboard = () => {
     dispatch(getUserProperties());
   }, []);
 
-  const { totalProperties } = useSelector((state) => state.property);
+  const { totalProperties, userProperties } = useSelector(
+    (state) => state.property
+  );
   return (
     <ScrollView className="bg-slate-300 dark:bg-[#09092B] flex-1">
       <View className="p-5">
@@ -69,20 +71,26 @@ const Dashboard = () => {
           <StatCard
             icon="home"
             label="Total Properties"
-            value={totalProperties}
+            value={userProperties?.totalProperties || 0}
             color="bg-blue-500"
           />
           <StatCard
             icon="eye"
             label="Total Views"
-            value={dashboardData.summary.totalViews}
+            value={userProperties?.totalViews || 0}
             color="bg-green-500"
           />
           <StatCard
             icon="heart"
             label="Total Favorites"
-            value={dashboardData.summary.totalFavorites}
+            value={userProperties?.totalFavorites || 0}
             color="bg-red-500"
+          />
+          <StatCard
+            icon="checkmark-circle"
+            label="Active Listings"
+            value={userProperties?.activeProperties || 0}
+            color="bg-orange-500"
           />
         </ScrollView>
 

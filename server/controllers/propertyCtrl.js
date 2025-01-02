@@ -235,12 +235,39 @@ const getUserProperties = asyncHandler(async (req, res) => {
   try {
     const properties = await Property.find({ owner: id });
     const totalProperties = properties.length;
-    // const len = 0;
-    // const totalViews = properties?.map((prop) => (len += prop?.views?.count));
-    // console.log(totalViews);
-    //// const activeProperites = properties?.map((prop) => (len += prop?.views?.count));
-    // console.log(activeProperties);
-    res.json({ properties, totalProperties });
+
+    // Calculate total views across all user properties
+    const totalViews = properties.reduce((sum, property) => {
+      return sum + (property.views?.count || 0);
+    }, 0);
+
+    // Calculate active properties (those with status "available")
+    const activeProperties = properties.filter(
+      (prop) => prop.status === "available"
+    ).length;
+
+    // Get all users to check their wishlists
+    const users = await User.find({}, "wishlist");
+
+    // Calculate total favorites across all properties
+    const totalFavorites = users.reduce((sum, user) => {
+      return (
+        sum +
+        user.wishlist.filter((wishlistId) =>
+          properties.some(
+            (prop) => prop._id.toString() === wishlistId.toString()
+          )
+        ).length
+      );
+    }, 0);
+
+    res.json({
+      properties,
+      totalProperties,
+      totalViews,
+      activeProperties,
+      totalFavorites,
+    });
   } catch (error) {
     throw new Error(error);
   }
@@ -382,11 +409,13 @@ const getAllViews = asyncHandler(async (req, res) => {
 });
 
 const changeFeatured = asyncHandler(async (req, res) => {
-  const { propId } = req.params;
-
+  const { prodId } = req.params;
+  console.log(req.params);
   try {
+    const prop = await Property.findById(prodId);
+    console.log("prop", prop);
     const property = await Property.findByIdAndUpdate(
-      propId,
+      prodId,
       {
         isFeatured: true,
       },
