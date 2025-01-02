@@ -137,6 +137,52 @@ const getUserProperties = async () => {
   return response.data;
 };
 
+const updateProperty = async (propertyData) => {
+  const userData = await AsyncStorage.getItem("user");
+  const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
+
+  const formData = new FormData();
+
+  // Append new images if they exist
+  if (propertyData.images && propertyData.images.length > 0) {
+    propertyData.images.forEach((image, index) => {
+      if (image.uri) {
+        // Only append if it's a new image
+        formData.append("images", {
+          uri: image.uri,
+          type: "image/jpeg",
+          name: image.fileName || `image${index}.jpg`,
+        });
+      }
+    });
+  }
+
+  // Append other fields
+  Object.keys(propertyData).forEach((key) => {
+    if (key !== "images") {
+      if (key === "typeSpecificFields") {
+        formData.append(key, JSON.stringify(propertyData[key]));
+      } else {
+        formData.append(key, propertyData[key]);
+      }
+    }
+  });
+
+  const response = await axios.put(
+    `${baseUrl}/property/update/${propertyData._id}`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage?.token}`,
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: true,
+    }
+  );
+
+  return response.data;
+};
+
 const buyProperty = async (data) => {
   try {
     const userData = await AsyncStorage.getItem("user");
@@ -225,6 +271,7 @@ const propertyService = {
   getAllProperties,
   getPropertiesByUse,
   getUserProperties,
+  updateProperty,
   buyProperty,
   getUserTransactions,
   changeView,

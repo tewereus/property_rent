@@ -28,6 +28,8 @@ const _layout = memo(() => {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="payment_post" options={{ headerShown: false }} />
+          <Stack.Screen name="boost_payment" options={{ headerShown: false }} />
+          <Stack.Screen name="edit_property" options={{ headerShown: false }} />
           <Stack.Screen
             name="transaction_history"
             options={{
