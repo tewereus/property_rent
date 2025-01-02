@@ -1,12 +1,5 @@
 // app/app/create_property.js
-import {
-  View,
-  Text,
-  ScrollView,
-  Modal,
-  TouchableOpacity,
-  // Picker,
-} from "react-native";
+import { View, Text, ScrollView, Modal, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -143,7 +136,14 @@ const CreateProperty = () => {
 
     console.log(data);
 
-    dispatch(createProperty(data));
+    if (action === "rent") {
+      router.push({
+        pathname: "/payment_post",
+        params: { propertyData: JSON.stringify(data) },
+      });
+    } else {
+      dispatch(createProperty(data));
+    }
   };
 
   return (

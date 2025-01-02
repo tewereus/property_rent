@@ -27,6 +27,7 @@ const _layout = memo(() => {
             name="profile_management"
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="payment_post" options={{ headerShown: false }} />
           <Stack.Screen
             name="transaction_history"
             options={{
