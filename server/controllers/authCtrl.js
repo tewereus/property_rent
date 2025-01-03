@@ -107,10 +107,17 @@ const getWishlist = asyncHandler(async (req, res) => {
   try {
     const wishlist = await User.findById(id)
       .select("wishlist")
-      .populate("wishlist");
+      .populate({
+        path: "wishlist",
+        populate: [
+          { path: "address.region address.subregion address.location" },
+          { path: "owner", select: "phone" },
+        ],
+      });
+
     res.json(wishlist);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).json({ message: error.message });
   }
 });
 
