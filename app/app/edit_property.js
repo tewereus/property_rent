@@ -217,36 +217,105 @@ const EditProperty = () => {
   );
 
   const DynamicFields = () => {
-    const selectedType = propertyTypes?.find(
+    const selectedType = propertyTypes.find(
       (type) => type._id === formData.propertyType
     );
     if (!selectedType?.fields) return null;
 
-    return (
-      <View className="space-y-4">
-        <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-          Additional Details
-        </Text>
-        {selectedType.fields?.map((field) => (
-          <View key={field.name} className="mb-4">
-            <Text className="text-gray-600 dark:text-gray-300 mb-2">
-              {field.label}
-            </Text>
+    const renderField = (field) => {
+      const value = formData.typeSpecificFields[field.name]?.toString() || "";
+
+      switch (field.type) {
+        case "Boolean":
+          return (
+            <View className="flex-row space-x-4">
+              {["true", "false"].map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  onPress={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      typeSpecificFields: {
+                        ...prev.typeSpecificFields,
+                        [field.name]: option === "true",
+                      },
+                    }))
+                  }
+                  className={`flex-1 p-4 rounded-xl border ${
+                    value === option
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                      : "border-gray-200 dark:border-gray-700"
+                  }`}
+                >
+                  <Text
+                    className={`text-center capitalize ${
+                      value === option
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-700 dark:text-gray-300"
+                    }`}
+                  >
+                    {option}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          );
+
+        case "Number":
+          return (
             <TextInput
-              value={formData.typeSpecificFields[field.name]?.toString() || ""}
-              onChangeText={(value) =>
+              value={value}
+              onChangeText={(text) =>
                 setFormData((prev) => ({
                   ...prev,
                   typeSpecificFields: {
                     ...prev.typeSpecificFields,
-                    [field.name]: value,
+                    [field.name]: text ? parseFloat(text) : "",
                   },
                 }))
               }
-              placeholder={`Enter ${field?.label?.toLowerCase()}`}
+              placeholder={`Enter ${field.name}`}
+              keyboardType="numeric"
               className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
               placeholderTextColor="#9CA3AF"
             />
+          );
+
+        default:
+          return (
+            <TextInput
+              value={value}
+              onChangeText={(text) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  typeSpecificFields: {
+                    ...prev.typeSpecificFields,
+                    [field.name]: text,
+                  },
+                }))
+              }
+              placeholder={`Enter ${field.name}`}
+              className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
+              placeholderTextColor="#9CA3AF"
+            />
+          );
+      }
+    };
+
+    return (
+      <View className="space-y-4">
+        <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+          Property Details
+        </Text>
+        {selectedType.fields.map((field) => (
+          <View key={field.name} className="mb-4">
+            <View className="flex-row items-center mb-2">
+              <Text className="text-gray-600 dark:text-gray-300 text-base">
+                {field.name.replace(/([A-Z])/g, " $1").trim()}
+              </Text>
+              {field.required && <Text className="text-red-500 ml-1">*</Text>}
+            </View>
+            {renderField(field)}
           </View>
         ))}
       </View>
@@ -348,7 +417,10 @@ const EditProperty = () => {
             <TouchableOpacity onPress={() => router.back()} className="mr-4">
               <Ionicons name="arrow-back" size={24} color="#6B7280" />
             </TouchableOpacity>
-            <Text className="text-2xl font-bold text-gray-800 dark:text-white">
+            <Text
+              className="text-2xl font-bold text-gray-800 dark:text-white"
+              onPress={() => console.log(property)}
+            >
               Edit Property
             </Text>
           </View>

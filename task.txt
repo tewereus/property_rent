@@ -1,4 +1,1 @@
-view count
-address in register, filter, profile, create property
-property type in filter
-add property category
+modify edit property( type specific fields to show label and also the region subregion and location)
