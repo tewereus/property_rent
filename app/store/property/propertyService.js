@@ -19,7 +19,7 @@ const createProperty = async (propertyData) => {
 
   // Create FormData object
   const formData = new FormData();
-
+  console.log(propertyData);
   // Append images if they exist
   if (propertyData.images && propertyData.images.length > 0) {
     propertyData.images.forEach((image, index) => {

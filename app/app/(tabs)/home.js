@@ -9,6 +9,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Dimensions,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState, useCallback, memo } from "react";
 import { useColorScheme } from "nativewind";
@@ -30,6 +32,148 @@ import {
 import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import {
+  getAllRegions,
+  getAllSubRegions,
+  getAllLocations,
+} from "../../store/address/addressSlice";
+
+// Add this new component at the top
+const PropertyImages = memo(({ images }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  if (!images || images.length === 0) {
+    return (
+      <View
+        style={{ width: cardHeight - 24, height: cardHeight - 24, margin: 10 }}
+        className="bg-gray-200 dark:bg-gray-700 rounded-xl items-center justify-center"
+      >
+        <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+      </View>
+    );
+  }
+
+  return (
+    <View className="relative">
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(e) => {
+          const newIndex = Math.round(
+            e.nativeEvent.contentOffset.x / (cardHeight - 24)
+          );
+          setActiveIndex(newIndex);
+        }}
+      >
+        {images.map((image, index) => (
+          <Image
+            key={index}
+            source={{ uri: image }}
+            style={{
+              width: cardHeight - 24,
+              height: cardHeight - 24,
+              margin: 10,
+            }}
+            resizeMode="cover"
+            className="rounded-xl"
+          />
+        ))}
+      </ScrollView>
+
+      {/* Image counter */}
+      {images.length > 1 && (
+        <View className="absolute bottom-4 right-4 bg-black/60 px-2 py-1 rounded-full">
+          <Text className="text-white text-xs">
+            {activeIndex + 1}/{images.length}
+          </Text>
+        </View>
+      )}
+
+      {/* Dot indicators */}
+      {images.length > 1 && (
+        <View className="absolute bottom-4 left-0 right-0 flex-row justify-center space-x-1">
+          {images.map((_, index) => (
+            <View
+              key={index}
+              className={`h-1.5 rounded-full ${
+                index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/60"
+              }`}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+});
+
+// Then modify the PropertyCard component
+const PropertyCard = memo(({ item, onPress, onFavorite }) => {
+  const [isFavorite, setIsFavorite] = useState(item.isFavorite);
+
+  const handleFavoritePress = (e) => {
+    e.stopPropagation();
+    setIsFavorite(!isFavorite);
+    onFavorite(item);
+  };
+
+  return (
+    <TouchableOpacity className="mb-4 mx-4" onPress={() => onPress(item)}>
+      <View
+        className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md flex-row"
+        style={{ height: cardHeight }}
+      >
+        <View className="relative" style={{ width: cardHeight }}>
+          {/* If there are no images, show placeholder */}
+          {!item.images || item.images.length === 0 ? (
+            <View
+              style={{
+                width: cardHeight - 24,
+                height: cardHeight - 24,
+                margin: 10,
+              }}
+              className="bg-gray-200 dark:bg-gray-700 rounded-xl items-center justify-center"
+            >
+              <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+            </View>
+          ) : // If there's only one image, show it directly
+          item.images.length === 1 ? (
+            <Image
+              source={{ uri: item.images[0] }}
+              style={{
+                width: cardHeight - 24,
+                height: cardHeight - 24,
+                margin: 10,
+              }}
+              resizeMode="cover"
+              className="rounded-xl"
+            />
+          ) : (
+            // If there are multiple images, use the PropertyImages component
+            <PropertyImages images={item.images} />
+          )}
+          <View className="absolute top-2 right-2 bg-green-500/90 dark:bg-green-600/90 px-2 py-1 rounded-full">
+            <Text className="text-white text-xs font-medium">
+              {item.property_use === "rent" ? "For Rent" : "For Sale"}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={handleFavoritePress}
+            className="absolute top-4 right-4 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+          >
+            <Ionicons
+              name={isFavorite ? "heart" : "heart-outline"}
+              size={20}
+              color={isFavorite ? "#EF4444" : "#6B7280"}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Rest of the component stays the same */}
+      </View>
+    </TouchableOpacity>
+  );
+});
 
 // Memoize the PropertyItem component to prevent unnecessary re-renders
 const PropertyItem = memo(({ item, onPress, onFavorite }) => {
@@ -41,83 +185,85 @@ const PropertyItem = memo(({ item, onPress, onFavorite }) => {
     onFavorite(item);
   };
 
+  // Format location string
+  const locationString = [
+    // item.address?.region?.region_name,
+    item.address?.subregion?.subregion_name,
+    item.address?.location?.location,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <TouchableOpacity
       onPress={() => onPress(item)}
-      className="bg-white dark:bg-gray-800/90 rounded-2xl shadow-sm mx-2 w-[280px] overflow-hidden"
+      className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mx-2 w-72"
     >
+      {/* Image Container */}
       <View className="relative">
-        <Image
-          source={{ uri: item.image }}
-          className="w-full h-[160px]"
-          resizeMode="cover"
-        />
-        <TouchableOpacity
-          onPress={handleFavoritePress}
-          className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
-        >
-          <Ionicons
-            name={isFavorite ? "heart" : "heart-outline"}
-            size={20}
-            color={isFavorite ? "#EF4444" : "#6B7280"}
-          />
-        </TouchableOpacity>
+        {!item.images || item.images.length === 0 ? (
+          <View className="bg-gray-200 dark:bg-gray-700 h-48 rounded-xl mb-4 justify-center items-center">
+            <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+          </View>
+        ) : (
+          <View className="relative h-48 rounded-xl mb-4 overflow-hidden">
+            <Image
+              source={{ uri: item.images[0] }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+            {/* Price Badge */}
+            <View className="absolute top-2 left-2 bg-black/60 px-3 py-1.5 rounded-full">
+              <Text className="text-white font-bold">
+                ETB {item.price?.toLocaleString()}
+              </Text>
+            </View>
+            {/* Favorite Button */}
+            <TouchableOpacity
+              onPress={handleFavoritePress}
+              className="absolute top-2 right-2 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+            >
+              <Ionicons
+                name={isFavorite ? "heart" : "heart-outline"}
+                size={20}
+                color={isFavorite ? "#EF4444" : "#6B7280"}
+              />
+            </TouchableOpacity>
+            {/* Views Badge */}
+            <View className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded-full flex-row items-center">
+              <Ionicons name="eye-outline" size={14} color="white" />
+              <Text className="text-white text-xs ml-1">
+                {item.views?.count || 0}
+              </Text>
+            </View>
+          </View>
+        )}
       </View>
 
-      {/* Content Container */}
-      <View className="p-4">
-        {/* Price */}
-        <View className="flex-row items-center justify-between mb-2">
-          <Text className="text-blue-600 dark:text-blue-400 font-bold text-lg">
-            ${item.price.toLocaleString()}
-          </Text>
-          <View className="flex-row items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
-            <Ionicons name="eye-outline" size={14} color="#3B82F6" />
-            <Text className="text-blue-600 dark:text-blue-400 text-xs ml-1 font-medium">
-              {item?.views?.count || 0}
-            </Text>
-          </View>
-        </View>
-
+      {/* Content */}
+      <View>
         {/* Title */}
         <Text
-          className="text-gray-800 dark:text-white font-semibold mb-2"
+          className="text-lg font-bold text-gray-800 dark:text-white mb-2"
           numberOfLines={1}
         >
           {item.title}
         </Text>
 
         {/* Location */}
-        <View className="flex-row items-center mb-3">
-          <Ionicons name="location-outline" size={14} color="#6B7280" />
+        <View className="flex-row items-start">
+          <Ionicons
+            name="location-outline"
+            size={14}
+            color="#6B7280"
+            className="mt-1"
+          />
           <Text
-            className="text-gray-500 dark:text-gray-400 text-sm ml-1"
-            numberOfLines={1}
+            className="text-gray-500 dark:text-gray-400 ml-1 flex-1"
+            numberOfLines={2}
           >
-            {item.location}
+            {locationString}
           </Text>
-        </View>
-
-        {/* Property Features */}
-        <View className="flex-row items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-          <View className="flex-row items-center">
-            <Ionicons name="bed-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
-              {item.bedrooms} Beds
-            </Text>
-          </View>
-          <View className="flex-row items-center">
-            <Ionicons name="water-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
-              {item.bathrooms} Baths
-            </Text>
-          </View>
-          <View className="flex-row items-center">
-            <Ionicons name="square-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
-              {item.area} m²
-            </Text>
-          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -133,102 +279,254 @@ const PropertyModal = memo(
     favouriteOn,
     onFavourite,
     onBuy,
-    onScheduleVisit,
     isPurchasing,
-    isSchedulingVisit,
     showPaymentOptions,
     setShowPaymentOptions,
     paymentMethod,
     setPaymentMethod,
   }) => {
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+
     if (!visible || !property) return null;
+
+    // Format location string
+    const locationString = [
+      property?.address?.region?.region_name,
+      property?.address?.subregion?.subregion_name,
+      property?.address?.location?.location_name,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    // Filter typeSpecificFields to only show fields with data
+    const validTypeSpecificFields = Object.entries(
+      property.typeSpecificFields || {}
+    )
+      .filter(
+        ([_, value]) =>
+          value !== null &&
+          value !== undefined &&
+          value !== false &&
+          value !== ""
+      )
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
     return (
       <Modal
-        animationType="none"
+        animationType="slide"
         transparent={true}
         visible={visible}
         onRequestClose={onClose}
       >
-        <View className="flex-1 bg-white dark:bg-gray-900">
-          <View className="relative bg-white dark:bg-gray-900 pt-12 pb-4 px-5">
+        <View className="flex-1 bg-black/50">
+          <View className="flex-1 mt-20 bg-white dark:bg-gray-900 rounded-t-3xl overflow-hidden">
+            {/* Header with close button */}
             <TouchableOpacity
               onPress={onClose}
-              className="absolute left-5 top-12 z-10 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+              className="absolute top-4 right-4 z-10 bg-black/50 p-2 rounded-full"
             >
-              <Ionicons name="close" size={24} color="#6B7280" />
+              <Ionicons name="close" size={24} color="white" />
             </TouchableOpacity>
-            <Text className="text-center text-xl font-bold text-gray-800 dark:text-white">
-              Property Details
-            </Text>
-          </View>
 
-          <ScrollView
-            className="flex-1"
-            showsVerticalScrollIndicator={false}
-            removeClippedSubviews={true}
-          >
-            <View className="relative">
-              <Image
-                source={{ uri: property.image }}
-                className="w-screen h-72"
-                resizeMode="cover"
-              />
-              <TouchableOpacity
-                onPress={onFavourite}
-                className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
-              >
-                <Ionicons
-                  name={favouriteOn ? "heart" : "heart-outline"}
-                  size={24}
-                  color={favouriteOn ? "#EF4444" : "#6B7280"}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Rest of the modal content */}
-            {/* ... */}
-          </ScrollView>
-
-          {/* Bottom Action Button */}
-          <View className="p-5 border-t border-gray-200 dark:border-gray-800">
-            {showPaymentOptions ? (
-              <View>
-                <PaymentMethodSelector
-                  paymentMethod={paymentMethod}
-                  setPaymentMethod={setPaymentMethod}
-                />
-                <TouchableOpacity
-                  onPress={onBuy}
-                  disabled={isPurchasing}
-                  className={`${
-                    isPurchasing ? "bg-gray-400" : "bg-blue-600"
-                  } rounded-xl py-4 px-6`}
-                >
-                  {isPurchasing ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text className="text-white text-center font-semibold text-base">
-                      Confirm{" "}
-                      {property?.property_use === "rent"
-                        ? "Rental"
-                        : "Purchase"}
-                    </Text>
-                  )}
-                </TouchableOpacity>
+            <ScrollView className="flex-1">
+              {/* Image Gallery */}
+              <View className="relative h-72">
+                {property.images && property.images.length > 0 ? (
+                  <>
+                    <ScrollView
+                      horizontal
+                      pagingEnabled
+                      showsHorizontalScrollIndicator={false}
+                      onMomentumScrollEnd={(e) => {
+                        const newIndex = Math.round(
+                          e.nativeEvent.contentOffset.x /
+                            Dimensions.get("window").width
+                        );
+                        setActiveImageIndex(newIndex);
+                      }}
+                    >
+                      {property.images.map((image, index) => (
+                        <Image
+                          key={index}
+                          source={{ uri: image }}
+                          className="w-screen h-72"
+                          resizeMode="cover"
+                        />
+                      ))}
+                    </ScrollView>
+                    {/* Image counter */}
+                    <View className="absolute bottom-4 right-4 bg-black/60 px-2 py-1 rounded-full">
+                      <Text className="text-white text-xs">
+                        {activeImageIndex + 1}/{property.images.length}
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <View className="w-full h-72 bg-gray-200 dark:bg-gray-700 items-center justify-center">
+                    <Ionicons name="image-outline" size={48} color="#9CA3AF" />
+                  </View>
+                )}
               </View>
-            ) : (
-              <TouchableOpacity
-                onPress={() => setShowPaymentOptions(true)}
-                className="bg-blue-600 rounded-xl py-4 px-6"
-              >
-                <Text className="text-white text-center font-semibold text-base">
-                  {property?.property_use === "rent"
-                    ? "Rent Property"
-                    : "Buy Property"}
-                </Text>
-              </TouchableOpacity>
-            )}
+
+              {/* Content */}
+              <View className="p-6">
+                {/* Title and Price Row */}
+                <View className="flex-row justify-between items-start mb-4">
+                  <View className="flex-1">
+                    <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                      {property.title}
+                    </Text>
+                    <Text className="text-xl font-bold text-[#FF8E01]">
+                      ETB {property.price?.toLocaleString()}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={onFavourite}
+                    className="bg-gray-100 dark:bg-gray-800 p-3 rounded-full"
+                  >
+                    <Ionicons
+                      name={favouriteOn ? "heart" : "heart-outline"}
+                      size={24}
+                      color={favouriteOn ? "#EF4444" : "#6B7280"}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Location */}
+                {locationString && (
+                  <View className="flex-row items-start mb-4">
+                    <Ionicons
+                      name="location-outline"
+                      size={20}
+                      color="#6B7280"
+                    />
+                    <Text className="text-gray-600 dark:text-gray-300 ml-2 flex-1">
+                      {locationString}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Property Details */}
+                {(property.propertyType?.name ||
+                  property.status ||
+                  Object.keys(validTypeSpecificFields).length > 0) && (
+                  <View className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                      Property Details
+                    </Text>
+                    <View className="flex-row flex-wrap">
+                      {property.propertyType?.name && (
+                        <View className="w-1/2 mb-3">
+                          <Text className="text-gray-500 dark:text-gray-400">
+                            Type
+                          </Text>
+                          <Text className="text-gray-800 dark:text-white font-medium">
+                            {property.propertyType.name}
+                          </Text>
+                        </View>
+                      )}
+                      {property.status && (
+                        <View className="w-1/2 mb-3">
+                          <Text className="text-gray-500 dark:text-gray-400">
+                            Status
+                          </Text>
+                          <Text className="text-gray-800 dark:text-white font-medium capitalize">
+                            {property.status}
+                          </Text>
+                        </View>
+                      )}
+                      {Object.entries(validTypeSpecificFields).map(
+                        ([key, value]) => (
+                          <View key={key} className="w-1/2 mb-3">
+                            <Text className="text-gray-500 dark:text-gray-400 capitalize">
+                              {key.replace(/([A-Z])/g, " $1").trim()}
+                            </Text>
+                            <Text className="text-gray-800 dark:text-white font-medium">
+                              {value} {key.includes("area") ? "m²" : ""}
+                            </Text>
+                          </View>
+                        )
+                      )}
+                    </View>
+                  </View>
+                )}
+
+                {/* Description */}
+                {property.description && (
+                  <View className="mb-6">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                      Description
+                    </Text>
+                    <Text className="text-gray-600 dark:text-gray-300">
+                      {property.description}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+
+            {/* Bottom Action Button */}
+            <View className="p-5 border-t border-gray-200 dark:border-gray-800">
+              {property?.property_use === "rent" ? (
+                // For Rental Properties - Show Contact Info
+                <View className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl">
+                  <Text
+                    className="text-gray-800 dark:text-white font-semibold mb-2"
+                    onPress={() => console.log(property.owner)}
+                  >
+                    Contact Owner
+                  </Text>
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center">
+                      <Ionicons name="call-outline" size={20} color="#6B7280" />
+                      <Text className="text-gray-600 dark:text-gray-300 ml-2">
+                        {property?.owner?.phone || "Phone not available"}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        Linking.openURL(`tel:${property?.owner?.phone}`)
+                      }
+                      className="bg-[#FF8E01] px-4 py-2 rounded-lg"
+                    >
+                      <Text className="text-white font-medium">Call Now</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : // For Sale Properties - Show Payment Options
+              showPaymentOptions ? (
+                <View>
+                  <PaymentMethodSelector
+                    paymentMethod={paymentMethod}
+                    setPaymentMethod={setPaymentMethod}
+                  />
+                  <TouchableOpacity
+                    onPress={onBuy}
+                    disabled={isPurchasing}
+                    className={`${
+                      isPurchasing ? "bg-gray-400" : "bg-[#FF8E01]"
+                    } rounded-xl py-4 px-6`}
+                  >
+                    {isPurchasing ? (
+                      <ActivityIndicator color="white" />
+                    ) : (
+                      <Text className="text-white text-center font-semibold text-base">
+                        Confirm Purchase
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => setShowPaymentOptions(true)}
+                  className="bg-[#FF8E01] rounded-xl py-4 px-6"
+                >
+                  <Text className="text-white text-center font-semibold text-base">
+                    Buy Property
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
       </Modal>
@@ -316,6 +614,9 @@ const Home = () => {
     dispatch(getPropertiesByUse("sell"));
     dispatch(getPropertiesByUse("rent"));
     dispatch(getAllViews());
+    dispatch(getAllRegions());
+    dispatch(getAllSubRegions());
+    dispatch(getAllLocations());
   }, []);
 
   const { propertiesByUse, views, isSuccess } = useSelector(
@@ -707,161 +1008,20 @@ const Home = () => {
       </ScrollView>
 
       {/* Property Detail Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
+      <PropertyModal
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View className="flex-1 bg-white dark:bg-gray-900">
-          {/* Modal Header */}
-          <View className="relative bg-white dark:bg-gray-900 pt-12 pb-4 px-5">
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              className="absolute left-5 top-12 z-10 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
-            >
-              <Ionicons name="close" size={24} color="#6B7280" />
-            </TouchableOpacity>
-            <Text className="text-center text-xl font-bold text-gray-800 dark:text-white">
-              Property Details
-            </Text>
-          </View>
-
-          {selectedProperty && (
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              {/* Property Image */}
-              <View className="relative">
-                <Image
-                  source={{ uri: selectedProperty.image }}
-                  className="w-screen h-72"
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  onPress={handleFavourite}
-                  className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
-                >
-                  <Ionicons
-                    name={favouriteOn ? "heart" : "heart-outline"}
-                    size={24}
-                    color={favouriteOn ? "#EF4444" : "#6B7280"}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {/* Content */}
-              <View className="p-5">
-                {/* Price and Schedule Visit */}
-                <View className="flex-row justify-between items-center mb-4">
-                  <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    ${selectedProperty.price}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={handleScheduleVisit}
-                    disabled={isSchedulingVisit}
-                    className="flex-row items-center bg-green-500 px-4 py-2 rounded-full"
-                  >
-                    {isSchedulingVisit ? (
-                      <ActivityIndicator color="white" size="small" />
-                    ) : (
-                      <>
-                        <Ionicons
-                          name="calendar-outline"
-                          size={20}
-                          color="white"
-                        />
-                        <Text className="text-white font-semibold ml-2">
-                          Schedule Visit
-                        </Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                </View>
-
-                {/* Property Name */}
-                <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                  {selectedProperty.name}
-                </Text>
-
-                {/* Location */}
-                <View className="flex-row items-center mb-4">
-                  <Ionicons name="location" size={20} color="#6B7280" />
-                  <Text className="text-gray-600 dark:text-gray-300 ml-2 text-base">
-                    {selectedProperty.location}
-                  </Text>
-                </View>
-
-                {/* Property Features */}
-                <View className="flex-row justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4">
-                  <View className="items-center">
-                    <Ionicons name="bed-outline" size={24} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                      {selectedProperty.bedrooms || "3"} Beds
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Ionicons name="water-outline" size={24} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                      {selectedProperty.bathrooms || "2"} Baths
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Ionicons name="square-outline" size={24} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                      {selectedProperty.area || "1,200"} sqft
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Description */}
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                  Description
-                </Text>
-                <Text className="text-gray-600 dark:text-gray-300 mb-4">
-                  {selectedProperty.description || "No description available"}
-                </Text>
-              </View>
-            </ScrollView>
-          )}
-
-          {/* Bottom Action Button */}
-          <View className="p-5 border-t border-gray-200 dark:border-gray-800">
-            {showPaymentOptions ? (
-              <View>
-                <PaymentMethodSelector />
-                <TouchableOpacity
-                  onPress={handleBuyProperty}
-                  disabled={isPurchasing}
-                  className={`${
-                    isPurchasing ? "bg-gray-400" : "bg-[#FF8E01]"
-                  } rounded-xl py-4 px-6`}
-                >
-                  {isPurchasing ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text className="text-white text-center font-semibold text-base">
-                      Confirm{" "}
-                      {selectedProperty?.property_use === "rent"
-                        ? "Rental"
-                        : "Purchase"}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                onPress={() => setShowPaymentOptions(true)}
-                className="bg-[#FF8E01] rounded-xl py-4 px-6"
-              >
-                <Text className="text-white text-center font-semibold text-base">
-                  {selectedProperty?.property_use === "rent"
-                    ? "Rent Property"
-                    : "Buy Property"}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </Modal>
+        onClose={handleModalClose}
+        property={selectedProperty}
+        favouriteOn={favouriteOn}
+        onFavourite={handleFavourite}
+        onBuy={handleBuyProperty}
+        onScheduleVisit={handleScheduleVisit}
+        isPurchasing={isPurchasing}
+        showPaymentOptions={showPaymentOptions}
+        setShowPaymentOptions={setShowPaymentOptions}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+      />
     </View>
   );
 };

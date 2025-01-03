@@ -4,11 +4,15 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState, useCallback } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import { createProperty } from "../store/property/propertySlice";
+import {
+  createProperty,
+  updateProperty,
+} from "../store/property/propertySlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -67,24 +71,69 @@ const PaymentPost = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Parse the propertyData and check if it's an edit operation
+  const propertyData = params.propertyData
+    ? JSON.parse(params.propertyData)
+    : null;
+  const isEdit = params.isEdit === "true";
+
   const handlePayment = useCallback(async () => {
     if (!paymentMethod) {
       alert("Please select a payment method");
       return;
     }
 
+    if (!propertyData) {
+      alert("Property data is missing");
+      return;
+    }
+
     setIsProcessing(true);
     try {
-      // Create the property after payment
-      await dispatch(createProperty(JSON.parse(params.propertyData))).unwrap();
-      alert("Property listed successfully!");
-      router.push("/seller_tabs");
+      if (isEdit) {
+        // Update existing property
+        await dispatch(updateProperty(propertyData)).unwrap();
+        Alert.alert("Success", "Property updated successfully!", [
+          {
+            text: "OK",
+            onPress: () => router.push("/seller_tabs/listing"),
+          },
+        ]);
+      } else {
+        // Create new property
+        await dispatch(createProperty(propertyData)).unwrap();
+        Alert.alert("Success", "Property listed successfully!", [
+          {
+            text: "OK",
+            onPress: () => router.push("/seller_tabs/listing"),
+          },
+        ]);
+      }
     } catch (error) {
-      alert(error.message || "Failed to process payment");
+      Alert.alert("Error", error.message || "Failed to process payment");
     } finally {
       setIsProcessing(false);
     }
-  }, [paymentMethod, params.propertyData, dispatch]);
+  }, [paymentMethod, propertyData, isEdit, dispatch]);
+
+  // Show error if no property data
+  if (!propertyData) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900">
+        <View className="flex-1 justify-center items-center p-6">
+          <Text className="text-red-500 text-lg text-center">
+            Error: Property data is missing
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="mt-4 bg-[#FF8E01] px-6 py-3 rounded-xl"
+          >
+            <Text className="text-white font-medium">Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900">
@@ -96,7 +145,7 @@ const PaymentPost = () => {
               <Ionicons name="arrow-back" size={24} color="#6B7280" />
             </TouchableOpacity>
             <Text className="text-xl font-bold text-gray-800 dark:text-white">
-              Payment for Listing
+              Payment for {isEdit ? "Updating" : "Listing"}
             </Text>
           </View>
         </View>
@@ -108,10 +157,10 @@ const PaymentPost = () => {
               Amount to Pay
             </Text>
             <Text className="text-3xl font-bold text-gray-800 dark:text-white">
-              ETB 100.00
+              ETB {isEdit ? "50.00" : "100.00"}
             </Text>
             <Text className="text-gray-500 dark:text-gray-400 mt-2">
-              Rental listing fee
+              {isEdit ? "Property update fee" : "Rental listing fee"}
             </Text>
           </View>
 

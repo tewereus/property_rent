@@ -1,9 +1,63 @@
 import { View, Image, TouchableOpacity, ScrollView } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import FormField from "./FormField";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Text } from "react-native";
+
+const BooleanToggle = memo(({ title, value, onChange }) => {
+  return (
+    <View className="mb-6">
+      <Text className="text-gray-700 dark:text-gray-200 text-lg font-semibold mb-2">
+        {title}
+      </Text>
+      <View className="flex-row">
+        <TouchableOpacity
+          onPress={() => onChange(true)}
+          className={`flex-1 mr-2 p-4 rounded-xl flex-row items-center justify-center ${
+            value === true ? "bg-[#FF8E01]" : "bg-gray-100 dark:bg-gray-800"
+          }`}
+        >
+          <Ionicons
+            name="checkmark-circle"
+            size={20}
+            color={value === true ? "#FFFFFF" : "#6B7280"}
+            style={{ marginRight: 8 }}
+          />
+          <Text
+            className={`font-medium ${
+              value === true ? "text-white" : "text-gray-600 dark:text-gray-400"
+            }`}
+          >
+            Yes
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onChange(false)}
+          className={`flex-1 ml-2 p-4 rounded-xl flex-row items-center justify-center ${
+            value === false ? "bg-[#FF8E01]" : "bg-gray-100 dark:bg-gray-800"
+          }`}
+        >
+          <Ionicons
+            name="close-circle"
+            size={20}
+            color={value === false ? "#FFFFFF" : "#6B7280"}
+            style={{ marginRight: 8 }}
+          />
+          <Text
+            className={`font-medium ${
+              value === false
+                ? "text-white"
+                : "text-gray-600 dark:text-gray-400"
+            }`}
+          >
+            No
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+});
 
 const PropertyForm = ({ formData, setFormData, propertyType }) => {
   const pickImage = async () => {
@@ -46,10 +100,35 @@ const PropertyForm = ({ formData, setFormData, propertyType }) => {
   const renderField = (field) => {
     const value = formData.typeSpecificFields?.[field.name] || "";
 
+    if (field.type === "Boolean") {
+      return (
+        <BooleanToggle
+          key={field.name}
+          title={
+            field.name.charAt(0).toUpperCase() +
+            field.name.slice(1).replace(/([A-Z])/g, " $1")
+          }
+          value={value}
+          onChange={(newValue) => {
+            setFormData({
+              ...formData,
+              typeSpecificFields: {
+                ...formData.typeSpecificFields,
+                [field.name]: newValue,
+              },
+            });
+          }}
+        />
+      );
+    }
+
     return (
       <FormField
         key={field.name}
-        title={field.name.charAt(0).toUpperCase() + field.name.slice(1)}
+        title={
+          field.name.charAt(0).toUpperCase() +
+          field.name.slice(1).replace(/([A-Z])/g, " $1")
+        }
         value={value.toString()}
         placeholder={`Enter ${field.name}`}
         handleChangeText={(e) => {
@@ -57,9 +136,6 @@ const PropertyForm = ({ formData, setFormData, propertyType }) => {
           switch (field.type) {
             case "Number":
               parsedValue = parseInt(e);
-              break;
-            case "Boolean":
-              parsedValue = e === "true";
               break;
             case "Date":
               parsedValue = new Date(e);
@@ -75,7 +151,6 @@ const PropertyForm = ({ formData, setFormData, propertyType }) => {
             },
           });
         }}
-        otherStyles="mt-6"
         keyboardType={field.type === "Number" ? "numeric" : "default"}
       />
     );

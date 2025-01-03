@@ -49,13 +49,14 @@ const Dashboard = () => {
     dispatch(getUserProperties());
   }, []);
 
-  const { totalProperties, userProperties } = useSelector(
-    (state) => state.property
-  );
+  const { userProperties } = useSelector((state) => state.property);
   return (
     <ScrollView className="bg-slate-300 dark:bg-[#09092B] flex-1">
       <View className="p-5">
-        <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+        <Text
+          className="text-2xl font-bold text-gray-800 dark:text-white mb-6"
+          onPress={() => console.log(userProperties)}
+        >
           Dashboard
         </Text>
 
@@ -101,29 +102,34 @@ const Dashboard = () => {
         <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full bg-blue-500 mr-2" />
-              <Text className="text-gray-600 dark:text-gray-300">For Rent</Text>
+              <View className="w-3 h-3 rounded-full bg-green-500 mr-2" />
+              <Text className="text-gray-600 dark:text-gray-300">Active</Text>
             </View>
             <Text className="text-gray-800 dark:text-white font-semibold">
-              {dashboardData.propertyStats.forRent}
+              {userProperties?.properties?.filter(
+                (p) => p.status === "available"
+              ).length || 0}
             </Text>
           </View>
           <View className="flex-row justify-between items-center mb-4">
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full bg-green-500 mr-2" />
-              <Text className="text-gray-600 dark:text-gray-300">For Sale</Text>
-            </View>
-            <Text className="text-gray-800 dark:text-white font-semibold">
-              {dashboardData.propertyStats.forSale}
-            </Text>
-          </View>
-          <View className="flex-row justify-between items-center">
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full bg-yellow-500 mr-2" />
               <Text className="text-gray-600 dark:text-gray-300">Pending</Text>
             </View>
             <Text className="text-gray-800 dark:text-white font-semibold">
-              {dashboardData.propertyStats.pendingApproval}
+              {userProperties?.properties?.filter((p) => p.status === "pending")
+                .length || 0}
+            </Text>
+          </View>
+          <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center">
+              <View className="w-3 h-3 rounded-full bg-red-500 mr-2" />
+              <Text className="text-gray-600 dark:text-gray-300">Rejected</Text>
+            </View>
+            <Text className="text-gray-800 dark:text-white font-semibold">
+              {userProperties?.properties?.filter(
+                (p) => p.status === "rejected"
+              ).length || 0}
             </Text>
           </View>
         </View>

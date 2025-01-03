@@ -134,14 +134,29 @@ const CreateProperty = () => {
       property_use: action,
     };
 
-    console.log(data);
+    const propertyData = {
+      title: formData.title,
+      description: formData.description,
+      price: formData.price,
+      propertyType: formData.propertyType,
+      property_use: formData.property_use,
+      region: formData.region,
+      subregion: formData.subregion,
+      location: formData.location,
+      typeSpecificFields: formData.typeSpecificFields,
+      images: formData.images,
+    };
 
     if (action === "rent") {
       router.push({
         pathname: "/payment_post",
-        params: { propertyData: JSON.stringify(data) },
+        params: {
+          propertyData: JSON.stringify(propertyData),
+          isEdit: "false",
+        },
       });
     } else {
+      // For sale properties, create directly
       dispatch(createProperty(data));
     }
   };

@@ -94,9 +94,18 @@ const EditProperty = () => {
       return;
     }
 
-    const data = {
-      ...formData,
+    const propertyData = {
       _id: property._id,
+      title: formData.title,
+      description: formData.description,
+      price: formData.price,
+      propertyType: formData.propertyType,
+      property_use: formData.property_use,
+      region: formData.region,
+      subregion: formData.subregion,
+      location: formData.location,
+      typeSpecificFields: formData.typeSpecificFields,
+      images: formData.images,
     };
 
     // Check if changing to rent
@@ -104,12 +113,12 @@ const EditProperty = () => {
       router.push({
         pathname: "/payment_post",
         params: {
-          propertyData: JSON.stringify(data),
+          propertyData: JSON.stringify(propertyData),
           isEdit: true,
         },
       });
     } else {
-      dispatch(updateProperty(data))
+      dispatch(updateProperty(propertyData))
         .unwrap()
         .then(() => {
           Alert.alert("Success", "Property updated successfully", [

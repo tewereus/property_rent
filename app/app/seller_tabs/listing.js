@@ -20,6 +20,74 @@ import { getIconForField, getUnitForField } from "../../assets/utils";
 
 const cardHeight = 160;
 
+const StatusFilter = memo(
+  ({ activeFilter, onFilterChange, userProperties }) => {
+    const filters = [
+      {
+        id: "available",
+        label: "Active",
+        icon: "checkmark-circle-outline",
+        color: "bg-green-500",
+      },
+      {
+        id: "pending",
+        label: "Pending",
+        icon: "time-outline",
+        color: "bg-yellow-500",
+      },
+      {
+        id: "rejected",
+        label: "Rejected",
+        icon: "close-circle-outline",
+        color: "bg-red-500",
+      },
+    ];
+
+    return (
+      <View className="flex-row justify-between px-4 mb-4">
+        {filters.map((filter) => (
+          <TouchableOpacity
+            key={filter.id}
+            onPress={() => onFilterChange(filter.id)}
+            className={`flex-1 mx-1 px-3 py-3 rounded-full flex-row items-center justify-center ${
+              activeFilter === filter.id
+                ? "bg-[#FF8E01] border-orange-400"
+                : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+            } border`}
+            style={{
+              transform: [{ scale: activeFilter === filter.id ? 1.05 : 1 }],
+            }}
+          >
+            <Ionicons
+              name={filter.icon}
+              size={18}
+              color={activeFilter === filter.id ? "#FFFFFF" : "#6B7280"}
+              style={{ marginRight: 6 }}
+            />
+            <Text
+              className={`${
+                activeFilter === filter.id
+                  ? "text-white font-medium"
+                  : "text-gray-700 dark:text-gray-300"
+              }`}
+            >
+              {filter.label}
+              <Text className="text-sm opacity-70">
+                {" "}
+                (
+                {userProperties?.properties?.filter(
+                  (p) => p.status === filter.id
+                ).length || 0}
+                )
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  }
+);
+
 const PropertyCard = memo(({ item, onPress, handleBoost }) => (
   <TouchableOpacity className="mb-4 mx-4" onPress={() => onPress(item)}>
     <View
@@ -116,6 +184,7 @@ const Listing = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const router = useRouter();
+  const [statusFilter, setStatusFilter] = useState("available");
 
   useEffect(() => {
     dispatch(getUserProperties());
@@ -149,6 +218,11 @@ const Listing = () => {
     [handlePropertyPress]
   );
 
+  const filteredProperties =
+    userProperties?.properties?.filter((property) =>
+      statusFilter === "all" ? true : property.status === statusFilter
+    ) || [];
+
   return (
     <View className="flex-1 bg-gray-100 dark:bg-[#09092B]">
       <View className="px-5 pt-8 pb-4">
@@ -163,9 +237,15 @@ const Listing = () => {
         </Text>
       </View>
 
+      <StatusFilter
+        activeFilter={statusFilter}
+        onFilterChange={setStatusFilter}
+        userProperties={userProperties}
+      />
+
       {userProperties?.properties?.length > 0 ? (
         <FlatList
-          data={userProperties?.properties}
+          data={filteredProperties}
           keyExtractor={(item) => item._id}
           renderItem={renderProperties}
           contentContainerStyle={{ paddingVertical: 10 }}
@@ -279,9 +359,7 @@ const Listing = () => {
                               {key.replace(/([A-Z])/g, " $1").trim()}
                             </Text>
                             <Text className="text-gray-800 dark:text-gray-200 font-semibold">
-                              {value.toString() === "true"
-                                ? ""
-                                : value.toString()}
+                              {value.toString()}
                               {getUnitForField(key)}
                             </Text>
                           </View>

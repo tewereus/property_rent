@@ -72,6 +72,7 @@ const createProperty = asyncHandler(async (req, res) => {
       property_use: fields.property_use[0],
       images: imageUrls,
       owner: id,
+      status: "pending",
       typeSpecificFields,
     };
 
@@ -355,9 +356,13 @@ const getPropertiesByType = asyncHandler(async (req, res) => {
 const getPropertiesByUse = asyncHandler(async (req, res) => {
   const { use } = req.params; // 'sell' or 'rent'
   try {
-    const properties = await Property.find({ property_use: use })
+    const properties = await Property.find({
+      property_use: use,
+      status: "available",
+    })
       .populate("propertyType")
-      .populate("owner", "firstname lastname");
+      .populate("owner")
+      .populate("address.region address.subregion address.location");
     res.json(properties);
   } catch (error) {
     throw new Error(error);
