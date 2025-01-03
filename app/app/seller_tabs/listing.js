@@ -16,30 +16,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import { getIconForField, getUnitForField } from "../../assets/utils";
 
 const cardHeight = 160;
-
-const getIconForField = (fieldName) => {
-  const icons = {
-    bedrooms: "bed-outline",
-    bathrooms: "water-outline",
-    totalArea: "square-outline",
-    floors: "layers-outline",
-    parkingSpaces: "car-outline",
-    clearHeight: "resize-outline",
-    yearBuilt: "calendar-outline",
-  };
-  return icons[fieldName] || "information-circle-outline";
-};
-
-const getUnitForField = (fieldName) => {
-  const units = {
-    totalArea: " sqft",
-    clearHeight: " ft",
-    parkingSpaces: " spaces",
-  };
-  return units[fieldName] || "";
-};
 
 const PropertyCard = memo(({ item, onPress, handleBoost }) => (
   <TouchableOpacity className="mb-4 mx-4" onPress={() => onPress(item)}>
