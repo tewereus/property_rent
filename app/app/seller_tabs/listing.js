@@ -19,7 +19,28 @@ import { useRouter } from "expo-router";
 
 const cardHeight = 160;
 
-// Memoize the PropertyCard component
+const getIconForField = (fieldName) => {
+  const icons = {
+    bedrooms: "bed-outline",
+    bathrooms: "water-outline",
+    totalArea: "square-outline",
+    floors: "layers-outline",
+    parkingSpaces: "car-outline",
+    clearHeight: "resize-outline",
+    yearBuilt: "calendar-outline",
+  };
+  return icons[fieldName] || "information-circle-outline";
+};
+
+const getUnitForField = (fieldName) => {
+  const units = {
+    totalArea: " sqft",
+    clearHeight: " ft",
+    parkingSpaces: " spaces",
+  };
+  return units[fieldName] || "";
+};
+
 const PropertyCard = memo(({ item, onPress, handleBoost }) => (
   <TouchableOpacity className="mb-4 mx-4" onPress={() => onPress(item)}>
     <View
@@ -27,15 +48,29 @@ const PropertyCard = memo(({ item, onPress, handleBoost }) => (
       style={{ height: cardHeight }}
     >
       <View className="relative" style={{ width: cardHeight }}>
-        <Image
-          source={{ uri: item.image }}
-          style={{
-            width: cardHeight - 24,
-            height: cardHeight - 24,
-            margin: 10,
-          }}
-          resizeMode="cover"
-        />
+        {item.images && item.images.length > 0 ? (
+          <Image
+            source={{ uri: item.images[0] }}
+            style={{
+              width: cardHeight - 24,
+              height: cardHeight - 24,
+              margin: 10,
+            }}
+            resizeMode="cover"
+            className="rounded-xl"
+          />
+        ) : (
+          <View
+            style={{
+              width: cardHeight - 24,
+              height: cardHeight - 24,
+              margin: 10,
+            }}
+            className="bg-gray-200 dark:bg-gray-700 rounded-xl items-center justify-center"
+          >
+            <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+          </View>
+        )}
         <View className="absolute top-2 right-2 bg-green-500/90 dark:bg-green-600/90 px-2 py-1 rounded-full">
           <Text className="text-white text-xs font-medium">
             {item.property_use === "rent" ? "For Rent" : "For Sale"}
@@ -47,11 +82,13 @@ const PropertyCard = memo(({ item, onPress, handleBoost }) => (
         <View>
           <View className="flex-row justify-between items-center mb-2">
             <Text className="text-blue-600 dark:text-blue-400 font-bold text-lg">
-              ${item.price || "0"}
+              ${item.price?.toLocaleString() || "0"}
             </Text>
-            <View className="bg-blue-500 dark:bg-blue-900 px-2 py-1 rounded-full">
+            <View className="bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">
               <TouchableOpacity onPress={() => handleBoost(item)}>
-                <Text className="text-white px-2">Boost</Text>
+                <Text className="text-blue-600 dark:text-blue-400 text-xs font-medium">
+                  {item.isFeatured ? "Featured" : "Boost"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -63,21 +100,32 @@ const PropertyCard = memo(({ item, onPress, handleBoost }) => (
             {item.title}
           </Text>
 
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="location-sharp" size={14} color="#6B7280" />
-            <Text
-              className="text-gray-500 dark:text-gray-400 ml-1 text-sm"
-              numberOfLines={1}
-            >
-              {item.location}
-            </Text>
-          </View>
+          {item.address && (
+            <View className="space-y-1 mb-2">
+              <View className="flex-row items-center">
+                <Ionicons name="location-sharp" size={14} color="#6B7280" />
+                <Text
+                  className="text-gray-500 dark:text-gray-400 ml-1 text-sm"
+                  numberOfLines={1}
+                >
+                  {item?.address?.subregion?.subregion_name || " "},{" "}
+                  {item?.address?.location?.location || " "}
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
 
         <View className="flex-row justify-between items-center mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-          <Text className="text-gray-500 dark:text-gray-400 text-sm">
+          <Text className="text-gray-500 dark:text-gray-400 text-xs">
             Posted {new Date(item.createdAt).toLocaleDateString()}
           </Text>
+          <View className="flex-row items-center">
+            <Ionicons name="eye-outline" size={14} color="#6B7280" />
+            <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">
+              {item.views?.count || 0}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -125,7 +173,10 @@ const Listing = () => {
   return (
     <View className="flex-1 bg-gray-100 dark:bg-[#09092B]">
       <View className="px-5 pt-8 pb-4">
-        <Text className="text-3xl font-bold text-gray-800 dark:text-white">
+        <Text
+          className="text-3xl font-bold text-gray-800 dark:text-white"
+          onPress={() => console.log(userProperties?.properties)}
+        >
           My Listings
         </Text>
         <Text className="text-gray-500 dark:text-gray-400 mt-1 text-base">
@@ -179,20 +230,27 @@ const Listing = () => {
                 className="flex-1"
                 showsVerticalScrollIndicator={false}
               >
-                <Image
-                  source={{ uri: selectedProperty.image }}
-                  className="w-screen h-72"
-                  resizeMode="cover"
-                />
+                {selectedProperty.images &&
+                selectedProperty.images.length > 0 ? (
+                  <Image
+                    source={{ uri: selectedProperty.images[0] }}
+                    className="w-screen h-72"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View className="w-screen h-72 bg-gray-200 dark:bg-gray-700 items-center justify-center">
+                    <Ionicons name="image-outline" size={48} color="#9CA3AF" />
+                  </View>
+                )}
 
                 <View className="p-5">
                   <View className="flex-row justify-between items-center mb-4">
                     <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      ${selectedProperty.price}
+                      ${selectedProperty.price?.toLocaleString()}
                     </Text>
                     <View className="bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-full">
                       <Text className="text-blue-600 dark:text-blue-400 font-medium">
-                        {selectedProperty.propertyType}
+                        {selectedProperty.propertyType?.name || "Property"}
                       </Text>
                     </View>
                   </View>
@@ -201,41 +259,57 @@ const Listing = () => {
                     {selectedProperty.title}
                   </Text>
 
-                  <View className="flex-row items-center mb-4">
-                    <Ionicons name="location" size={20} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 ml-2 text-base">
-                      {selectedProperty.location}
-                    </Text>
-                  </View>
+                  {selectedProperty.address && (
+                    <View className="flex-row items-center mb-4">
+                      <Ionicons name="location" size={20} color="#6B7280" />
+                      <Text className="text-gray-600 dark:text-gray-300 ml-2 text-base">
+                        {selectedProperty.address.subregion?.subregion_name ||
+                          ""}
+                        , {selectedProperty.address.location?.location || ""}
+                      </Text>
+                    </View>
+                  )}
 
-                  <View className="flex-row justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4">
-                    <View className="items-center">
-                      <Ionicons name="bed-outline" size={24} color="#6B7280" />
-                      <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                        {selectedProperty.bedrooms || "3"} Beds
+                  {selectedProperty.typeSpecificFields && (
+                    <View className="mb-4">
+                      <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                        Property Details
                       </Text>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        className="flex-row"
+                      >
+                        {Object.entries(
+                          selectedProperty.typeSpecificFields
+                        ).map(([key, value], index) => (
+                          <View
+                            key={key}
+                            className={`bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mr-3 min-w-[120px] items-center ${
+                              index === 0 ? "ml-0" : ""
+                            }`}
+                          >
+                            <View className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mb-2">
+                              <Ionicons
+                                name={getIconForField(key)}
+                                size={20}
+                                color="#3B82F6"
+                              />
+                            </View>
+                            <Text className="text-gray-500 dark:text-gray-400 text-sm capitalize mb-1">
+                              {key.replace(/([A-Z])/g, " $1").trim()}
+                            </Text>
+                            <Text className="text-gray-800 dark:text-gray-200 font-semibold">
+                              {value.toString() === "true"
+                                ? ""
+                                : value.toString()}
+                              {getUnitForField(key)}
+                            </Text>
+                          </View>
+                        ))}
+                      </ScrollView>
                     </View>
-                    <View className="items-center">
-                      <Ionicons
-                        name="water-outline"
-                        size={24}
-                        color="#6B7280"
-                      />
-                      <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                        {selectedProperty.bathrooms || "2"} Baths
-                      </Text>
-                    </View>
-                    <View className="items-center">
-                      <Ionicons
-                        name="square-outline"
-                        size={24}
-                        color="#6B7280"
-                      />
-                      <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                        {selectedProperty.area || "1,200"} sqft
-                      </Text>
-                    </View>
-                  </View>
+                  )}
 
                   <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
                     Description

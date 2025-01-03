@@ -141,32 +141,54 @@ const updateProperty = async (propertyData) => {
   const userData = await AsyncStorage.getItem("user");
   const getTokenFromLocalStorage = userData ? JSON.parse(userData) : null;
 
+  // console.log("Sending property data:", propertyData);
+
   const formData = new FormData();
 
-  // Append new images if they exist
+  // Handle address object
+  if (propertyData.region || propertyData.subregion || propertyData.location) {
+    const address = {
+      region: propertyData.region,
+      subregion: propertyData.subregion,
+      location: propertyData.location,
+    };
+    formData.append("address", JSON.stringify(address));
+  }
+
+  // Handle images
   if (propertyData.images && propertyData.images.length > 0) {
     propertyData.images.forEach((image, index) => {
       if (image.uri) {
-        // Only append if it's a new image
+        // New image
         formData.append("images", {
           uri: image.uri,
           type: "image/jpeg",
           name: image.fileName || `image${index}.jpg`,
         });
+      } else {
+        // Existing image URL
+        formData.append("existingImages", image);
       }
     });
   }
 
   // Append other fields
-  Object.keys(propertyData).forEach((key) => {
-    if (key !== "images") {
-      if (key === "typeSpecificFields") {
-        formData.append(key, JSON.stringify(propertyData[key]));
-      } else {
-        formData.append(key, propertyData[key]);
-      }
+  const fieldsToAppend = {
+    title: propertyData.title,
+    description: propertyData.description,
+    price: propertyData.price,
+    propertyType: propertyData.propertyType,
+    property_use: propertyData.property_use,
+    typeSpecificFields: JSON.stringify(propertyData.typeSpecificFields),
+  };
+
+  Object.entries(fieldsToAppend).forEach(([key, value]) => {
+    if (value !== undefined) {
+      formData.append(key, value);
     }
   });
+
+  console.log(formData);
 
   const response = await axios.put(
     `${baseUrl}/property/update/${propertyData._id}`,

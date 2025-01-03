@@ -29,17 +29,19 @@ const EditProperty = () => {
   const property = JSON.parse(params.property);
 
   const [formData, setFormData] = useState({
-    title: property?.title,
-    location: property?.location,
-    price: property?.price.toString(),
-    description: property?.description,
-    region: property?.address?.region,
-    subregion: property?.address?.subregion,
-    location: property?.address?.location,
-    images: property?.images,
-    typeSpecificFields: property?.typeSpecificFields || {},
-    property_use: property?.property_use,
-    propertyType: property?.propertyType,
+    _id: property._id,
+    title: property.title || "",
+    description: property.description || "",
+    price: property.price?.toString() || "0",
+    propertyType: property.propertyType?._id || "",
+    property_use: property.property_use || "",
+    region: property.address?.region?._id || property.address?.region || "",
+    subregion:
+      property.address?.subregion?._id || property.address?.subregion || "",
+    location:
+      property.address?.location?._id || property.address?.location || "",
+    images: property.images || [],
+    typeSpecificFields: property.typeSpecificFields || {},
   });
 
   const { propertyTypes } = useSelector((state) => state.propertyType);
@@ -60,7 +62,7 @@ const EditProperty = () => {
   useEffect(() => {
     if (formData.region) {
       const filtered = subregions?.filter(
-        (subregion) => subregion.region === formData.region
+        (subregion) => subregion?.region_id?._id === formData.region
       );
       setFilteredSubRegions(filtered);
     }
@@ -69,7 +71,7 @@ const EditProperty = () => {
   useEffect(() => {
     if (formData.subregion) {
       const filtered = locations?.filter(
-        (location) => location.subregion === formData.subregion
+        (location) => location?.subregion_id?._id === formData.subregion
       );
       setFilteredLocations(filtered);
     }
@@ -217,7 +219,7 @@ const EditProperty = () => {
   );
 
   const DynamicFields = () => {
-    const selectedType = propertyTypes.find(
+    const selectedType = propertyTypes?.find(
       (type) => type._id === formData.propertyType
     );
     if (!selectedType?.fields) return null;
@@ -229,7 +231,7 @@ const EditProperty = () => {
         case "Boolean":
           return (
             <View className="flex-row space-x-4">
-              {["true", "false"].map((option) => (
+              {["true", "false"]?.map((option) => (
                 <TouchableOpacity
                   key={option}
                   onPress={() =>
@@ -307,7 +309,7 @@ const EditProperty = () => {
         <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
           Property Details
         </Text>
-        {selectedType.fields.map((field) => (
+        {selectedType?.fields?.map((field) => (
           <View key={field.name} className="mb-4">
             <View className="flex-row items-center mb-2">
               <Text className="text-gray-600 dark:text-gray-300 text-base">
@@ -347,7 +349,7 @@ const EditProperty = () => {
             {regions?.map((region) => (
               <Picker.Item
                 key={region._id}
-                label={region.region}
+                label={region.region_name}
                 value={region._id}
               />
             ))}
@@ -376,7 +378,7 @@ const EditProperty = () => {
             {filteredSubRegions?.map((subregion) => (
               <Picker.Item
                 key={subregion._id}
-                label={subregion.subregion}
+                label={subregion.subregion_name}
                 value={subregion._id}
               />
             ))}

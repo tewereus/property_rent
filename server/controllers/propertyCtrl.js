@@ -188,9 +188,18 @@ const getProperty = asyncHandler(async (req, res) => {
 
 const updateProperty = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { typeSpecificFields, ...updateData } = req.body;
+  const form = formidable({
+    multiples: true,
+    keepExtensions: true,
+    maxFileSize: 5 * 1024 * 1024, // 5MB limit per file
+  });
 
   try {
+    // Parse the form data using formidable
+    const [fields, files] = await form.parse(req);
+    console.log("Received fields:", fields);
+    console.log("Received files:", files);
+
     const property = await Property.findById(id);
     if (!property) {
       return res.status(404).json({
@@ -198,18 +207,61 @@ const updateProperty = asyncHandler(async (req, res) => {
       });
     }
 
-    // Update basic fields
-    Object.assign(property, updateData);
+    // Parse the form data
+    const updateData = {
+      title: fields.title?.[0],
+      description: fields.description?.[0],
+      price: fields.price?.[0],
+      propertyType: fields.propertyType?.[0],
+      property_use: fields.property_use?.[0],
+    };
 
-    // Update type-specific fields
-    if (typeSpecificFields) {
-      property.setTypeFields(typeSpecificFields);
+    // Handle address
+    if (fields.address?.[0]) {
+      updateData.address = JSON.parse(fields.address[0]);
     }
 
+    // Handle typeSpecificFields
+    if (fields.typeSpecificFields?.[0]) {
+      const typeFields = JSON.parse(fields.typeSpecificFields[0]);
+      property.typeSpecificFields = new Map(Object.entries(typeFields));
+    }
+
+    // Handle images
+    if (files.images) {
+      const newImages = [];
+      // Handle new uploaded images
+      const imageFiles = Array.isArray(files.images)
+        ? files.images
+        : [files.images];
+      for (const file of imageFiles) {
+        const result = await uploadToCloudinary(file.filepath);
+        newImages.push(result.secure_url);
+      }
+
+      // Combine with existing images
+      const existingImages = fields.existingImages || [];
+      updateData.images = [
+        ...(Array.isArray(existingImages) ? existingImages : [existingImages]),
+        ...newImages,
+      ];
+    }
+
+    // Update the property
+    Object.assign(property, updateData);
     await property.save();
-    res.json(property);
+
+    // Populate necessary fields before sending response
+    const updatedProperty = await Property.findById(id)
+      .populate("propertyType")
+      .populate("address.region")
+      .populate("address.subregion")
+      .populate("address.location");
+
+    res.json(updatedProperty);
   } catch (error) {
-    throw new Error(error);
+    console.error("Update error:", error);
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -233,7 +285,22 @@ const deleteProperty = asyncHandler(async (req, res) => {
 const getUserProperties = asyncHandler(async (req, res) => {
   const { id } = req.user;
   try {
-    const properties = await Property.find({ owner: id });
+    // const properties = await Property.find({ owner: id });
+    const properties = await Property.find({ owner: id })
+      .populate("propertyType")
+      .populate({
+        path: "address.region",
+        select: "region region_name",
+      })
+      .populate({
+        path: "address.subregion",
+        select: "subregion subregion_name",
+      })
+      .populate({
+        path: "address.location",
+        select: "location",
+      });
+
     const totalProperties = properties.length;
 
     // Calculate total views across all user properties

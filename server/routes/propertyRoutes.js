@@ -30,7 +30,7 @@ router.put("/change-featured/:prodId", changeFeatured);
 router.use(authMiddleware);
 router.post("/change-view", changeViewCount);
 router.post("/create-property", createProperty);
-router.put("/update-property", updateProperty);
+router.put("/update/:id", updateProperty);
 router.delete("/delete-property", deleteProperty);
 router.post("/buy-property", authMiddleware, buyProperty);
 
