@@ -16,7 +16,7 @@ import {
 } from "../store/property/propertySlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { paymentService } from "../store/payment/paymentSlice";
+import { initializePayment } from "../store/payment/paymentSlice";
 
 const PaymentMethodSelector = ({ selectedMethod, onSelect }) => {
   const methods = [
@@ -81,48 +81,74 @@ const PaymentPost = () => {
 
   const handlePayment = useCallback(async () => {
     if (!paymentMethod) {
-      alert("Please select a payment method");
+      Alert.alert("Error", "Please select a payment method");
       return;
     }
 
     if (!propertyData) {
-      alert("Property data is missing");
+      Alert.alert("Error", "Property data is missing");
       return;
     }
 
     setIsProcessing(true);
     try {
+      // First create/update the property
+      let property;
+      // if (isEdit) {
+      //   property = await dispatch(updateProperty(propertyData)).unwrap();
+      // } else {
+      //   property = await dispatch(createProperty(propertyData)).unwrap();
+      // }
+
+      // if (!property?._id) {
+      //   throw new Error("Failed to create/update property");
+      // }
+
       // Initialize payment
       const paymentData = {
-        amount: isEdit ? 50 : 100, // Different amounts for edit vs new listing
-        propertyData: propertyData,
+        amount: 100, // Different amounts for edit vs new listing
+        propertyId: propertyData._id,
         paymentMethod: paymentMethod,
-        transactionType: "listing",
+        transactionType: "rent",
       };
 
-      const response = await paymentService.initializePayment(paymentData);
+      console.log("Initiating payment with data:", paymentData);
 
-      // Open payment URL in browser
-      if (response.paymentUrl) {
-        await Linking.openURL(response.paymentUrl);
+      const response = await dispatch(initializePayment(paymentData)).unwrap();
+      console.log("Payment initialization response:", response);
 
-        Alert.alert(
-          "Payment Initiated",
-          "Complete the payment in your browser. Your property will be listed once payment is confirmed.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.push("/seller_tabs/(tabs)/listing"),
-            },
-          ]
-        );
+      if (!response?.paymentUrl) {
+        throw new Error("Payment URL not received from server");
       }
+
+      // Navigate to WebView with payment URL
+      router.push({
+        pathname: "/payment-webview",
+        params: {
+          paymentUrl: response.paymentUrl,
+          tx_ref: response.tx_ref,
+        },
+      });
+
+      // Clear state
+      setPaymentMethod("");
+      setIsProcessing(false);
+
+      Alert.alert(
+        "Payment Initiated",
+        "Complete the payment in your browser. Your property will be listed once payment is confirmed.",
+        [{ text: "OK" }]
+      );
     } catch (error) {
-      Alert.alert("Error", error.message || "Failed to process payment");
+      console.error("Payment error:", error);
+      Alert.alert(
+        "Error",
+        error?.message || "Failed to process payment. Please try again."
+      );
     } finally {
       setIsProcessing(false);
     }
-  }, [paymentMethod, propertyData, isEdit]);
+  }, [paymentMethod, propertyData, isEdit, dispatch, router]);
 
   // Show error if no property data
   if (!propertyData) {
@@ -165,7 +191,7 @@ const PaymentPost = () => {
               Amount to Pay
             </Text>
             <Text className="text-3xl font-bold text-gray-800 dark:text-white">
-              ETB {isEdit ? "50.00" : "100.00"}
+              ETB {"100.00"}
             </Text>
             <Text className="text-gray-500 dark:text-gray-400 mt-2">
               {isEdit ? "Property update fee" : "Rental listing fee"}

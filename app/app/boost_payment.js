@@ -5,6 +5,7 @@ import {
   Linking,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState, useCallback } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -71,23 +72,20 @@ const BoostPayment = () => {
 
   const handlePayment = useCallback(async () => {
     if (!paymentMethod) {
-      alert("Please select a payment method");
+      Alert.alert("Error", "Please select a payment method");
       return;
     }
 
     setIsProcessing(true);
     try {
-      // Boost the property after payment
-      // await dispatch(changeFeatured(params.propertyId)).unwrap();
-
       const paymentData = {
         amount: 50,
         propertyId: params.propertyId,
         paymentMethod: paymentMethod,
-        transactionType: "purchase",
+        transactionType: "boost",
       };
 
-      console.log("Payment data:", paymentData);
+      console.log("Initiating payment with data:", paymentData);
 
       const response = await dispatch(initializePayment(paymentData)).unwrap();
       console.log("Payment initialization response:", response);
@@ -96,25 +94,28 @@ const BoostPayment = () => {
         throw new Error("Payment URL not received from server");
       }
 
-      await Linking.openURL(response.paymentUrl);
+      // Navigate to WebView with payment URL
+      router.push({
+        pathname: "/payment-webview",
+        params: {
+          paymentUrl: response.paymentUrl,
+          tx_ref: response.tx_ref,
+        },
+      });
 
-      setModalVisible(false);
-      setShowPaymentOptions(false);
-      setPaymentMethod("cash");
-
-      Alert.alert(
-        "Payment Initiated",
-        "Complete the payment in your browser. The property will be marked as purchased once payment is confirmed.",
-        [{ text: "OK" }]
-      );
-      alert("Property boosted successfully!");
-      router.back();
+      // Clear state
+      setPaymentMethod("");
+      setIsProcessing(false);
     } catch (error) {
-      alert(error.message || "Failed to process payment");
+      console.error("Payment error:", error);
+      Alert.alert(
+        "Payment Error",
+        error?.message || "Failed to initiate payment. Please try again."
+      );
     } finally {
       setIsProcessing(false);
     }
-  }, [paymentMethod, params.propertyId, dispatch]);
+  }, [paymentMethod, params.propertyId, dispatch, router]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900">

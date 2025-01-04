@@ -10,16 +10,26 @@ const initializePayment = asyncHandler(async (req, res) => {
     const { amount, propertyId, paymentMethod, transactionType } = req.body;
     const { id } = req.user;
 
-    // Validate property exists and is available
+    // Validate required fields
+    if (!amount || !propertyId || !paymentMethod || !transactionType) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        details: { amount, propertyId, paymentMethod, transactionType },
+      });
+    }
+
+    // Validate property exists
     const property = await Property.findById(propertyId).exec();
     console.log("3. Found property:", property ? "Yes" : "No");
 
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
     }
-    if (property.status !== "available") {
-      return res.status(400).json({ message: "Property is not available" });
-    }
+
+    // For boost payments, don't check property status
+    // if (transactionType !== "boost" && property.status !== "available") {
+    //   return res.status(400).json({ message: "Property is not available" });
+    // }
 
     // Validate Chapa API key
     if (!process.env.CHAPA_SECRET_KEY) {
@@ -38,6 +48,8 @@ const initializePayment = asyncHandler(async (req, res) => {
     const firstName = nameParts[0] || "User";
     const lastName = nameParts.slice(1).join(" ") || "Customer";
 
+    const tx_ref = `TX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
     // Setup Chapa request options
     const options = {
       method: "POST",
@@ -53,7 +65,7 @@ const initializePayment = asyncHandler(async (req, res) => {
         first_name: firstName,
         last_name: lastName,
         phone_number: user.phone || "0912345678",
-        tx_ref: `TX-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        tx_ref: tx_ref,
         callback_url:
           "https://webhook.site/077164d6-49c9-44b7-b708-e9c39bd0386d",
         return_url: `${process.env.CLIENT_URL}/(payment)/payment-webview`,

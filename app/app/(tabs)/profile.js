@@ -140,8 +140,6 @@ const Profile = () => {
 
     if (user?.seller_tab === "inactive") {
       router.push("/seller_auth");
-    } else if (user?.seller_tab === "waiting") {
-      router.push("/waiting");
     } else if (user?.seller_tab === "active") {
       dispatch(changeMode(data))
         .unwrap()
@@ -228,6 +226,13 @@ const Profile = () => {
           onPress={handlePress}
         />
 
+        {/* Transaction History Option */}
+        <ProfileOption
+          icon="receipt-outline"
+          label="Transaction History"
+          onPress={() => router.push("/transaction_history")}
+        />
+
         {/* Account Settings */}
         <ProfileOption
           icon="settings-outline"
@@ -236,13 +241,12 @@ const Profile = () => {
         />
 
         {/* Help & Support */}
-        <ProfileOption
+        {/* <ProfileOption
           icon="help-circle-outline"
           label="Help & Support"
           onPress={() => {
-            /* Add navigation to help */
           }}
-        />
+        /> */}
 
         {/* Privacy Policy */}
         <ProfileOption
@@ -251,13 +255,6 @@ const Profile = () => {
           onPress={() => {
             /* Add navigation to privacy policy */
           }}
-        />
-
-        {/* Transaction History Option */}
-        <ProfileOption
-          icon="receipt-outline"
-          label="Transaction History"
-          onPress={() => router.push("/transaction_history")}
         />
 
         {/* Logout Button */}

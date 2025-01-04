@@ -115,6 +115,7 @@ const EditProperty = () => {
         params: {
           propertyData: JSON.stringify(propertyData),
           isEdit: true,
+          isSale: property?.property_use,
         },
       });
     } else {
