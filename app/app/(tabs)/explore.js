@@ -9,6 +9,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Dimensions,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +29,8 @@ import {
 } from "../../store/address/addressSlice";
 import { Picker } from "@react-native-picker/picker";
 import { addToWishlist } from "../../store/auth/authSlice";
+import { getAllPropertyTypes } from "../../store/propertyType/propertyTypeSlice";
+import { getIconForField, getUnitForField } from "../../assets/utils";
 
 // Memoize the FilterOption component
 const FilterOption = memo(({ icon, label, children }) => (
@@ -45,6 +49,65 @@ const FilterOption = memo(({ icon, label, children }) => (
 ));
 
 // Memoize the property card component
+const PropertyImages = memo(({ images }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  if (!images || images.length === 0) {
+    return (
+      <View className="bg-gray-200 dark:bg-gray-700 h-full w-full items-center justify-center">
+        <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+      </View>
+    );
+  }
+
+  return (
+    <View className="relative h-full w-full">
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(e) => {
+          const newIndex = Math.round(e.nativeEvent.contentOffset.x / 160);
+          setActiveIndex(newIndex);
+        }}
+      >
+        {images.map((image, index) => (
+          <Image
+            key={index}
+            source={{ uri: image }}
+            style={{ width: 160, height: 160 }}
+            resizeMode="cover"
+          />
+        ))}
+      </ScrollView>
+
+      {/* Image counter */}
+      {images.length > 1 && (
+        <View className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded-full">
+          <Text className="text-white text-xs">
+            {activeIndex + 1}/{images.length}
+          </Text>
+        </View>
+      )}
+
+      {/* Dot indicators */}
+      {images.length > 1 && (
+        <View className="absolute bottom-2 left-0 right-0 flex-row justify-center space-x-1">
+          {images.map((_, index) => (
+            <View
+              key={index}
+              className={`h-1.5 rounded-full ${
+                index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/60"
+              }`}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+});
+
+// Memoize the property card component
 const PropertyCard = memo(({ item, onPress, onFavorite }) => (
   <TouchableOpacity onPress={() => onPress(item)} className="mb-4 mx-4">
     <View
@@ -53,11 +116,7 @@ const PropertyCard = memo(({ item, onPress, onFavorite }) => (
     >
       {/* Left: Image */}
       <View className="relative" style={{ width: 160 }}>
-        <Image
-          source={{ uri: item.image }}
-          style={{ width: 160, height: 160 }}
-          resizeMode="cover"
-        />
+        <PropertyImages images={item.images} />
         <TouchableOpacity
           className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 p-1.5 rounded-full"
           onPress={() => onFavorite(item)}
@@ -208,102 +267,143 @@ const FilterModal = memo(
                 </View>
               </FilterOption>
 
-              {/* Location */}
-              <FilterOption icon="location-outline" label="Location">
-                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                  <TextInput
-                    placeholder="Enter location"
-                    value={filterValues.location}
-                    onChangeText={(text) => onChangeFilter.setLocation(text)}
-                    className="text-gray-700 dark:text-gray-300"
-                    placeholderTextColor="#A0AEC0"
+              {/* Location Filters Group */}
+              <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
+                <Text className="text-gray-800 dark:text-white font-semibold mb-4 flex-row items-center">
+                  <Ionicons
+                    name="location"
+                    size={18}
+                    color="#6B7280"
+                    style={{ marginRight: 8 }}
                   />
-                </View>
-              </FilterOption>
+                  Location Details
+                </Text>
 
-              {/* Region Picker */}
-              <FilterOption icon="location-outline" label="Region">
-                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
-                  <Picker
-                    selectedValue={filterValues.region}
-                    onValueChange={(value) => onChangeFilter.setRegion(value)}
-                    style={{ height: 50, width: "100%" }}
-                  >
-                    <Picker.Item label="Select Region" value="" />
-                    {filterValues.regions.map((region) => (
-                      <Picker.Item
-                        key={region._id}
-                        label={region.region_name}
-                        value={region._id}
-                      />
-                    ))}
-                  </Picker>
+                {/* Region Picker */}
+                <View className="mb-4">
+                  <Text className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                    Region
+                  </Text>
+                  <View className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <Picker
+                      selectedValue={filterValues.region}
+                      onValueChange={(value) => onChangeFilter.setRegion(value)}
+                      style={{ height: 50, width: "100%" }}
+                    >
+                      <Picker.Item label="Select Region" value="" />
+                      {filterValues.regions?.map((region) => (
+                        <Picker.Item
+                          key={region._id}
+                          label={region.region_name}
+                          value={region._id}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </FilterOption>
 
-              {/* Sub Region Picker */}
-              <FilterOption icon="location-outline" label="Sub Region">
-                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
-                  <Picker
-                    selectedValue={filterValues.subregion}
-                    onValueChange={(value) =>
-                      onChangeFilter.setSubregion(value)
-                    }
-                    style={{ height: 50, width: "100%" }}
-                    enabled={!!filterValues.region}
+                {/* Sub Region Picker */}
+                <View className="mb-4">
+                  <Text className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                    Sub Region
+                  </Text>
+                  <View
+                    className={`bg-white dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 ${
+                      !filterValues.region ? "opacity-50" : ""
+                    }`}
                   >
-                    <Picker.Item label="Select Sub Region" value="" />
-                    {filterValues.filteredSubRegions.map((subRegion) => (
-                      <Picker.Item
-                        key={subRegion._id}
-                        label={subRegion.subregion_name}
-                        value={subRegion._id}
-                      />
-                    ))}
-                  </Picker>
+                    <Picker
+                      selectedValue={filterValues.subregion}
+                      onValueChange={(value) =>
+                        onChangeFilter.setSubregion(value)
+                      }
+                      style={{ height: 50, width: "100%" }}
+                      enabled={!!filterValues.region}
+                    >
+                      <Picker.Item label="Select Sub Region" value="" />
+                      {filterValues.filteredSubRegions?.map((subRegion) => (
+                        <Picker.Item
+                          key={subRegion._id}
+                          label={subRegion.subregion_name}
+                          value={subRegion._id}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </FilterOption>
 
-              {/* Location Picker */}
-              <FilterOption icon="location-outline" label="Location">
-                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
-                  <Picker
-                    selectedValue={filterValues.location}
-                    onValueChange={(value) => onChangeFilter.setLocation(value)}
-                    style={{ height: 50, width: "100%" }}
-                    enabled={!!filterValues.subregion}
+                {/* Location Picker */}
+                <View>
+                  <Text className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                    Location
+                  </Text>
+                  <View
+                    className={`bg-white dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 ${
+                      !filterValues.subregion ? "opacity-50" : ""
+                    }`}
                   >
-                    <Picker.Item label="Select Location" value="" />
-                    {filterValues.filteredLocations.map((location) => (
-                      <Picker.Item
-                        key={location._id}
-                        label={location.location}
-                        value={location._id}
-                      />
-                    ))}
-                  </Picker>
+                    <Picker
+                      selectedValue={filterValues.location}
+                      onValueChange={(value) =>
+                        onChangeFilter.setLocation(value)
+                      }
+                      style={{ height: 50, width: "100%" }}
+                      enabled={!!filterValues.subregion}
+                    >
+                      <Picker.Item label="Select Location" value="" />
+                      {filterValues.filteredLocations?.map((location) => (
+                        <Picker.Item
+                          key={location._id}
+                          label={location.location}
+                          value={location._id}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </FilterOption>
+              </View>
 
               {/* Property Type */}
-              <FilterOption icon="home-outline" label="Property Type">
-                <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                  <TextInput
-                    placeholder="Enter property type"
-                    value={filterValues.propertyType}
-                    onChangeText={(text) =>
-                      onChangeFilter.setPropertyType(text)
-                    }
-                    className="text-gray-700 dark:text-gray-300"
-                    placeholderTextColor="#A0AEC0"
+              <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
+                <Text className="text-gray-800 dark:text-white font-semibold mb-4 flex-row items-center">
+                  <Ionicons
+                    name="home"
+                    size={18}
+                    color="#6B7280"
+                    style={{ marginRight: 8 }}
                   />
+                  Property Details
+                </Text>
+
+                <View>
+                  <Text className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                    Property Type
+                  </Text>
+                  <View className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <Picker
+                      selectedValue={filterValues.propertyType}
+                      onValueChange={(value) =>
+                        onChangeFilter.setPropertyType(value)
+                      }
+                      style={{ height: 50, width: "100%" }}
+                    >
+                      <Picker.Item label="Select Property Type" value="" />
+                      {filterValues.propertyTypes?.map((type) => (
+                        <Picker.Item
+                          key={type._id}
+                          label={type.name}
+                          value={type._id}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </FilterOption>
+              </View>
 
               {/* Property Use Selection */}
               <FilterOption icon="repeat-outline" label="Property Use">
                 <View className="flex-row flex-wrap gap-2">
-                  {propertyUseOptions.map((option) => (
+                  {propertyUseOptions?.map((option) => (
                     <TouchableOpacity
                       key={option.value}
                       onPress={() =>
@@ -358,6 +458,280 @@ const FilterModal = memo(
   }
 );
 
+// Update the PropertyModal component to include image gallery
+const PropertyModal = memo(
+  ({
+    visible,
+    onClose,
+    property,
+    favouriteOn,
+    onFavourite,
+    onBuy,
+    isPurchasing,
+    showPaymentOptions,
+    setShowPaymentOptions,
+    paymentMethod,
+    setPaymentMethod,
+  }) => {
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+    if (!visible || !property) return null;
+
+    // Format location string
+    const locationString = [
+      property?.address?.region?.region_name,
+      property?.address?.subregion?.subregion_name,
+      property?.address?.location?.location,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View className="flex-1 bg-black/50">
+          <View className="flex-1 mt-20 bg-white dark:bg-gray-900 rounded-t-3xl overflow-hidden">
+            {/* Header with close button */}
+            <TouchableOpacity
+              onPress={onClose}
+              className="absolute top-4 right-4 z-10 bg-black/50 p-2 rounded-full"
+            >
+              <Ionicons name="close" size={24} color="white" />
+            </TouchableOpacity>
+
+            <ScrollView className="flex-1">
+              {/* Image Gallery */}
+              <View className="relative h-72">
+                {property.images && property.images.length > 0 ? (
+                  <>
+                    <ScrollView
+                      horizontal
+                      pagingEnabled
+                      showsHorizontalScrollIndicator={false}
+                      onMomentumScrollEnd={(e) => {
+                        const newIndex = Math.round(
+                          e.nativeEvent.contentOffset.x /
+                            Dimensions.get("window").width
+                        );
+                        setActiveImageIndex(newIndex);
+                      }}
+                    >
+                      {property.images.map((image, index) => (
+                        <Image
+                          key={index}
+                          source={{ uri: image }}
+                          className="w-screen h-72"
+                          resizeMode="cover"
+                        />
+                      ))}
+                    </ScrollView>
+                    {/* Image counter */}
+                    <View className="absolute bottom-4 right-4 bg-black/60 px-2 py-1 rounded-full">
+                      <Text className="text-white text-xs">
+                        {activeImageIndex + 1}/{property.images.length}
+                      </Text>
+                    </View>
+                    {/* Dot indicators */}
+                    <View className="absolute bottom-4 left-0 right-0 flex-row justify-center space-x-1">
+                      {property.images.map((_, index) => (
+                        <View
+                          key={index}
+                          className={`h-1.5 rounded-full ${
+                            index === activeImageIndex
+                              ? "w-4 bg-white"
+                              : "w-1.5 bg-white/60"
+                          }`}
+                        />
+                      ))}
+                    </View>
+                  </>
+                ) : (
+                  <View className="w-full h-72 bg-gray-200 dark:bg-gray-700 items-center justify-center">
+                    <Ionicons name="image-outline" size={48} color="#9CA3AF" />
+                  </View>
+                )}
+              </View>
+
+              {/* Content */}
+              <View className="p-6">
+                {/* Title and Price Row */}
+                <View className="flex-row justify-between items-start mb-4">
+                  <View className="flex-1">
+                    <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                      {property.name}
+                    </Text>
+                    <Text className="text-xl font-bold text-[#FF8E01]">
+                      ETB {property.price?.toLocaleString()}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => onFavourite(property)}
+                    className="bg-gray-100 dark:bg-gray-800 p-3 rounded-full"
+                  >
+                    <Ionicons
+                      name={favouriteOn ? "heart" : "heart-outline"}
+                      size={24}
+                      color={favouriteOn ? "#EF4444" : "#6B7280"}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Location */}
+                {locationString && (
+                  <View className="flex-row items-start mb-4">
+                    <Ionicons
+                      name="location-outline"
+                      size={20}
+                      color="#6B7280"
+                    />
+                    <Text className="text-gray-600 dark:text-gray-300 ml-2 flex-1">
+                      {locationString}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Property Details */}
+                <View className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4">
+                  <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Property Details
+                  </Text>
+                  <View className="flex-row flex-wrap">
+                    {property.propertyType?.name && (
+                      <View className="w-1/2 mb-3">
+                        <Text className="text-gray-500 dark:text-gray-400">
+                          Type
+                        </Text>
+                        <Text className="text-gray-800 dark:text-white font-medium">
+                          {property.propertyType.name}
+                        </Text>
+                      </View>
+                    )}
+                    <View className="w-1/2 mb-3">
+                      <Text className="text-gray-500 dark:text-gray-400">
+                        Status
+                      </Text>
+                      <Text className="text-gray-800 dark:text-white font-medium capitalize">
+                        {property.property_use === "rent"
+                          ? "For Rent"
+                          : "For Sale"}
+                      </Text>
+                    </View>
+                    {/* Dynamic Property Fields */}
+                    {Object.entries(property.typeSpecificFields || {}).map(
+                      ([key, value]) => {
+                        if (
+                          value === null ||
+                          value === undefined ||
+                          value === false ||
+                          value === ""
+                        ) {
+                          return null;
+                        }
+                        return (
+                          <View key={key} className="w-1/2 mb-3">
+                            <Text className="text-gray-500 dark:text-gray-400 capitalize">
+                              {key.replace(/([A-Z])/g, " $1").trim()}
+                            </Text>
+                            <View className="flex-row items-center">
+                              <Ionicons
+                                name={getIconForField(key)}
+                                size={16}
+                                color="#6B7280"
+                                style={{ marginRight: 4 }}
+                              />
+                              <Text className="text-gray-800 dark:text-white font-medium">
+                                {value}
+                                {getUnitForField(key)}
+                              </Text>
+                            </View>
+                          </View>
+                        );
+                      }
+                    )}
+                  </View>
+                </View>
+
+                {/* Description */}
+                {property.description && (
+                  <View className="mb-6">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                      Description
+                    </Text>
+                    <Text className="text-gray-600 dark:text-gray-300">
+                      {property.description}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+
+            {/* Bottom Action Buttons */}
+            <View className="p-5 border-t border-gray-200 dark:border-gray-800">
+              {property?.property_use === "rent" ? (
+                // For Rental Properties
+                <View className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl">
+                  <Text className="text-gray-800 dark:text-white font-semibold mb-2">
+                    Contact Owner
+                  </Text>
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center">
+                      <Ionicons name="call-outline" size={20} color="#6B7280" />
+                      <Text className="text-gray-600 dark:text-gray-300 ml-2">
+                        {property?.owner?.phone || "Phone not available"}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        Linking.openURL(`tel:${property?.owner?.phone}`)
+                      }
+                      className="bg-[#FF8E01] px-4 py-2 rounded-lg"
+                    >
+                      <Text className="text-white font-medium">Call Now</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : showPaymentOptions ? (
+                // For Sale Properties - Payment Options
+                <View>
+                  <PaymentMethodSelector
+                    paymentMethod={paymentMethod}
+                    setPaymentMethod={setPaymentMethod}
+                  />
+                  <TouchableOpacity
+                    onPress={onBuy}
+                    disabled={isPurchasing}
+                    className={`${
+                      isPurchasing ? "bg-gray-400" : "bg-[#FF8E01]"
+                    } rounded-xl py-4 px-6`}
+                  >
+                    <Text className="text-white text-center font-semibold text-base">
+                      {isPurchasing ? "Processing..." : "Confirm Purchase"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                // Initial Buy Button
+                <TouchableOpacity
+                  onPress={() => setShowPaymentOptions(true)}
+                  className="bg-[#FF8E01] rounded-xl py-4 px-6"
+                >
+                  <Text className="text-white text-center font-semibold text-base">
+                    Buy Property
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+);
+
 const Explore = () => {
   const dispatch = useDispatch();
   const params = useLocalSearchParams();
@@ -388,11 +762,13 @@ const Explore = () => {
   );
 
   const { properties, views } = useSelector((state) => state.property);
+  const { propertyTypes } = useSelector((state) => state.propertyType);
 
   useEffect(() => {
     dispatch(getAllRegions());
     dispatch(getAllSubRegions());
     dispatch(getAllLocations());
+    dispatch(getAllPropertyTypes());
   }, []);
 
   useEffect(() => {
@@ -579,7 +955,7 @@ const Explore = () => {
       <Text className="text-gray-800 dark:text-white font-semibold mb-2">
         Select Payment Method
       </Text>
-      {["cash", "bank_transfer", "mortgage"].map((method) => (
+      {["cash", "bank_transfer", "mortgage"]?.map((method) => (
         <TouchableOpacity
           key={method}
           onPress={() => setPaymentMethod(method)}
@@ -687,10 +1063,10 @@ const Explore = () => {
           propertyUse,
           region,
           subregion,
-          location,
           regions,
           filteredSubRegions,
           filteredLocations,
+          propertyTypes,
         }}
         onChangeFilter={{
           setLimit,
@@ -706,155 +1082,19 @@ const Explore = () => {
         onSubmit={handleSubmit}
       />
 
-      <Modal
-        animationType="slide"
-        transparent={true}
+      <PropertyModal
         visible={propertyDetailModalVisible}
-        onRequestClose={() => setPropertyDetailModalVisible(false)}
-      >
-        <View className="flex-1 bg-white dark:bg-gray-900">
-          <View className="relative bg-white dark:bg-gray-900 pt-12 pb-4 px-5">
-            <TouchableOpacity
-              onPress={() => setPropertyDetailModalVisible(false)}
-              className="absolute left-5 top-12 z-10 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
-            >
-              <Ionicons name="close" size={24} color="#6B7280" />
-            </TouchableOpacity>
-            <Text className="text-center text-xl font-bold text-gray-800 dark:text-white">
-              Property Details
-            </Text>
-          </View>
-
-          {selectedProperty && (
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              <View className="relative">
-                <Image
-                  source={{ uri: selectedProperty.image }}
-                  className="w-screen h-72"
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  onPress={() => handleFavourite(selectedProperty)}
-                  className="absolute top-4 right-4 bg-white/90 p-2 rounded-full z-10"
-                >
-                  <Ionicons
-                    name={favouriteOn ? "heart" : "heart-outline"}
-                    size={24}
-                    color={favouriteOn ? "#EF4444" : "#6B7280"}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View className="p-5">
-                <View className="flex-row justify-between items-center mb-4">
-                  <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    ${selectedProperty.price.toLocaleString()}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={handleScheduleVisit}
-                    disabled={isSchedulingVisit}
-                    className="flex-row items-center bg-green-500 px-4 py-2 rounded-full"
-                  >
-                    {isSchedulingVisit ? (
-                      <ActivityIndicator color="white" size="small" />
-                    ) : (
-                      <>
-                        <Ionicons
-                          name="calendar-outline"
-                          size={20}
-                          color="white"
-                        />
-                        <Text className="text-white font-semibold ml-2">
-                          Schedule Visit
-                        </Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                </View>
-
-                <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                  {selectedProperty.title}
-                </Text>
-
-                <View className="flex-row items-center mb-4">
-                  <Ionicons name="location" size={20} color="#6B7280" />
-                  <Text className="text-gray-600 dark:text-gray-300 ml-2 text-base">
-                    {selectedProperty.location}
-                  </Text>
-                </View>
-
-                <View className="flex-row justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4">
-                  <View className="items-center">
-                    <Ionicons name="bed-outline" size={24} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                      {selectedProperty.bedrooms || "3"} Beds
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Ionicons name="water-outline" size={24} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                      {selectedProperty.bathrooms || "2"} Baths
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Ionicons name="square-outline" size={24} color="#6B7280" />
-                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
-                      {selectedProperty.area || "1,200"} sqft
-                    </Text>
-                  </View>
-                </View>
-
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                  Description
-                </Text>
-                <Text className="text-gray-600 dark:text-gray-300 mb-4">
-                  {selectedProperty.description || "No description available"}
-                </Text>
-              </View>
-            </ScrollView>
-          )}
-
-          <View className="p-5 border-t border-gray-200 dark:border-gray-800">
-            {showPaymentOptions ? (
-              <View>
-                <PaymentMethodSelector
-                  paymentMethod={paymentMethod}
-                  setPaymentMethod={setPaymentMethod}
-                />
-                <TouchableOpacity
-                  onPress={handleBuyProperty}
-                  disabled={isPurchasing}
-                  className={`${
-                    isPurchasing ? "bg-gray-400" : "bg-[#FF8E01]"
-                  } rounded-xl py-4 px-6`}
-                >
-                  {isPurchasing ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text className="text-white text-center font-semibold text-base">
-                      Confirm{" "}
-                      {selectedProperty?.property_use === "rent"
-                        ? "Rental"
-                        : "Purchase"}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                onPress={() => setShowPaymentOptions(true)}
-                className="bg-[#FF8E01] rounded-xl py-4 px-6"
-              >
-                <Text className="text-white text-center font-semibold text-base">
-                  {selectedProperty?.property_use === "rent"
-                    ? "Rent Property"
-                    : "Buy Property"}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setPropertyDetailModalVisible(false)}
+        property={selectedProperty}
+        favouriteOn={favouriteOn}
+        onFavourite={handleFavourite}
+        onBuy={handleBuyProperty}
+        isPurchasing={isPurchasing}
+        showPaymentOptions={showPaymentOptions}
+        setShowPaymentOptions={setShowPaymentOptions}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+      />
     </View>
   );
 };
