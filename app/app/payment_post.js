@@ -5,6 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Linking,
 } from "react-native";
 import React, { useState, useCallback } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -15,6 +16,7 @@ import {
 } from "../store/property/propertySlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { paymentService } from "../store/payment/paymentSlice";
 
 const PaymentMethodSelector = ({ selectedMethod, onSelect }) => {
   const methods = [
@@ -90,31 +92,37 @@ const PaymentPost = () => {
 
     setIsProcessing(true);
     try {
-      if (isEdit) {
-        // Update existing property
-        await dispatch(updateProperty(propertyData)).unwrap();
-        Alert.alert("Success", "Property updated successfully!", [
-          {
-            text: "OK",
-            onPress: () => router.push("/seller_tabs/listing"),
-          },
-        ]);
-      } else {
-        // Create new property
-        await dispatch(createProperty(propertyData)).unwrap();
-        Alert.alert("Success", "Property listed successfully!", [
-          {
-            text: "OK",
-            onPress: () => router.push("/seller_tabs/listing"),
-          },
-        ]);
+      // Initialize payment
+      const paymentData = {
+        amount: isEdit ? 50 : 100, // Different amounts for edit vs new listing
+        propertyData: propertyData,
+        paymentMethod: paymentMethod,
+        transactionType: "listing",
+      };
+
+      const response = await paymentService.initializePayment(paymentData);
+
+      // Open payment URL in browser
+      if (response.paymentUrl) {
+        await Linking.openURL(response.paymentUrl);
+
+        Alert.alert(
+          "Payment Initiated",
+          "Complete the payment in your browser. Your property will be listed once payment is confirmed.",
+          [
+            {
+              text: "OK",
+              onPress: () => router.push("/seller_tabs/(tabs)/listing"),
+            },
+          ]
+        );
       }
     } catch (error) {
       Alert.alert("Error", error.message || "Failed to process payment");
     } finally {
       setIsProcessing(false);
     }
-  }, [paymentMethod, propertyData, isEdit, dispatch]);
+  }, [paymentMethod, propertyData, isEdit]);
 
   // Show error if no property data
   if (!propertyData) {

@@ -18,6 +18,7 @@ import { getWishlists, addToWishlist } from "../../store/auth/authSlice";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { buyProperty } from "../../store/property/propertySlice";
+import { initializePayment } from "../../store/payment/paymentSlice";
 
 const PaymentMethodSelector = ({ paymentMethod, setPaymentMethod }) => {
   const methods = [
@@ -459,37 +460,47 @@ const Bookmark = () => {
 
   const handleBuyProperty = async () => {
     if (!selectedWishlist?._id) return;
-    console.log(selectedWishlist);
 
     setIsPurchasing(true);
     try {
-      await dispatch(
-        buyProperty({
-          propertyId: selectedWishlist._id,
-          paymentMethod: paymentMethod,
-        })
-      ).unwrap();
+      console.log(
+        "Starting payment process for property:",
+        selectedWishlist._id
+      );
+
+      const paymentData = {
+        amount: 10000,
+        propertyId: selectedWishlist._id,
+        paymentMethod: paymentMethod,
+        transactionType:
+          selectedWishlist.property_use === "rent" ? "rent" : "purchase",
+      };
+
+      console.log("Payment data:", paymentData);
+
+      const response = await dispatch(initializePayment(paymentData)).unwrap();
+      console.log("Payment initialization response:", response);
+
+      if (!response?.paymentUrl) {
+        throw new Error("Payment URL not received from server");
+      }
+
+      await Linking.openURL(response.paymentUrl);
+
+      setModalVisible(false);
+      setShowPaymentOptions(false);
+      setPaymentMethod("cash");
 
       Alert.alert(
-        "Success",
-        "Property purchase initiated successfully! Check your transactions for details.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              setModalVisible(false);
-              setShowPaymentOptions(false);
-              setPaymentMethod("cash");
-              dispatch(getWishlists());
-            },
-          },
-        ]
+        "Payment Initiated",
+        "Complete the payment in your browser. The property will be marked as purchased once payment is confirmed.",
+        [{ text: "OK" }]
       );
     } catch (error) {
+      console.error("Payment error:", error);
       Alert.alert(
-        "Error",
-        error?.message ||
-          "Failed to initiate property purchase. Please try again later."
+        "Payment Error",
+        error?.message || "Failed to initiate payment. Please try again later."
       );
     } finally {
       setIsPurchasing(false);

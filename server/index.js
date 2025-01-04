@@ -17,6 +17,7 @@ const transactionRouter = require("./routes/transactionRoutes");
 const locationRouter = require("./routes/locationRoutes");
 const regionRouter = require("./routes/regionRoutes");
 const subRegionRouter = require("./routes/subRegionRoutes");
+const paymentRouter = require("./routes/paymentRoute");
 const PORT = process.env.PORT || 9001;
 // const User = require("./models/userModel");
 
@@ -56,6 +57,7 @@ app.use("/api/v1/transaction", transactionRouter);
 app.use("/api/v1/region", regionRouter);
 app.use("/api/v1/subregion", subRegionRouter);
 app.use("/api/v1/location", locationRouter);
+app.use("/api/v1/payment", paymentRouter);
 
 // const updateUsers = async () => {
 //   try {
