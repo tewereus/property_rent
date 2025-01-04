@@ -469,14 +469,12 @@ const Bookmark = () => {
       );
 
       const paymentData = {
-        amount: 10000,
+        amount: 1000,
         propertyId: selectedWishlist._id,
         paymentMethod: paymentMethod,
         transactionType:
           selectedWishlist.property_use === "rent" ? "rent" : "purchase",
       };
-
-      console.log("Payment data:", paymentData);
 
       const response = await dispatch(initializePayment(paymentData)).unwrap();
       console.log("Payment initialization response:", response);
@@ -485,17 +483,19 @@ const Bookmark = () => {
         throw new Error("Payment URL not received from server");
       }
 
-      await Linking.openURL(response.paymentUrl);
-
+      // Close modals
       setModalVisible(false);
       setShowPaymentOptions(false);
       setPaymentMethod("cash");
 
-      Alert.alert(
-        "Payment Initiated",
-        "Complete the payment in your browser. The property will be marked as purchased once payment is confirmed.",
-        [{ text: "OK" }]
-      );
+      // Navigate to WebView with payment URL
+      router.push({
+        pathname: "/payment-webview",
+        params: {
+          paymentUrl: response.paymentUrl,
+          tx_ref: response.tx_ref,
+        },
+      });
     } catch (error) {
       console.error("Payment error:", error);
       Alert.alert(

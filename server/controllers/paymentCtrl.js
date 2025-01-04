@@ -49,14 +49,14 @@ const initializePayment = asyncHandler(async (req, res) => {
       body: JSON.stringify({
         amount: amount.toString(),
         currency: "ETB",
-        email: "abebech_bekele@gmail.com", // Use a valid test email for now
+        email: "abebech_bekele@gmail.com",
         first_name: firstName,
         last_name: lastName,
         phone_number: user.phone || "0912345678",
         tx_ref: `TX-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         callback_url:
-          "https://webhook.site/077164d6-49c9-44b7-b708-e9c39bd0386d", // Use webhook.site for testing
-        return_url: `${process.env.CLIENT_URL}/payment-success`,
+          "https://webhook.site/077164d6-49c9-44b7-b708-e9c39bd0386d",
+        return_url: `${process.env.CLIENT_URL}/(payment)/payment-webview`,
         "customization[title]": `Property ${transactionType}`,
         "customization[description]": `Payment for property ${transactionType}`,
       }),

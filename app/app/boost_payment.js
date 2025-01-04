@@ -2,6 +2,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Linking,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
@@ -11,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { changeFeatured } from "../store/property/propertySlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { initializePayment } from "../store/payment/paymentSlice";
 
 const PaymentMethodSelector = ({ selectedMethod, onSelect }) => {
   const methods = [
@@ -76,7 +78,35 @@ const BoostPayment = () => {
     setIsProcessing(true);
     try {
       // Boost the property after payment
-      await dispatch(changeFeatured(params.propertyId)).unwrap();
+      // await dispatch(changeFeatured(params.propertyId)).unwrap();
+
+      const paymentData = {
+        amount: 50,
+        propertyId: params.propertyId,
+        paymentMethod: paymentMethod,
+        transactionType: "purchase",
+      };
+
+      console.log("Payment data:", paymentData);
+
+      const response = await dispatch(initializePayment(paymentData)).unwrap();
+      console.log("Payment initialization response:", response);
+
+      if (!response?.paymentUrl) {
+        throw new Error("Payment URL not received from server");
+      }
+
+      await Linking.openURL(response.paymentUrl);
+
+      setModalVisible(false);
+      setShowPaymentOptions(false);
+      setPaymentMethod("cash");
+
+      Alert.alert(
+        "Payment Initiated",
+        "Complete the payment in your browser. The property will be marked as purchased once payment is confirmed.",
+        [{ text: "OK" }]
+      );
       alert("Property boosted successfully!");
       router.back();
     } catch (error) {

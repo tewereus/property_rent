@@ -31,6 +31,14 @@ const _layout = memo(() => {
           <Stack.Screen name="boost_payment" options={{ headerShown: false }} />
           <Stack.Screen name="edit_property" options={{ headerShown: false }} />
           <Stack.Screen
+            name="payment_success"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="payment-webview"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="transaction_history"
             options={{
               headerShown: false,
