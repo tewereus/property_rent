@@ -31,7 +31,7 @@ const SplashScreen = () => {
         }}
       >
         <Image
-          source={images.logoSmall2}
+          source={images.splashLogo}
           className="w-[250px] h-[150px]"
           resizeMode="contain"
         />

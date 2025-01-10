@@ -73,7 +73,6 @@ const PaymentPost = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Parse the propertyData and check if it's an edit operation
   const propertyData = params.propertyData
     ? JSON.parse(params.propertyData)
     : null;
@@ -104,9 +103,8 @@ const PaymentPost = () => {
       //   throw new Error("Failed to create/update property");
       // }
 
-      // Initialize payment
       const paymentData = {
-        amount: 100, // Different amounts for edit vs new listing
+        amount: 100,
         propertyId: propertyData._id,
         paymentMethod: paymentMethod,
         transactionType: "rent",
@@ -121,7 +119,6 @@ const PaymentPost = () => {
         throw new Error("Payment URL not received from server");
       }
 
-      // Navigate to WebView with payment URL
       router.push({
         pathname: "/payment-webview",
         params: {
@@ -150,7 +147,6 @@ const PaymentPost = () => {
     }
   }, [paymentMethod, propertyData, isEdit, dispatch, router]);
 
-  // Show error if no property data
   if (!propertyData) {
     return (
       <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900">

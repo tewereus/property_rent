@@ -113,7 +113,7 @@ import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadUser, resetAuthState } from "../store/auth/authSlice";
 import SplashScreen from "../components/SplashScreen";
-import WelcomeScreen from "../components/WelcomeScreen"; // Move your current index content to this component
+import WelcomeScreen from "../components/WelcomeScreen";
 
 const Index = () => {
   const dispatch = useDispatch();
@@ -122,24 +122,17 @@ const Index = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Load user data
         await dispatch(loadUser()).unwrap();
-
-        // Check if user exists
         const user = await AsyncStorage.getItem("user");
-
-        // Simulate minimum splash screen duration
         await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Navigate based on auth status
         if (user) {
           router.push("/home");
         } else {
-          setIsLoading(false); // Show welcome screen
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Initialization error:", error);
-        setIsLoading(false); // Show welcome screen on error
+        setIsLoading(false);
       }
     };
 

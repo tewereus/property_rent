@@ -6,6 +6,7 @@ import logo from "../assets/images/prime_logo.jpg";
 import logoSmall from "../assets/images/logo_small.png";
 import logoSmall2 from "../assets/images/logo_small_2.png";
 import empty from "../assets/images/empty.png";
+import splashLogo from "../assets/images/logo_removed.png";
 
 export default {
   profile,
@@ -16,4 +17,5 @@ export default {
   logoSmall,
   empty,
   logoSmall2,
+  splashLogo,
 };

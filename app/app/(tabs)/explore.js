@@ -520,7 +520,7 @@ const PropertyModal = memo(
                         setActiveImageIndex(newIndex);
                       }}
                     >
-                      {property.images.map((image, index) => (
+                      {property.images?.map((image, index) => (
                         <Image
                           key={index}
                           source={{ uri: image }}
@@ -537,7 +537,7 @@ const PropertyModal = memo(
                     </View>
                     {/* Dot indicators */}
                     <View className="absolute bottom-4 left-0 right-0 flex-row justify-center space-x-1">
-                      {property.images.map((_, index) => (
+                      {property.images?.map((_, index) => (
                         <View
                           key={index}
                           className={`h-1.5 rounded-full ${

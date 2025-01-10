@@ -36,6 +36,11 @@ const propertySchema = new mongoose.Schema(
       ref: "PropertyType",
       required: true,
     },
+    propertyCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PropertyCategory",
+      required: true,
+    },
     property_use: {
       type: String,
       enum: ["sell", "rent"],
