@@ -4,32 +4,49 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { verifyPayment } from "../store/payment/paymentSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect } from "react";
 
 export default function PaymentWebView() {
   const { paymentUrl, tx_ref } = useLocalSearchParams();
   const dispatch = useDispatch();
   const router = useRouter();
 
+  useEffect(() => {
+    console.log("here at web view");
+    console.log("Payment URL:", paymentUrl); // Log the payment URL for debugging
+  }, [paymentUrl]);
+
   const handleNavigationStateChange = async (navState) => {
-    // Check if the URL contains success indicators
+    console.log("Navigated to:", navState.url); // Log navigation state changes
+
+    if (navState.url.includes("test-payment-receipt")) {
+      // Handle receipt processing here
+      console.log("Handling receipt:", navState.url);
+      console.log("tx_ref", tx_ref);
+      // You can call your verification logic here
+      await dispatch(verifyPayment(tx_ref)).unwrap();
+      // router.back();
+      router.replace("/payment_success");
+      return; // Prevent further processing
+    }
+
     if (
       navState.url.includes("success") ||
       navState.url.includes("completed")
     ) {
+      console.log("Payment successful");
       try {
         await dispatch(verifyPayment(tx_ref)).unwrap();
-        // Payment verified successfully
         router.replace("/transaction_history");
       } catch (error) {
         console.error("Payment verification failed:", error);
         router.replace("/(tabs)/home");
       }
-    }
-    // Handle cancellation or failure
-    else if (
+    } else if (
       navState.url.includes("cancel") ||
       navState.url.includes("failed")
     ) {
+      console.log("Payment failed or canceled");
       router.replace("/(tabs)/home");
     }
   };

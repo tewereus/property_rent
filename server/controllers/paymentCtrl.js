@@ -66,9 +66,8 @@ const initializePayment = asyncHandler(async (req, res) => {
         last_name: lastName,
         phone_number: user.phone || "0912345678",
         tx_ref: tx_ref,
-        callback_url:
-          "https://webhook.site/077164d6-49c9-44b7-b708-e9c39bd0386d",
-        return_url: `${process.env.CLIENT_URL}/(payment)/payment-webview`,
+        callback_url: "http://localhost:4884/api/v1/payment/verify",
+        // return_url: `http://192.168.1.6:4884/api/v1/payment-webview`,
         "customization[title]": `Property ${transactionType}`,
         "customization[description]": `Payment for property ${transactionType}`,
       }),
@@ -114,6 +113,7 @@ const initializePayment = asyncHandler(async (req, res) => {
             return res.json({
               paymentUrl: responseData.data.checkout_url,
               reference: responseData.data.reference,
+              tx_ref,
               transaction: transaction._id,
             });
           } else {
@@ -140,63 +140,95 @@ const initializePayment = asyncHandler(async (req, res) => {
   }
 });
 
+// const verifyPayment = asyncHandler(async (req, res) => {
+//   const { reference } = req.params;
+
+//   try {
+//     // Verify payment with Chapa
+//     const response = await axios.get(
+//       `https://api.chapa.co/v1/transaction/verify/${reference}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}`,
+//         },
+//       }
+//     );
+
+//     if (response.data.status === "success") {
+//       // Find and update transaction
+//       const transaction = await Transaction.findOne({
+//         "transactionDetails.receiptNumber": reference,
+//       });
+
+//       if (!transaction) {
+//         return res.status(404).json({ message: "Transaction not found" });
+//       }
+
+//       // Update transaction status
+//       transaction.status = "completed";
+//       await transaction.save();
+
+//       // Update property status
+//       const property = await Property.findById(transaction.property);
+//       if (property) {
+//         if (transaction.transactionType === "purchase") {
+//           property.status = "sold";
+//         } else if (transaction.transactionType === "rent") {
+//           property.status = "rented";
+//         }
+//         property.transactionHistory.push(transaction._id);
+//         await property.save();
+//       }
+
+//       res.json({
+//         status: "success",
+//         message: "Payment verified successfully",
+//         transaction,
+//       });
+//     } else {
+//       res.status(400).json({
+//         status: "failed",
+//         message: "Payment verification failed",
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Verification Error:", error);
+//     res.status(500).json({
+//       message: error.response?.data?.message || "Payment verification failed",
+//     });
+//   }
+// });
+
 const verifyPayment = asyncHandler(async (req, res) => {
-  const { reference } = req.params;
+  const { reference } = req.params; // Get transaction reference from request body
+  console.log(req.params);
+  // Call Chapa's verify endpoint
+  const options = {
+    method: "GET",
+    url: `https://api.chapa.co/v1/transaction/verify/${reference}`,
+    headers: {
+      Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}`,
+    },
+  };
 
-  try {
-    // Verify payment with Chapa
-    const response = await axios.get(
-      `https://api.chapa.co/v1/transaction/verify/${reference}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}`,
-        },
-      }
-    );
-
-    if (response.data.status === "success") {
-      // Find and update transaction
-      const transaction = await Transaction.findOne({
-        "transactionDetails.receiptNumber": reference,
-      });
-
-      if (!transaction) {
-        return res.status(404).json({ message: "Transaction not found" });
-      }
-
-      // Update transaction status
-      transaction.status = "completed";
-      await transaction.save();
-
-      // Update property status
-      const property = await Property.findById(transaction.property);
-      if (property) {
-        if (transaction.transactionType === "purchase") {
-          property.status = "sold";
-        } else if (transaction.transactionType === "rent") {
-          property.status = "rented";
-        }
-        property.transactionHistory.push(transaction._id);
-        await property.save();
-      }
-
-      res.json({
-        status: "success",
-        message: "Payment verified successfully",
-        transaction,
-      });
-    } else {
-      res.status(400).json({
-        status: "failed",
-        message: "Payment verification failed",
-      });
+  request(options, (error, chapaResponse) => {
+    if (error) {
+      return res.status(500).json({ message: "Verification failed", error });
     }
-  } catch (error) {
-    console.error("Verification Error:", error);
-    res.status(500).json({
-      message: error.response?.data?.message || "Payment verification failed",
-    });
-  }
+
+    const responseData = JSON.parse(chapaResponse.body);
+    console.log(responseData);
+    if (responseData.status === "success") {
+      // Handle successful verification
+      console.log("Payment verified:", responseData);
+      // Update transaction status in your database
+      return res.json({ message: "Payment verified", data: responseData });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Payment not verified", details: responseData });
+    }
+  });
 });
 
 module.exports = {
