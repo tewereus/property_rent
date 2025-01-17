@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
+import { View, Text, ScrollView, Dimensions, Image } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { images } from "../../constants";
@@ -199,15 +199,16 @@ const SignUp = () => {
   }, [isSuccess, isError, router]);
 
   return (
-    <SafeAreaView className="bg-[#09092B] h-full">
-      <ScrollView>
+    <SafeAreaView className="bg-slate-100 flex-1">
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View
-          className="w-full flex justify-center h-full px-4 my-5"
+          className="w-full flex justify-center px-6 my-5"
           style={{
             minHeight: Dimensions.get("window").height - 100,
           }}
         >
-          <View className="w-full flex justify-center items-center">
+          {/* Logo */}
+          <View className="w-full flex justify-center items-center mb-10">
             <Image
               source={images.logoSmall2}
               resizeMode="contain"
@@ -215,89 +216,102 @@ const SignUp = () => {
             />
           </View>
 
-          <Text className="text-2xl font-semibold text-white mt-7">
-            Sign Up to Prime
-          </Text>
+          {/* Welcome Text */}
+          <View className="mb-8">
+            <Text className="text-3xl font-bold text-gray-800 mb-2">
+              Create Account
+            </Text>
+            <Text className="text-gray-500 text-base">
+              Join us to start your journey
+            </Text>
+          </View>
 
-          <FormField
-            title="Full Name"
-            value={form.name}
-            handleChangeText={(value) => handleChange("name", value)}
-            otherStyles="mt-6"
-            placeholder="name"
-            error={errors.name}
-            autoCapitalize="words"
-          />
+          {/* Form Fields */}
+          <View className="space-y-5">
+            <FormField
+              title="Full Name"
+              value={form.name}
+              handleChangeText={(value) => handleChange("name", value)}
+              placeholder="full name"
+              error={errors.name}
+              autoCapitalize="words"
+              containerStyle="bg-white"
+            />
 
-          <FormField
-            title="Email"
-            value={form.email}
-            handleChangeText={(value) => handleChange("email", value)}
-            otherStyles="mt-7"
-            keyboardType="email-address"
-            placeholder="email address"
-            error={errors.email}
-            autoCapitalize="none"
-          />
+            <FormField
+              title="Email Address"
+              value={form.email}
+              handleChangeText={(value) => handleChange("email", value)}
+              keyboardType="email-address"
+              placeholder="example@email.com"
+              error={errors.email}
+              autoCapitalize="none"
+              containerStyle="bg-white"
+            />
 
-          <FormField
-            title="Phone"
-            value={form.phone}
-            handleChangeText={(value) => handleChange("phone", value)}
-            placeholder="phone"
-            otherStyles="mt-6"
-            keyboardType="phone-pad"
-            error={errors.phone}
-          />
+            <FormField
+              title="Phone Number"
+              value={form.phone}
+              handleChangeText={(value) => handleChange("phone", value)}
+              placeholder="+251 91234 5678"
+              keyboardType="phone-pad"
+              error={errors.phone}
+              containerStyle="bg-white"
+            />
 
-          <FormField
-            title="Address"
-            value={form.address}
-            handleChangeText={(value) => handleChange("address", value)}
-            placeholder="address"
-            otherStyles="mt-6"
-            error={errors.address}
-          />
+            <FormField
+              title="Address"
+              value={form.address}
+              handleChangeText={(value) => handleChange("address", value)}
+              placeholder="Your current address"
+              error={errors.address}
+              containerStyle="bg-white"
+            />
 
-          <FormField
-            title="Password"
-            value={form.password}
-            handleChangeText={(value) => handleChange("password", value)}
-            placeholder="password"
-            otherStyles="mt-7"
-            secureTextEntry
-            error={errors.password}
-          />
+            <FormField
+              title="Password"
+              value={form.password}
+              handleChangeText={(value) => handleChange("password", value)}
+              placeholder="Create a strong password"
+              secureTextEntry
+              error={errors.password}
+              containerStyle="bg-white"
+            />
 
-          <FormField
-            title="Confirm Password"
-            value={form.confirmPassword}
-            handleChangeText={(value) => handleChange("confirmPassword", value)}
-            placeholder="confirm password"
-            otherStyles="mt-7"
-            secureTextEntry
-            error={errors.confirmPassword}
-          />
+            <FormField
+              title="Confirm Password"
+              value={form.confirmPassword}
+              handleChangeText={(value) =>
+                handleChange("confirmPassword", value)
+              }
+              placeholder="Repeat your password"
+              secureTextEntry
+              error={errors.confirmPassword}
+              containerStyle="bg-white"
+            />
+          </View>
 
+          {/* Sign Up Button */}
           <CustomButton
-            title="Sign Up"
+            title="Create Account"
             handlePress={submit}
-            containerStyles="mt-7"
+            containerStyles="mt-8"
             isLoading={isSubmitting}
             disabled={
               isSubmitting || Object.values(errors).some((error) => error)
             }
           />
 
-          <View className="flex justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg text-gray-100 font-normal">
-              Have an account already?
+          {/* Sign In Link */}
+          <View className="flex justify-center pt-6 flex-row gap-2">
+            <Text className="text-base text-gray-600">
+              Already have an account?
             </Text>
             <Link
               href="/sign-in"
-              className="text-lg font-semibold text-secondary"
+              className="text-base font-semibold text-[#FF8E01]"
             >
-              Login
+              Sign In
             </Link>
           </View>
         </View>

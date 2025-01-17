@@ -39,7 +39,7 @@ const propertySchema = new mongoose.Schema(
     propertyCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PropertyCategory",
-      required: true,
+      // required: true,
     },
     property_use: {
       type: String,

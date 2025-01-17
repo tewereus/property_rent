@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import { icons } from "../constants";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const FormField = ({
   title,
@@ -8,35 +8,85 @@ const FormField = ({
   placeholder,
   handleChangeText,
   otherStyles,
+  containerStyle,
+  secureTextEntry,
+  error,
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Check if this is a password field
+  const isPasswordField = title?.toLowerCase().includes("password");
+
+  // Get the appropriate icon based on the field type
+  const getFieldIcon = () => {
+    const fieldType = title?.toLowerCase() || "";
+    if (fieldType.includes("email")) return "mail-outline";
+    if (fieldType.includes("phone")) return "call-outline";
+    if (fieldType.includes("password")) return "lock-closed-outline";
+    if (fieldType.includes("name")) return "person-outline";
+    if (fieldType.includes("address")) return "location-outline";
+    return "document-text-outline";
+  };
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
-      <Text className="text-base font-medium text-gray-100">{title}</Text>
+      <Text className="text-base font-medium text-gray-800">{title}</Text>
 
-      <View className="w-full h-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-300 dark:border-gray-600 flex flex-row items-center">
+      <View
+        className={`w-full h-14 px-4 rounded-xl border ${containerStyle}
+          ${
+            isFocused
+              ? "border-[#FF8E01]"
+              : error
+              ? "border-red-500"
+              : "border-gray-200"
+          } 
+          flex flex-row items-center space-x-3`}
+      >
+        <Ionicons
+          name={getFieldIcon()}
+          size={20}
+          color={isFocused ? "#FF8E01" : error ? "#EF4444" : "#6B7280"}
+        />
+
         <TextInput
-          className="flex-1 text-gray-800 dark:text-white font-semibold text-base"
+          className="flex-1 text-gray-800 font-medium text-base h-full"
+          style={{
+            textAlignVertical: "center",
+            paddingVertical: 0, // Remove default padding
+          }}
           value={value}
           placeholder={placeholder}
-          placeholderTextColor="#A0AEC0" // Placeholder color for light mode
+          placeholderTextColor="#9CA3AF"
           onChangeText={handleChangeText}
-          secureTextEntry={title === "Password" && !showPassword}
+          secureTextEntry={isPasswordField && !showPassword}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           {...props}
         />
 
-        {title === "Password" && (
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Image
-              source={!showPassword ? icons.eye : icons.eyeHide}
-              className="w-6 h-6"
-              resizeMode="contain"
+        {isPasswordField && (
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            className="p-2"
+          >
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={20}
+              color={isFocused ? "#FF8E01" : "#6B7280"}
             />
           </TouchableOpacity>
         )}
       </View>
+
+      {error && (
+        <View className="flex-row items-center space-x-1">
+          <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
+          <Text className="text-red-500 text-sm">{error}</Text>
+        </View>
+      )}
     </View>
   );
 };

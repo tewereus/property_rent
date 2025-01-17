@@ -1,4 +1,11 @@
-import { Dimensions, Image, ScrollView, Text, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../constants";
@@ -86,7 +93,7 @@ const SignIn = () => {
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: "Login Error",
         text2: error?.message || "An error occurred during login",
       });
     } finally {
@@ -102,10 +109,8 @@ const SignIn = () => {
         text2: "logged in successfully",
       });
       if (user?.mode === "customer") {
-        console.log("customer");
         router.push("/home");
       } else if (user?.mode === "seller") {
-        console.log("seller");
         router.push("/seller_tabs");
       }
       dispatch(resetAuthState());
@@ -116,71 +121,90 @@ const SignIn = () => {
         text1: "Error",
         text2: "An error occurred during login.",
       });
-      dispatch(resetAuthState()); // Dispatch resetAuthState on error
+      dispatch(resetAuthState());
     }
   }, [isSuccess, isError, dispatch, router]);
 
   return (
-    <SafeAreaView className="bg-[#09092B] h-full">
-      <ScrollView>
+    <SafeAreaView className="bg-slate-100 flex-1">
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View
-          className="w-full flex justify-center h-full px-4 my-6"
+          className="w-full flex justify-center px-6 my-5"
           style={{
             minHeight: Dimensions.get("window").height - 100,
           }}
         >
-          <View className="w-full flex justify-center items-center">
+          {/* Logo */}
+          <View className="w-full flex justify-center items-center mb-10">
             <Image
               source={images.logoSmall2}
               resizeMode="contain"
-              className="w-[215px] h-[120px]"
+              className="w-[315px] h-[175px]"
             />
           </View>
 
-          <Text className="text-2xl font-semibold text-white mt-10">
-            Log in to Prime
-          </Text>
+          {/* Welcome Text */}
+          <View className="mb-8">
+            <Text className="text-3xl font-bold text-gray-800 mb-2">
+              Welcome Back
+            </Text>
+            <Text className="text-gray-500 text-base">
+              Sign in to continue your journey
+            </Text>
+          </View>
 
-          <FormField
-            title="Email"
-            value={form.email}
-            handleChangeText={(value) => handleChange("email", value)}
-            otherStyles="mt-7"
-            keyboardType="email-address"
-            placeholder="email address"
-            error={errors.email}
-            autoCapitalize="none"
-          />
+          {/* Form Fields */}
+          <View className="space-y-5">
+            <FormField
+              title="Email Address"
+              value={form.email}
+              handleChangeText={(value) => handleChange("email", value)}
+              keyboardType="email-address"
+              placeholder="email address"
+              error={errors.email}
+              autoCapitalize="none"
+              containerStyle="bg-white"
+            />
 
-          <FormField
-            title="Password"
-            value={form.password}
-            handleChangeText={(value) => handleChange("password", value)}
-            otherStyles="mt-7"
-            placeholder="password"
-            secureTextEntry
-            error={errors.password}
-          />
+            <FormField
+              title="Password"
+              value={form.password}
+              handleChangeText={(value) => handleChange("password", value)}
+              placeholder="password"
+              secureTextEntry
+              error={errors.password}
+              containerStyle="bg-white"
+            />
+          </View>
 
+          {/* Forgot Password Link */}
+          <TouchableOpacity className="mt-4 mb-6">
+            <Text className="text-[#FF8E01] text-right text-base font-medium">
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+
+          {/* Sign In Button */}
           <CustomButton
             title="Sign In"
             handlePress={submit}
-            containerStyles="mt-7"
+            containerStyles="mt-2"
             isLoading={isSubmitting}
             disabled={
               isSubmitting || Object.values(errors).some((error) => error)
             }
           />
 
-          <View className="flex justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg text-gray-100 font-normal">
+          {/* Sign Up Link */}
+          <View className="flex justify-center pt-8 flex-row gap-2">
+            <Text className="text-base text-gray-600">
               Don't have an account?
             </Text>
             <Link
               href="/sign-up"
-              className="text-lg font-semibold text-secondary"
+              className="text-base font-semibold text-[#FF8E01]"
             >
-              Signup
+              Sign Up
             </Link>
           </View>
         </View>

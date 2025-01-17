@@ -244,7 +244,7 @@ const authSlice = createSlice({
       .addCase(getWishlists.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        state.isSuccess = true;
+        // state.isSuccess = true;
         state.message = "success";
         state.wishlist = action.payload;
       })
