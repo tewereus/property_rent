@@ -58,7 +58,7 @@ const propertySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "sold", "rented", "pending"],
+      enum: ["available", "sold", "rented", "pending", "rejected"],
       default: "available",
     },
     views: {
@@ -72,6 +72,9 @@ const propertySchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+    },
+    is_rejected: {
+      type: String,
     },
     isFeatured: {
       type: Boolean,

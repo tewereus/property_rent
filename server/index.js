@@ -19,6 +19,7 @@ const regionRouter = require("./routes/regionRoutes");
 const subRegionRouter = require("./routes/subRegionRoutes");
 const paymentRouter = require("./routes/paymentRoute");
 const PORT = process.env.PORT || 9001;
+// const { Property } = require("./models/propertyModel");
 // const User = require("./models/userModel");
 
 connectDB();
@@ -62,7 +63,7 @@ app.use("/api/v1/payment", paymentRouter);
 // const updateUsers = async () => {
 //   try {
 //     // Update all users to add the new properties field
-//     await User.updateMany({}, { $set: { mode: "customer" } }); // Initialize properties as an empty array
+//     await Property.updateMany({}, { $set: { is_rejected: "" } }); // Initialize properties as an empty array
 
 //     console.log("All users have been updated successfully.");
 //   } catch (error) {

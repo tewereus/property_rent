@@ -479,13 +479,13 @@ const getAllViews = asyncHandler(async (req, res) => {
 });
 
 const changeFeatured = asyncHandler(async (req, res) => {
-  const { prodId } = req.params;
+  const { propId } = req.params;
   console.log(req.params);
   try {
-    const prop = await Property.findById(prodId);
+    const prop = await Property.findById(propId);
     console.log("prop", prop);
     const property = await Property.findByIdAndUpdate(
-      prodId,
+      propId,
       {
         isFeatured: true,
       },
@@ -493,6 +493,62 @@ const changeFeatured = asyncHandler(async (req, res) => {
     );
     console.log(property);
     res.json(property);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const changePropertyStatus = asyncHandler(async (req, res) => {
+  const { propId } = req.params;
+  const { status, message } = req.body;
+  console.log(req.params);
+  try {
+    const prop = await Property.findById(propId);
+    console.log("property", prop);
+    if (status === "available") {
+      const property = await Property.findByIdAndUpdate(
+        propId,
+        {
+          status,
+          is_rejected: "",
+        },
+        { new: true }
+      );
+      res.json(property);
+    }
+    if (status === "rejected") {
+      // console.log("here");
+      const property = await Property.findByIdAndUpdate(
+        propId,
+        {
+          status,
+          is_rejected: message,
+        },
+        { new: true }
+      );
+      res.json(property);
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getRejectionMessages = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  // const { userId } = req.params;
+  try {
+    // const properties = await Property.find({ owner: id });
+    const properties = await Property.find({
+      owner: id,
+      status: "rejected",
+    }).select("is_rejected -_id");
+
+    const message = properties[0].is_rejected;
+    // console.log(message);
+
+    res.json({
+      message,
+    });
   } catch (error) {
     throw new Error(error);
   }
@@ -511,4 +567,6 @@ module.exports = {
   changeViewCount,
   getAllViews,
   changeFeatured,
+  changePropertyStatus,
+  getRejectionMessages,
 };

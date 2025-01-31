@@ -19,6 +19,7 @@ const _layout = memo(() => {
           <Stack.Screen name="seller_tabs" options={{ headerShown: false }} />
           <Stack.Screen name="seller_auth" options={{ headerShown: false }} />
           <Stack.Screen name="waiting" options={{ headerShown: false }} />
+          <Stack.Screen name="notification" options={{ headerShown: false }} />
           <Stack.Screen
             name="create_property"
             options={{ headerShown: false }}

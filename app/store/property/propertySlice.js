@@ -141,6 +141,17 @@ export const changeFeatured = createAsyncThunk(
   }
 );
 
+export const getRejectionMessages = createAsyncThunk(
+  "property/reject-message",
+  async (_, thunkAPI) => {
+    try {
+      return await propertyService.getRejectionMessages();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const propertySlice = createSlice({
   name: "property",
   initialState: {
@@ -321,6 +332,20 @@ export const propertySlice = createSlice({
         state.isSuccess = true;
       })
       .addCase(changeFeatured.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(getRejectionMessages.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getRejectionMessages.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.rejectedMessage = action.payload;
+        console.log(action.payload);
+      })
+      .addCase(getRejectionMessages.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

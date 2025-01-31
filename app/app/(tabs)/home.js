@@ -900,7 +900,7 @@ const Home = () => {
             <TouchableOpacity
               className="bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
               onPress={() => {
-                /* Handle notification press */
+                router.push("/notification");
               }}
             >
               <Ionicons
