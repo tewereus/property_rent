@@ -28,6 +28,7 @@ import {
   getAllLocations,
 } from "../../store/address/addressSlice";
 import { Picker } from "@react-native-picker/picker";
+import { useTranslation } from "react-i18next";
 
 // Memoize the ProfileOption component
 const ProfileOption = memo(({ icon, label, value, onPress, rightElement }) => (
@@ -51,6 +52,7 @@ const Profile = () => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation();
   const { user, isSuccess } = useSelector((state) => state.auth);
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -220,8 +222,8 @@ const Profile = () => {
           icon="briefcase-outline"
           label={
             user?.seller_tab === "inactive"
-              ? "Become a Seller"
-              : "Seller Dashboard"
+              ? t("become_seller")
+              : t("seller_dashboard")
           }
           onPress={handlePress}
         />

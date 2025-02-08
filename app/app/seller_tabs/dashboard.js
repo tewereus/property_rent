@@ -144,25 +144,25 @@ const Dashboard = () => {
         >
           <StatCard
             icon="home"
-            label="Total Properties"
+            label={t("total_properties")}
             value={userProperties?.totalProperties || 0}
             color="bg-blue-500"
           />
           <StatCard
             icon="eye"
-            label="Total Views"
+            label={t("total_views")}
             value={userProperties?.totalViews || 0}
             color="bg-green-500"
           />
           <StatCard
             icon="heart"
-            label="Total Favorites"
+            label={t("total_favourites")}
             value={userProperties?.totalFavorites || 0}
             color="bg-red-500"
           />
           <StatCard
             icon="checkmark-circle"
-            label="Active Listings"
+            label={t("active_listing")}
             value={userProperties?.activeProperties || 0}
             color="bg-orange-500"
           />
@@ -176,7 +176,9 @@ const Dashboard = () => {
           <View className="flex-row justify-between items-center mb-4">
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full bg-green-500 mr-2" />
-              <Text className="text-gray-600 dark:text-gray-300">Active</Text>
+              <Text className="text-gray-600 dark:text-gray-300">
+                {t("active")}
+              </Text>
             </View>
             <Text className="text-gray-800 dark:text-white font-semibold">
               {userProperties?.properties?.filter(
@@ -187,7 +189,9 @@ const Dashboard = () => {
           <View className="flex-row justify-between items-center mb-4">
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full bg-yellow-500 mr-2" />
-              <Text className="text-gray-600 dark:text-gray-300">Pending</Text>
+              <Text className="text-gray-600 dark:text-gray-300">
+                {t("pending")}
+              </Text>
             </View>
             <Text className="text-gray-800 dark:text-white font-semibold">
               {userProperties?.properties?.filter((p) => p.status === "pending")
@@ -197,7 +201,9 @@ const Dashboard = () => {
           <View className="flex-row justify-between items-center">
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full bg-red-500 mr-2" />
-              <Text className="text-gray-600 dark:text-gray-300">Rejected</Text>
+              <Text className="text-gray-600 dark:text-gray-300">
+                {t("rejected")}
+              </Text>
             </View>
             <Text className="text-gray-800 dark:text-white font-semibold">
               {userProperties?.properties?.filter(
@@ -234,17 +240,29 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <Text className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">
-          Quick Actions
+          {t("quick_actions")}
         </Text>
         <View className="flex-row flex-wrap gap-4">
-          <TouchableOpacity className="bg-[#FF8E01] rounded-xl p-4 flex-1">
+          <TouchableOpacity
+            className="bg-[#FF8E01] rounded-xl p-4 flex-1"
+            onPress={() => {
+              router.push("/seller_tabs/create");
+            }}
+          >
             <Ionicons name="add-circle-outline" size={24} color="white" />
-            <Text className="text-white font-semibold mt-2">Add Property</Text>
+            <Text className="text-white font-semibold mt-2">
+              {t("add_property")}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="bg-blue-500 rounded-xl p-4 flex-1">
+          <TouchableOpacity
+            className="bg-blue-500 rounded-xl p-4 flex-1"
+            onPress={() => {
+              router.push("/profile_management");
+            }}
+          >
             <Ionicons name="stats-chart-outline" size={24} color="white" />
             <Text className="text-white font-semibold mt-2">
-              View Analytics
+              {t("account_setting")}
             </Text>
           </TouchableOpacity>
         </View>

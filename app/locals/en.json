@@ -1,6 +1,5 @@
 {
   "welcome": "Welcome",
-  "add_property": "Add Property",
   "location": "Location",
   "available_for_sell": "Available for Sell",
   "available_for_rent": "Available for Rent",
@@ -8,8 +7,25 @@
   "apartment": "apartment",
   "cars": "cars",
   "land": "land",
-  "villa": "villa",
-  "commenrcial": "commercial",
+  "villa": "villas",
+  "commercial": "commercial",
   "office": "office",
-  "houses": "houses"
+  "houses": "houses",
+  "become_seller": "Become a Seller",
+  "seller_dashboard": "Seller Dashboard",
+  "buyer_dashboard": "Buyer Dashboard",
+
+  "total_properties": "Total Properties",
+  "total_views": "Total Views",
+  "total_favourites": "Total Favourites",
+  "active_listing": "Active Listing",
+
+  "property_distribution": "Property Distribution",
+  "active": "Active",
+  "pending": "Pending",
+  "rejected": "Rejected",
+
+  "quick_actions": "Quick Actions",
+  "add_property": "Add Property",
+  "account_setting": "Account Setting"
 }

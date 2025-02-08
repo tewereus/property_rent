@@ -95,10 +95,10 @@ const Profile = () => {
             </Text>
           </View>
           <Text className="text-2xl font-bold text-gray-800 dark:text-white mb-1">
-            Seller Dashboard
+            {user?.name}
           </Text>
           <Text className="text-gray-500 dark:text-gray-400">
-            {user?.email || "seller@example.com"}
+            seller dashboard
           </Text>
         </View>
       </View>
@@ -127,13 +127,17 @@ const Profile = () => {
         <ProfileOption
           icon="settings-outline"
           label="Account Settings"
-          onPress={() => {}}
+          onPress={() => {
+            router.push("/profile_management");
+          }}
         />
 
         <ProfileOption
           icon="bar-chart-outline"
           label="Analytics"
-          onPress={() => {}}
+          onPress={() => {
+            router.push("/seller_tabs/dashboard");
+          }}
         />
         <ProfileOption
           icon="help-circle-outline"

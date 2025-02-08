@@ -750,7 +750,7 @@ const Home = () => {
     },
     {
       icon: "business-outline",
-      label: t("villas"),
+      label: t("villa"),
       type: "Villa",
       color: "#9C27B0",
     },
