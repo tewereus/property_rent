@@ -43,7 +43,7 @@ const FormField = ({
               ? "border-red-500"
               : "border-gray-200"
           } 
-          flex flex-row items-center space-x-3`}
+          flex flex-row items-center space-x-3 space-y-0`}
       >
         <Ionicons
           name={getFieldIcon()}

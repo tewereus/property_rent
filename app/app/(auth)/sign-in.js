@@ -364,6 +364,7 @@ const SignIn = () => {
               value={form.password}
               handleChangeText={(value) => handleChange("password", value)}
               placeholder="Enter your password"
+              otherStyles="mt-7"
               secureTextEntry
               error={errors.password}
               containerStyle="bg-white"
