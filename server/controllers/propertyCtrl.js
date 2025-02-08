@@ -543,12 +543,27 @@ const getRejectionMessages = asyncHandler(async (req, res) => {
       status: "rejected",
     }).select("is_rejected -_id");
 
+    console.log(properties);
+
     const message = properties[0].is_rejected;
     // console.log(message);
 
     res.json({
       message,
     });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllFeatured = asyncHandler(async (req, res) => {
+  try {
+    const featuredProperties = await Property.find({ isFeatured: true })
+      .populate("propertyType")
+      .populate("owner", "firstname lastname")
+      .populate("address.region address.subregion address.location");
+
+    res.json(featuredProperties);
   } catch (error) {
     throw new Error(error);
   }
@@ -567,6 +582,7 @@ module.exports = {
   changeViewCount,
   getAllViews,
   changeFeatured,
+  getAllFeatured,
   changePropertyStatus,
   getRejectionMessages,
 };

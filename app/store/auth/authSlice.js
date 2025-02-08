@@ -210,8 +210,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         // state.isError = false;
         // state.isSuccess = true;
-        // state.message = "mode changed successfully";
-        console.log("output:", action.payload.seller_tab);
+        // state.message = "Seller Verified Successfully";
+        // console.log("output:", action.payload.seller_tab);
         if (action.payload.seller_tab) {
           state.user.seller_tab = action.payload.seller_tab;
         }

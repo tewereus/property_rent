@@ -23,6 +23,7 @@ import {
   buyProperty,
   getAllViews,
   changeView,
+  getAllFeatured,
 } from "../../store/property/propertySlice";
 import {
   addToWishlist,
@@ -38,6 +39,8 @@ import {
   getAllLocations,
 } from "../../store/address/addressSlice";
 
+const { width: screenWidth } = Dimensions.get("window");
+const cardHeight = screenWidth * 0.7;
 // Add this new component at the top
 const PropertyImages = memo(({ images }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -617,9 +620,10 @@ const Home = () => {
     dispatch(getAllRegions());
     dispatch(getAllSubRegions());
     dispatch(getAllLocations());
+    dispatch(getAllFeatured());
   }, []);
 
-  const { propertiesByUse, views, isSuccess } = useSelector(
+  const { propertiesByUse, views, isSuccess, featuredProperties } = useSelector(
     (state) => state.property
   );
 
@@ -798,18 +802,18 @@ const Home = () => {
     </TouchableOpacity>
   );
 
-  const renderFeaturedListing = ({ item }) => (
-    <View className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mx-2 w-72">
-      <View className="bg-gray-200 dark:bg-gray-700 h-40 rounded-xl mb-4 justify-center items-center">
-        <Text className="text-gray-500 dark:text-gray-400">Property Image</Text>
-      </View>
-      <Text className="text-lg font-bold text-gray-800 dark:text-white">
-        Modern Apartment
-      </Text>
-      <Text className="text-gray-500 dark:text-gray-400">New York, USA</Text>
-      <Text className="text-blue-600 dark:text-blue-400">$2,500/month</Text>
-    </View>
-  );
+  // const renderFeaturedListing = ({ item }) => (
+  //   <View className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mx-2 w-72">
+  //     <View className="bg-gray-200 dark:bg-gray-700 h-40 rounded-xl mb-4 justify-center items-center">
+  //       <Text className="text-gray-500 dark:text-gray-400">Property Image</Text>
+  //     </View>
+  //     <Text className="text-lg font-bold text-gray-800 dark:text-white">
+  //       Modern Apartment
+  //     </Text>
+  //     <Text className="text-gray-500 dark:text-gray-400">New York, USA</Text>
+  //     <Text className="text-blue-600 dark:text-blue-400">$2,500/month</Text>
+  //   </View>
+  // );
 
   const handleSeeAll = (propertyUse) => {
     console.log(propertyUse);
@@ -830,7 +834,6 @@ const Home = () => {
     [handlePress, handleFavourite]
   );
 
-  // Add error handling for the modal visibility state
   useEffect(() => {
     if (!modalVisible) {
       setSelectedProperty(null);
@@ -839,7 +842,6 @@ const Home = () => {
     }
   }, [modalVisible]);
 
-  // In the PropertyModal component, add error handling for the close action
   const handleModalClose = useCallback(() => {
     setModalVisible(false);
     setSelectedProperty(null);
@@ -916,7 +918,6 @@ const Home = () => {
           </View>
         </View>
       </View>
-      {/* <Text>{t("welcome")}</Text> */}
 
       <ScrollView
         className="flex-1"
@@ -941,7 +942,7 @@ const Home = () => {
         </View>
 
         {/* Featured Listings */}
-        <View className="mb-6">
+        {/* <View className="mb-6">
           <SectionHeader title="Featured Listings" />
           <FlatList
             data={[1, 2, 3]}
@@ -950,6 +951,39 @@ const Home = () => {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 10 }}
+          />
+        </View> */}
+
+        <View className="mb-6">
+          <SectionHeader
+            title={t("featured_listings")}
+            onSeeAll={() => handleSeeAll("featured")}
+          />
+          <FlatList
+            data={featuredProperties}
+            keyExtractor={(item) => item._id}
+            renderItem={renderPropertyItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            initialNumToRender={3}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+            }}
+            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+            snapToAlignment="start"
+            decelerationRate="fast"
+            snapToInterval={296}
+            ListEmptyComponent={() => (
+              <View className="flex items-center justify-center p-4">
+                <Text className="text-gray-500 dark:text-gray-400">
+                  No featured properties available
+                </Text>
+              </View>
+            )}
           />
         </View>
 

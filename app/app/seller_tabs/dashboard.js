@@ -3,6 +3,9 @@ import React, { useEffect } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserProperties } from "../../store/property/propertySlice";
+import { useTranslation } from "react-i18next";
+import { changeLanguageMode } from "../../store/auth/authSlice";
+import { useRouter } from "expo-router";
 
 // Mock data
 const dashboardData = {
@@ -43,22 +46,92 @@ const StatCard = ({ icon, label, value, color }) => (
 );
 
 const Dashboard = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     dispatch(getUserProperties());
   }, []);
 
+  const handleLanguageChange = (lng) => {
+    const data = {
+      preference: {
+        language: lng,
+      },
+    };
+    i18n.changeLanguage(lng);
+    dispatch(changeLanguageMode(data));
+  };
+
   const { userProperties } = useSelector((state) => state.property);
   return (
     <ScrollView className="bg-slate-300 dark:bg-[#09092B] flex-1">
       <View className="p-5">
-        <Text
-          className="text-2xl font-bold text-gray-800 dark:text-white mb-6"
-          onPress={() => console.log(userProperties)}
-        >
-          Dashboard
-        </Text>
+        <View className="flex flex-row justify-between items-center mb-4">
+          <Text
+            className="text-2xl font-bold text-gray-800 dark:text-white mb-6"
+            onPress={() => console.log(userProperties)}
+          >
+            Dashboard
+          </Text>
+          <View className="flex-row items-center">
+            <View className="flex-row bg-white/90 dark:bg-gray-800/90 rounded-full mr-3 overflow-hidden">
+              <TouchableOpacity
+                onPress={() => handleLanguageChange("Eng")}
+                className="px-3 py-1"
+                style={{
+                  backgroundColor:
+                    i18n.language === "Eng" ? "#FF8E01" : "transparent",
+                }}
+              >
+                <Text
+                  className={`${
+                    i18n.language === "Eng"
+                      ? "text-white"
+                      : "text-gray-600 dark:text-gray-300"
+                  }`}
+                >
+                  EN
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleLanguageChange("Amh")}
+                className="px-3 py-1"
+                style={{
+                  backgroundColor:
+                    i18n.language === "Amh" ? "#FF8E01" : "transparent",
+                }}
+              >
+                <Text
+                  className={`${
+                    i18n.language === "Amh"
+                      ? "text-white"
+                      : "text-gray-600 dark:text-gray-300"
+                  }`}
+                >
+                  አማ
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              className="bg-white/90 dark:bg-gray-800/90 p-2 rounded-full"
+              onPress={() => {
+                router.push("/notification");
+              }}
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color="#6B7280"
+              />
+              {/* Notification badge - if needed */}
+              <View className="absolute -top-1 -right-1 bg-red-500 w-4 h-4 rounded-full items-center justify-center">
+                <Text className="text-white text-xs">2</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Quick Stats */}
         <Text className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">

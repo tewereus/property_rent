@@ -5,21 +5,35 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { verifySeller } from "../store/auth/authSlice";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 
 const { height } = Dimensions.get("window");
 
 const SellerAuth = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [agreed, setAgreed] = useState(false);
 
-  const handleAgree = () => {
+  const { message } = useSelector((state) => state.auth);
+
+  const handleAgree = async () => {
     if (agreed) {
-      dispatch(verifySeller());
+      try {
+        const result = await dispatch(verifySeller());
+        if (result.payload.seller_tab) {
+          console.log(result.payload.seller_tab);
+          router.push("/seller_tabs/dashboard");
+        } else {
+          console.error("Verification failed");
+        }
+      } catch (error) {
+        console.error("An error occurred during verification", error);
+      }
     }
   };
 

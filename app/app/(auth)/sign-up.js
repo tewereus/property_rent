@@ -21,7 +21,7 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    address: "",
+    // address: "",
     phone: "",
   });
 
@@ -30,7 +30,7 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    address: "",
+    // address: "",
     phone: "",
   });
 
@@ -41,7 +41,7 @@ const SignUp = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      address: "",
+      // address: "",
       phone: "",
     };
 
@@ -76,13 +76,13 @@ const SignUp = () => {
     }
 
     // Address validation
-    if (!form.address.trim()) {
-      newErrors.address = "Address is required";
-      isValid = false;
-    } else if (form.address.trim().length < 5) {
-      newErrors.address = "Address must be at least 5 characters";
-      isValid = false;
-    }
+    // if (!form.address.trim()) {
+    //   newErrors.address = "Address is required";
+    //   isValid = false;
+    // } else if (form.address.trim().length < 5) {
+    //   newErrors.address = "Address must be at least 5 characters";
+    //   isValid = false;
+    // }
 
     // Password validation
     if (!form.password) {
@@ -163,7 +163,7 @@ const SignUp = () => {
         name: form.name.trim(),
         email: form.email.toLowerCase(),
         password: form.password,
-        address: form.address.trim(),
+        // address: form.address.trim(),
         phone: form.phone.trim(),
       };
       await dispatch(register(data)).unwrap();
@@ -259,14 +259,14 @@ const SignUp = () => {
               containerStyle="bg-white"
             />
 
-            <FormField
+            {/* <FormField
               title="Address"
               value={form.address}
               handleChangeText={(value) => handleChange("address", value)}
               placeholder="Your current address"
               error={errors.address}
               containerStyle="bg-white"
-            />
+            /> */}
 
             <FormField
               title="Password"

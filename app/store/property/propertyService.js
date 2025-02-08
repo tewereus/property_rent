@@ -307,6 +307,11 @@ const getRejectionMessages = async () => {
   return response.data;
 };
 
+const getAllFeatured = async () => {
+  const response = await axios.get(`${baseUrl}/property/featured`);
+  return response.data;
+};
+
 const propertyService = {
   createProperty,
   getAllProperties,
@@ -319,6 +324,7 @@ const propertyService = {
   getAllViews,
   changeFeatured,
   getRejectionMessages,
+  getAllFeatured,
 };
 
 export default propertyService;

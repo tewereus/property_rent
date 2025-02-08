@@ -15,6 +15,7 @@ const {
   changeFeatured,
   changePropertyStatus,
   getRejectionMessages,
+  getAllFeatured,
 } = require("../controllers/propertyCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 // const { uploadImages } = require("../middlewares/uploadImages");
@@ -27,9 +28,10 @@ router.get("/use/:use", getPropertiesByUse);
 router.get("/users-properties", authMiddleware, getUserProperties);
 // router.get("/rejected-message/:userId", getRejectionMessages);
 router.get("/rejected-message", authMiddleware, getRejectionMessages);
-router.get("/:id", getProperty);
+router.get("/featured", getAllFeatured);
 router.put("/change-featured/:propId", changeFeatured);
 router.put("/property-status/:propId", changePropertyStatus);
+router.get("/:id", getProperty);
 
 // Protected routes
 router.use(authMiddleware);

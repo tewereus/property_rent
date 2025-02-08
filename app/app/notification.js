@@ -30,7 +30,7 @@ const notification = () => {
         </TouchableOpacity>
         <Text
           className="text-xl font-semibold text-gray-800 dark:text-white"
-          onPress={() => console.log(rejectedMessage.message)}
+          onPress={() => console.log(rejectedMessage?.message)}
         >
           Notifications
         </Text>
@@ -50,7 +50,7 @@ const notification = () => {
               className="text-center text-gray-500 dark:text-gray-400 mt-4"
               onPress={() => console.log(rejectedMessage)}
             >
-              {rejectedMessage.message}
+              {rejectedMessage?.message}
             </Text>
           ) : (
             <Text className="text-center text-gray-500 dark:text-gray-400 mt-4">

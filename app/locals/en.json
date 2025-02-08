@@ -3,5 +3,13 @@
   "add_property": "Add Property",
   "location": "Location",
   "available_for_sell": "Available for Sell",
-  "available_for_rent": "Available for Rent"
+  "available_for_rent": "Available for Rent",
+  "featured_listings": "Featured Properties",
+  "apartment": "apartment",
+  "cars": "cars",
+  "land": "land",
+  "villa": "villa",
+  "commenrcial": "commercial",
+  "office": "office",
+  "houses": "houses"
 }
