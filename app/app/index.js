@@ -128,10 +128,13 @@ const Index = () => {
         if (user) {
           router.push("/home");
         } else {
-          setIsLoading(false);
+          router.push("/sign-in");
         }
       } catch (error) {
         console.error("Initialization error:", error);
+        setIsLoading(false);
+        router.push("/sign-in");
+      } finally {
         setIsLoading(false);
       }
     };
@@ -143,7 +146,8 @@ const Index = () => {
     return <SplashScreen />;
   }
 
-  return <WelcomeScreen />;
+  // return <WelcomeScreen />;
+  return null;
 };
 
 export default Index;

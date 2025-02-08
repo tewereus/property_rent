@@ -231,6 +231,134 @@ const verifyPayment = asyncHandler(async (req, res) => {
   });
 });
 
+const postPayment = asyncHandler(async (req, res) => {
+  try {
+    console.log("1. Starting payment initialization");
+    const { amount, paymentMethod, transactionType } = req.body;
+    const { id } = req.user;
+
+    // Validate required fields
+    if (!amount || !paymentMethod || !transactionType) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        details: { amount, paymentMethod, transactionType },
+      });
+    }
+
+    // Validate Chapa API key
+    if (!process.env.CHAPA_SECRET_KEY) {
+      console.error("Chapa API key is missing");
+      return res.status(500).json({ message: "Payment configuration error" });
+    }
+
+    // Get user details from database to ensure valid data
+    const user = await User.findById(id).select("name email phone").lean();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Format user name
+    const nameParts = user.name.split(" ");
+    const firstName = nameParts[0] || "User";
+    const lastName = nameParts.slice(1).join(" ") || "Customer";
+
+    const tx_ref = `TX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    // Setup Chapa request options
+    const options = {
+      method: "POST",
+      url: "https://api.chapa.co/v1/transaction/initialize",
+      headers: {
+        Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: amount.toString(),
+        currency: "ETB",
+        email: "abebech_bekele@gmail.com",
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: user.phone || "0912345678",
+        tx_ref: tx_ref,
+        callback_url: "http://localhost:4884/api/v1/payment/verify",
+        // return_url: `http://192.168.1.6:4884/api/v1/payment-webview`,
+        "customization[title]": `Property ${transactionType}`,
+        "customization[description]": `Payment for property ${transactionType}`,
+      }),
+    };
+
+    console.log("Request options:", options);
+
+    // Make request to Chapa
+    return new Promise((resolve, reject) => {
+      request(options, async function (error, chapaResponse) {
+        if (error) {
+          console.error("Chapa Error:", error);
+          return res.status(500).json({
+            message: "Payment initialization failed",
+            error: error.message,
+          });
+        }
+
+        try {
+          const responseData = JSON.parse(chapaResponse.body);
+          console.log("Chapa Response:", responseData);
+
+          if (
+            responseData.status === "success" &&
+            responseData.data?.checkout_url
+          ) {
+            const newProperty = await Property.create({
+              ...propertyData, // Assuming propertyData contains all required fields for the property
+              owner: id, // Set the user who made the payment as the owner of the property
+            });
+
+            // Create pending transaction
+            const transaction = await Transaction.create({
+              property: propertyId,
+              buyer: id,
+              seller: property.owner,
+              amount: amount,
+              paymentMethod,
+              transactionType,
+              status: "pending",
+              transactionDetails: {
+                paymentDate: new Date(),
+                receiptNumber: responseData.data.reference,
+                tx_ref: responseData.data.tx_ref,
+              },
+            });
+
+            return res.json({
+              paymentUrl: responseData.data.checkout_url,
+              reference: responseData.data.reference,
+              tx_ref,
+              transaction: transaction._id,
+            });
+          } else {
+            return res.status(400).json({
+              message: "Payment initialization failed",
+              details: responseData.message,
+            });
+          }
+        } catch (parseError) {
+          console.error("Response parsing error:", parseError);
+          return res.status(500).json({
+            message: "Failed to process payment provider response",
+            error: parseError.message,
+          });
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Payment Error Details:", error);
+    return res.status(500).json({
+      message: error.message || "Failed to initialize payment",
+      error: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
+  }
+});
+
 module.exports = {
   initializePayment,
   verifyPayment,

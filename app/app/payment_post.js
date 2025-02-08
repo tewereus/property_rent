@@ -131,11 +131,11 @@ const PaymentPost = () => {
       setPaymentMethod("");
       setIsProcessing(false);
 
-      Alert.alert(
-        "Payment Initiated",
-        "Complete the payment in your browser. Your property will be listed once payment is confirmed.",
-        [{ text: "OK" }]
-      );
+      // Alert.alert(
+      //   "Payment Initiated",
+      //   "Complete the payment in your browser. Your property will be listed once payment is confirmed.",
+      //   [{ text: "OK" }]
+      // );
     } catch (error) {
       console.error("Payment error:", error);
       Alert.alert(
