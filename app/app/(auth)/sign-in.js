@@ -282,7 +282,7 @@ const SignIn = () => {
 
     setSubmitting(true);
     try {
-      await dispatch(login(form)).unwrap();
+      await dispatch(login(form));
     } catch (error) {
       Toast.show({
         type: "error",
@@ -295,6 +295,7 @@ const SignIn = () => {
   };
 
   useEffect(() => {
+    console.log(isSuccess, user);
     if (isSuccess && user) {
       Toast.show({
         type: "success",
