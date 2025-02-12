@@ -8,7 +8,13 @@ const {
   cancelTransaction,
 } = require("../controllers/transactionCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
+const {
+  getSaleTransaction,
+  getRentTransaction,
+} = require("../controllers/adminCtrl");
 
+router.get("/sale-transaction", getSaleTransaction);
+router.get("/rent-transaction", getRentTransaction);
 router.use(authMiddleware); // All transaction routes require authentication
 
 router.post("/create", createTransaction);

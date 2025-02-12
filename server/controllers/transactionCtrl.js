@@ -34,7 +34,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     });
 
     // Update property status
-    property.status = "pending";
+    property.status = "available";
     await property.save();
 
     // Populate references

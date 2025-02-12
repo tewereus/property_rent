@@ -30,6 +30,11 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: "inactive",
     },
+    status: {
+      type: String,
+      enum: ["active", "blocked"],
+      default: "active",
+    },
 
     mode: {
       type: String,

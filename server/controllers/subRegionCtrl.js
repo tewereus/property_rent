@@ -24,7 +24,7 @@ const getAllSubRegions = asyncHandler(async (req, res) => {
 // Edit SubRegion
 const editSubRegion = asyncHandler(async (req, res) => {
   const { addrId } = req.params;
-  validateMongoDbId(addrId);
+  // validateMongoDbId(addrId);
   try {
     const updatedSubRegion = await SubRegion.findByIdAndUpdate(
       addrId,
@@ -40,7 +40,7 @@ const editSubRegion = asyncHandler(async (req, res) => {
 // Delete SubRegion
 const deleteSubRegion = asyncHandler(async (req, res) => {
   const { addrId } = req.params;
-  validateMongoDbId(addrId);
+  // validateMongoDbId(addrId);
   try {
     const deletedSubRegion = await SubRegion.findByIdAndDelete(addrId);
     res.json(deletedSubRegion);

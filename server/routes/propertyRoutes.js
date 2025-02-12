@@ -31,6 +31,7 @@ router.get("/rejected-message", authMiddleware, getRejectionMessages);
 router.get("/featured", getAllFeatured);
 router.put("/change-featured/:propId", changeFeatured);
 router.put("/property-status/:propId", changePropertyStatus);
+router.delete("/delete-property/:id", deleteProperty);
 router.get("/:id", getProperty);
 
 // Protected routes
@@ -38,7 +39,7 @@ router.use(authMiddleware);
 router.post("/change-view", changeViewCount);
 router.post("/create-property", createProperty);
 router.put("/update/:id", updateProperty);
-router.delete("/delete-property", deleteProperty);
+// router.delete("/delete-property", deleteProperty);
 router.post("/buy-property", authMiddleware, buyProperty);
 
 module.exports = router;

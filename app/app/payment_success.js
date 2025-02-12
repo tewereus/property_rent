@@ -86,9 +86,7 @@ const PaymentSuccess = () => {
         }`}
         style={{ padding: 24 * SCALE_FACTOR }}
       >
-        {/* Top Section */}
         <View className="flex-1 justify-center items-center">
-          {/* Success Icon */}
           <View
             className={`mb-8 rounded-full items-center justify-center ${
               colorScheme === "dark" ? "bg-green-800" : "bg-green-100"
@@ -189,7 +187,7 @@ const PaymentSuccess = () => {
         {/* Bottom Buttons */}
         <View className="w-full max-w-sm space-y-4">
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/transaction_history")}
+            onPress={() => router.push("/transaction_history")}
             className={`rounded-2xl flex-row items-center justify-center ${
               colorScheme === "dark" ? "bg-orange-500" : "bg-[#FF8E01]"
             }`}
@@ -213,7 +211,7 @@ const PaymentSuccess = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)")}
+            onPress={() => router.push("/(tabs)/home")}
             className={`rounded-2xl flex-row items-center justify-center ${
               colorScheme === "dark" ? "bg-gray-800" : "bg-gray-100"
             }`}

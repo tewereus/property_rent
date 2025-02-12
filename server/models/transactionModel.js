@@ -28,7 +28,7 @@ const transactionSchema = new mongoose.Schema(
     },
     transactionType: {
       type: String,
-      enum: ["purchase", "rent", "boost"],
+      enum: ["purchase", "rent", "boost", "sell"],
       required: true,
     },
     paymentMethod: {

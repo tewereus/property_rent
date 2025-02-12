@@ -135,7 +135,11 @@ const getAllProperties = asyncHandler(async (req, res) => {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     let query = Property.find(JSON.parse(queryStr));
 
-    query = query.populate("propertyType").populate("owner");
+    query = query
+      .populate("propertyType")
+      .populate("owner")
+      .populate("address.subregion")
+      .populate("address.location");
 
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
