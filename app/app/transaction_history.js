@@ -268,7 +268,7 @@ const TransactionHistoryItem = ({ transaction }) => {
                       : "text-red-800 dark:text-red-200"
                   }`}
                 >
-                  {transaction.status}
+                  {/* {transaction.status} */}
                 </Text>
               </View>
             </View>

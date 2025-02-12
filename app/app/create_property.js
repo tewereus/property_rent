@@ -626,7 +626,7 @@ const CreateProperty = () => {
             </View>
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => setShowMapModal(true)}
             className="bg-blue-50 dark:bg-blue-900/30 rounded-2xl mb-6 flex-row items-center"
             style={{ padding: 16 * SCALE_FACTOR }}
@@ -655,7 +655,7 @@ const CreateProperty = () => {
                 {formData.location || "Choose on map"}
               </Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             onPress={handleSubmit}
