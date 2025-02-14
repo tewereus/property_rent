@@ -2,9 +2,9 @@
 A modern real estate web application built with React.js, designed to help users browse, list, and manage properties with ease.
 
 ### 🚀 Features
-✅ Property Listings – View detailed property listings with images, descriptions, and amenities.
-✅ Advanced Search – Filter properties by location, price, size, and type.
-✅ User Authentication – Secure registration and login for a personalized experience.
+- ** ✅ Property Listings ** – View detailed property listings with images, descriptions, and amenities.
+✅ - ** Advanced Search ** – Filter properties by location, price, size, and type.
+✅ -** User Authentication ** – Secure registration and login for a personalized experience.
 ✅ Favorites & Wishlist – Save properties for quick access later.
 ✅ Interactive Maps – View property locations with an integrated map.
 ✅ Agent Contact – Easily contact real estate agents from within the app.
