@@ -7,22 +7,26 @@ A modern real estate web application built with React.js, designed to help users
 - ✅ User Authentication – Secure registration and login for a personalized experience.
 - ✅ Favorites & Wishlist – Save properties for quick access later.
 - ✅ Interactive Maps – View property locations with an integrated map.
-- ✅ Agent Contact – Easily contact real estate agents from within the app.
+- ✅ Manager Panel – Manage users, listings based on their region.
 - ✅ Admin Panel – Manage users, listings, and site settings.
-
+- 
 ### 🛠 Technologies Used
-🔹 Frontend:
+🔹 Mobile App:
 
-- React.js – JavaScript library for building dynamic UIs
+- React Native with expo – JavaScript library for building dynamic Mobile App
 - React Router – Client-side routing for seamless navigation
 - Redux – State management
 - Axios – Handling API requests
-- Material-UI – Beautiful and responsive UI components
+- Tailwindcss/nativewind – Beautiful UI Styling
 🔹 Backend:
 
 - Node.js – JavaScript runtime for the backend
 - Express.js – Web framework for handling API requests
 - MongoDB – NoSQL database for managing property and user data
+🔹 Third Party APIs
+
+- Cloudinary - for image upload
+- Chapa - for payment integration
 📌 Getting Started
 1️⃣ Clone the Repository:
 ```
@@ -37,8 +41,19 @@ npm install
 Create a .env file in the root directory.
 Add the required environment variables:
 ```
-DATABASE_URL=your_database_url
-API_KEY=your_api_key
+MONGO_URI=your_mongodb_database_url
+PORT=
+JWT_SECRET=
+
+# Cloudinary configuration
+
+CLOUD_NAME=your_cloudinary_clound_name
+API_KEY= your_cloudinary_api_key
+API_SECRET = your_cloudinary_api_secret
+
+#Payment configuration
+CHAPA_SECRET_KEY=
+
 ```
 4️⃣ Start the Development Server
 ```
