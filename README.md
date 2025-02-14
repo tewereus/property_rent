@@ -1,7 +1,7 @@
-Prime Property 🏡
+### Prime Property 🏡
 A modern real estate web application built with React.js, designed to help users browse, list, and manage properties with ease.
 
-🚀 Features
+### 🚀 Features
 ✅ Property Listings – View detailed property listings with images, descriptions, and amenities.
 ✅ Advanced Search – Filter properties by location, price, size, and type.
 ✅ User Authentication – Secure registration and login for a personalized experience.
@@ -10,7 +10,7 @@ A modern real estate web application built with React.js, designed to help users
 ✅ Agent Contact – Easily contact real estate agents from within the app.
 ✅ Admin Panel – Manage users, listings, and site settings.
 
-🛠 Technologies Used
+### 🛠 Technologies Used
 🔹 Frontend:
 
 React.js – JavaScript library for building dynamic UIs
@@ -24,30 +24,26 @@ Node.js – JavaScript runtime for the backend
 Express.js – Web framework for handling API requests
 MongoDB – NoSQL database for managing property and user data
 📌 Getting Started
-1️⃣ Clone the Repository
-bash
-Copy
-Edit
+1️⃣ Clone the Repository:
+```
 git clone https://github.com/tewereus/prime_property.git
 cd prime_property
+```
 2️⃣ Install Dependencies
-bash
-Copy
-Edit
+```
 npm install
+```
 3️⃣ Set Up Environment Variables
 Create a .env file in the root directory.
 Add the required environment variables:
-env
-Copy
-Edit
+```
 DATABASE_URL=your_database_url
 API_KEY=your_api_key
+```
 4️⃣ Start the Development Server
-bash
-Copy
-Edit
+```
 npm start
+```
 The application will be accessible at:
 ➡ http://localhost:3000
 
@@ -84,8 +80,7 @@ Open a pull request describing your changes.
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 📩 Contact
-📧 Email: your.email@example.com
-🌐 Website: Your Website
+📧 Email: tewereus12312@gmail.com
 🔗 LinkedIn: Your LinkedIn Profile
 
 📢 How to Add Images to Your README
