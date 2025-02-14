@@ -95,6 +95,8 @@ const initializePayment = asyncHandler(async (req, res) => {
             responseData.status === "success" &&
             responseData.data?.checkout_url
           ) {
+            property.isFeatured = true;
+            await property.save();
             // Create pending transaction
             const transaction = await Transaction.create({
               property: propertyId,
