@@ -18,7 +18,7 @@ Prime Property is a Mobile application designed to facilitate property listings,
 - Redux – State management
 - Axios – Handling API requests
 - Tailwindcss/nativewind – Beautiful UI Styling
-- 
+  
 🔹 Backend:
 
 - Node.js – JavaScript runtime for the backend
@@ -29,7 +29,9 @@ Prime Property is a Mobile application designed to facilitate property listings,
 
 - Cloudinary - for image upload
 - Chapa - for payment integration
-📌 Getting Started
+
+
+### 📌 Getting Started
 1️⃣ Clone the Repository:
 ```
 git clone https://github.com/tewereus/prime_property.git
@@ -53,9 +55,8 @@ CLOUD_NAME=your_cloudinary_clound_name
 API_KEY= your_cloudinary_api_key
 API_SECRET = your_cloudinary_api_secret
 
-#Payment configuration
+# Payment configuration
 CHAPA_SECRET_KEY=
-
 ```
 4️⃣ Start the Development Server
 ```
@@ -64,7 +65,7 @@ npm start
 The application will be accessible at:
 ➡ http://localhost:3000
 
-📸 Screenshots
+### 📸 Screenshots
 🏠 Homepage
 
 🔍 Property Details
@@ -73,32 +74,15 @@ The application will be accessible at:
 
 Replace path/to/image.png with actual image paths in your repository.
 
-🤝 Contributing
+### 🤝 Contributing
 Contributions are welcome! To contribute:
 
-Fork the repository.
-Create a new branch:
-bash
-Copy
-Edit
-git checkout -b feature-name
-Make changes & commit:
-bash
-Copy
-Edit
-git commit -m "Added new feature"
-Push to GitHub:
-bash
-Copy
-Edit
-git push origin feature-name
-Open a pull request describing your changes.
-📜 License
+### 📜 License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-📩 Contact
+### 📩 Contact
 📧 Email: tewereus12312@gmail.com
-🔗 LinkedIn: Your LinkedIn Profile
+🔗 LinkedIn: www.linkedin.com/in/tewolde-gebreyesus-3434472b6
 
 📢 How to Add Images to Your README
 To include images in your README:
