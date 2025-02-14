@@ -3,7 +3,9 @@ Prime Property is a Mobile application designed to facilitate property listings,
 
 ### 📸 Screenshots
 🏠 Homepage
-app/assets/img/logo_small.png
+![Image](https://github.com/user-attachments/assets/867435e3-586a-4599-851a-bb033b29328f)
+
+![Image](https://github.com/user-attachments/assets/3b8fdbdc-7042-4a49-8172-e8d4a3aa63ed)
 🔍 Property Details
 
 ➕ Add Property
