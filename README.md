@@ -9,7 +9,7 @@ A modern real estate web application built with React.js, designed to help users
 - ✅ Interactive Maps – View property locations with an integrated map.
 - ✅ Manager Panel – Manage users, listings based on their region.
 - ✅ Admin Panel – Manage users, listings, and site settings.
-- 
+  
 ### 🛠 Technologies Used
 🔹 Mobile App:
 
@@ -23,7 +23,7 @@ A modern real estate web application built with React.js, designed to help users
 - Node.js – JavaScript runtime for the backend
 - Express.js – Web framework for handling API requests
 - MongoDB – NoSQL database for managing property and user data
-🔹 Third Party APIs
+🔹 Third Party APIs:
 
 - Cloudinary - for image upload
 - Chapa - for payment integration
