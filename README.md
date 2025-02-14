@@ -2,27 +2,27 @@
 A modern real estate web application built with React.js, designed to help users browse, list, and manage properties with ease.
 
 ### 🚀 Features
-- ** ✅ Property Listings ** – View detailed property listings with images, descriptions, and amenities.
-✅ - ** Advanced Search ** – Filter properties by location, price, size, and type.
-✅ -** User Authentication ** – Secure registration and login for a personalized experience.
-✅ Favorites & Wishlist – Save properties for quick access later.
-✅ Interactive Maps – View property locations with an integrated map.
-✅ Agent Contact – Easily contact real estate agents from within the app.
-✅ Admin Panel – Manage users, listings, and site settings.
+- ✅ Property Listings – View detailed property listings with images, descriptions, and amenities.
+- ✅ Advanced Search – Filter properties by location, price, size, and type.
+- ✅ User Authentication – Secure registration and login for a personalized experience.
+- ✅ Favorites & Wishlist – Save properties for quick access later.
+- ✅ Interactive Maps – View property locations with an integrated map.
+- ✅ Agent Contact – Easily contact real estate agents from within the app.
+- ✅ Admin Panel – Manage users, listings, and site settings.
 
 ### 🛠 Technologies Used
 🔹 Frontend:
 
-React.js – JavaScript library for building dynamic UIs
-React Router – Client-side routing for seamless navigation
-Redux – State management
-Axios – Handling API requests
-Material-UI – Beautiful and responsive UI components
+- React.js – JavaScript library for building dynamic UIs
+- React Router – Client-side routing for seamless navigation
+- Redux – State management
+- Axios – Handling API requests
+- Material-UI – Beautiful and responsive UI components
 🔹 Backend:
 
-Node.js – JavaScript runtime for the backend
-Express.js – Web framework for handling API requests
-MongoDB – NoSQL database for managing property and user data
+- Node.js – JavaScript runtime for the backend
+- Express.js – Web framework for handling API requests
+- MongoDB – NoSQL database for managing property and user data
 📌 Getting Started
 1️⃣ Clone the Repository:
 ```
