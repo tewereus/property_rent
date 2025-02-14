@@ -1,6 +1,15 @@
 ### Prime Property 🏡
 Prime Property is a Mobile application designed to facilitate property listings, searches, and management. It provides users with an intuitive interface to browse, list, and manage properties efficiently.
 
+### 📸 Screenshots
+🏠 Homepage
+app/assets/img/logo_small.png
+🔍 Property Details
+
+➕ Add Property
+
+Replace path/to/image.png with actual image paths in your repository.
+
 ### 🚀 Features
 - ✅ Property Listings – View detailed property listings with images, descriptions, and amenities.
 - ✅ Advanced Search – Filter properties by location, price, size, and type.
@@ -65,15 +74,6 @@ npm start
 The application will be accessible at:
 ➡ http://localhost:3000
 
-### 📸 Screenshots
-🏠 Homepage
-
-🔍 Property Details
-
-➕ Add Property
-
-Replace path/to/image.png with actual image paths in your repository.
-
 ### 🤝 Contributing
 Contributions are welcome! To contribute:
 
@@ -82,15 +82,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ### 📩 Contact
 📧 Email: tewereus12312@gmail.com
+
 🔗 LinkedIn: www.linkedin.com/in/tewolde-gebreyesus-3434472b6
-
-📢 How to Add Images to Your README
-To include images in your README:
-
-Upload images to your GitHub repository (e.g., assets/images/).
-Reference them in your README using this format:
-markdown
-Copy
-Edit
-![Alt Text](assets/images/homepage.png)
-This README is well-structured, easy to read, and informative. Let me know if you'd like any further tweaks! 🚀
