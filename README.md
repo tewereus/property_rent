@@ -1,5 +1,5 @@
 ### Prime Property 🏡
-A modern real estate web application built with React.js, designed to help users browse, list, and manage properties with ease.
+Prime Property is a Mobile application designed to facilitate property listings, searches, and management. It provides users with an intuitive interface to browse, list, and manage properties efficiently.
 
 ### 🚀 Features
 - ✅ Property Listings – View detailed property listings with images, descriptions, and amenities.
@@ -18,11 +18,13 @@ A modern real estate web application built with React.js, designed to help users
 - Redux – State management
 - Axios – Handling API requests
 - Tailwindcss/nativewind – Beautiful UI Styling
+- 
 🔹 Backend:
 
 - Node.js – JavaScript runtime for the backend
 - Express.js – Web framework for handling API requests
 - MongoDB – NoSQL database for managing property and user data
+
 🔹 Third Party APIs:
 
 - Cloudinary - for image upload
