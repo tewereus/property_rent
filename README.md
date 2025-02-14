@@ -4,11 +4,13 @@ Prime Property is a Mobile application designed to facilitate property listings,
 ### 📸 Screenshots
 🏠 Homepage
 <img src="https://github.com/user-attachments/assets/867435e3-586a-4599-851a-bb033b29328f" width="200" height="450" />
-![Image](https://github.com/user-attachments/assets/867435e3-586a-4599-851a-bb033b29328f) ![Image](https://github.com/user-attachments/assets/3b8fdbdc-7042-4a49-8172-e8d4a3aa63ed) ![Image](https://github.com/user-attachments/assets/33aa5d48-d2fc-4e11-b5ae-842704c9f478)
-![Image](https://github.com/user-attachments/assets/497474f4-1294-4bb9-9922-bd5642b73c58) ![Image](https://github.com/user-attachments/assets/ea226c1e-db70-4ac0-a6dc-c0d5527a3891) ![Image](https://github.com/user-attachments/assets/b5d51996-de6c-40f3-bf68-b98437b09e80)
-
-<img src="https://github.com/user-attachments/assets/867435e3-586a-4599-851a-bb033b29328f" width="400" />
-![Image](https://github.com/user-attachments/assets/074f946f-c597-443d-b0f5-0a734fedbc10) ![Image](https://github.com/user-attachments/assets/fe08d687-0b8b-4c13-a4f8-ec6db8e0a7f4)
+<img src="https://github.com/user-attachments/assets/3b8fdbdc-7042-4a49-8172-e8d4a3aa63ed" width="200" height="450" />
+<img src="https://github.com/user-attachments/assets/33aa5d48-d2fc-4e11-b5ae-842704c9f478" width="200" height="450" />
+<img src="https://github.com/user-attachments/assets/497474f4-1294-4bb9-9922-bd5642b73c58" width="200" height="450" />
+<img src="https://github.com/user-attachments/assets/ea226c1e-db70-4ac0-a6dc-c0d5527a3891" width="200" height="450" />
+<img src="https://github.com/user-attachments/assets/b5d51996-de6c-40f3-bf68-b98437b09e80" width="200" height="450" />
+<img src="https://github.com/user-attachments/assets/074f946f-c597-443d-b0f5-0a734fedbc10" width="200" height="450" />
+<img src="https://github.com/user-attachments/assets/fe08d687-0b8b-4c13-a4f8-ec6db8e0a7f4" width="200" height="450" />
 
 ### 🚀 Features
 - ✅ Property Listings – View detailed property listings with images, descriptions, and amenities.
